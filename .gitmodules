@@ -1,0 +1,6 @@
+[submodule "capstone"]
+	path = capstone
+	url = https://github.com/capstone-engine/capstone
+[submodule "bearparser"]
+	path = bearparser
+	url = https://github.com/hasherezade/bearparser

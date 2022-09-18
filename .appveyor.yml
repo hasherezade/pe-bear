@@ -1,0 +1,56 @@
+os:
+  - Visual Studio 2015
+
+platform: x64
+  - x64
+
+branches:
+  only:
+    - master
+   
+install:
+  - git submodule update --init --recursive
+  - set PATH=C:\Program Files\CMake\bin;%PATH%
+
+build:
+  verbosity: detailed
+
+configuration:
+  - Release
+  
+environment:
+  artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(CONFIGURATION)
+  matrix:
+    - env_arch: "x64"
+      QT5: C:\Qt\5.11\msvc2015_64
+    - env_arch: "x86"
+      QT5: C:\Qt\5.11\msvc2015
+
+before_build:
+  - set PATH=%PATH%;%QT5%\bin;%QT5%\lib\cmake
+  - set Qt5Core_DIR=%QT5%
+  - mkdir build
+  - cd build
+  - if [%env_arch%]==[x64] (
+    cmake .. -A x64 )
+  - if [%env_arch%]==[x86] (
+    cmake .. )
+    
+build_script:
+  - cmake --build . --config %CONFIGURATION%
+  
+after_build:
+  - mkdir %artifactName%
+  - cp -r patcher/%CONFIGURATION%/* %artifactName%
+  - cp %QT5%\bin\Qt5Core.dll %artifactName%
+  - cp %QT5%\bin\Qt5Gui.dll %artifactName%
+  - cp %QT5%\bin\Qt5Widgets.dll %artifactName%
+  - mkdir %artifactName%\platforms
+  - mkdir %artifactName%\styles
+  - mkdir %artifactName%\imageformats
+  - cp %QT5%\plugins\platforms\qwindows.dll %artifactName%\platforms
+  - cp %QT5%\plugins\styles\qwindowsvistastyle.dll %artifactName%\styles
+  - cp %QT5%\plugins\imageformats\qico.dll %artifactName%\imageformats
+  
+artifacts:
+- path: build\%artifactName%

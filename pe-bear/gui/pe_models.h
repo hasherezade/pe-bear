@@ -1,0 +1,18 @@
+#pragma once
+
+#include "pe_models/BoundImpTreeModel.h"
+#include "pe_models/DebugTreeModel.h"
+#include "pe_models/DelayImpTreeModel.h"
+#include "pe_models/ExceptionTreeModel.h"
+#include "pe_models/ExportsTreeModel.h"
+#include "pe_models/FileHdrTreeModel.h"
+#include "pe_models/ImportsTreeModel.h"
+#include "pe_models/LdConfigTreeModel.h"
+#include "pe_models/OptionalHdrTreeModel.h"
+#include "pe_models/RelocsTreeModel.h"
+#include "pe_models/ResourcesTreeModel.h"
+#include "pe_models/SecHdrsTreeModel.h"
+#include "pe_models/SecurityTreeModel.h"
+#include "pe_models/TLSTreeModel.h"
+#include "pe_models/RichHdrTreeModel.h"
+#include "pe_models/ClrHdrTreeModel.h"

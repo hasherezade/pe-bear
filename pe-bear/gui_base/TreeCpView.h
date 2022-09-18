@@ -1,0 +1,35 @@
+#pragma once
+#include <QtGlobal>
+
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#else
+	#include <QtGui>
+#endif
+
+class TreeCpView : public QTreeView
+{
+	Q_OBJECT
+
+public:
+	TreeCpView(QWidget *parent);
+	virtual ~TreeCpView() {}
+
+	void resizeColsToContent();
+
+	void keyPressEvent(QKeyEvent *key);
+	void setMenu(QMenu *menu);
+
+	QMenu* getMenu() { return myMenu; }
+	void setDefaultMenu() { myMenu = &defaultMenu; }
+	void enableMenu(bool enable);
+	void removeAllActions();
+
+public slots:
+	virtual void copySelected();
+	virtual void customMenuEvent(QPoint p);
+	
+protected:
+	QMenu *myMenu;
+	QMenu defaultMenu;
+};
