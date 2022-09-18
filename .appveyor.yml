@@ -1,6 +1,7 @@
 os:
   - Visual Studio 2015
-
+  - Visual Studio 2022
+  
 platform: x64
   - x64
 
