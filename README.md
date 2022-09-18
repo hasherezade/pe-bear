@@ -27,3 +27,5 @@ git clone --recursive https://github.com/hasherezade/pe-bear.git
 Download the latest [release](https://github.com/hasherezade/pe-bear/releases).
 
 ![](https://community.chocolatey.org/favicon.ico) Available also via [Chocolatey](https://community.chocolatey.org/packages/pebear)
+
+🧪 Fresh **test builds** (ahead of the official release) can be downloaded from the [AppVeyor build server](https://ci.appveyor.com/project/hasherezade/pe-bear). They are created on each commit to the `main` branch. You can download them by clicking on the build version, then choosing the tab `Artifacts`. WARNING: those builds may be unstable.
