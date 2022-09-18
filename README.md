@@ -1,4 +1,4 @@
-PE-bear releases
+PE-bear
 -
 <img src="./logo/main_ico.png" alt="PE-bear logo">
 
