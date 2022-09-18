@@ -14,10 +14,6 @@ PE-bear is a freeware reversing tool for PE files. Its objective is to deliver f
 Signatures for PE-bear:
 + [SIG.txt](SIG.txt) (updated: 22.01.2014) - *contains signatures from [PEid's UserDB](http://www.softpedia.com/get/Programming/Packers-Crypters-Protectors/PEiD-updated.shtml) - converted by a script provided by [crashish](http://crashish.blogspot.com/2013/09/peid-signature-conversion-for-pe-bear.html)*
 
-
-![](https://community.chocolatey.org/favicon.ico) Available also via [Chocolatey](https://community.chocolatey.org/packages/pebear)
-
-
 ## Clone
 
 Use **recursive clone** to get the repo together with the submodule:
@@ -25,3 +21,9 @@ Use **recursive clone** to get the repo together with the submodule:
 ```console
 git clone --recursive https://github.com/hasherezade/pe-bear.git
 ```
+
+## Builds
+
+Download the latest [release](https://github.com/hasherezade/pe-bear/releases).
+
+![](https://community.chocolatey.org/favicon.ico) Available also via [Chocolatey](https://community.chocolatey.org/packages/pebear)
