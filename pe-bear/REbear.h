@@ -2,7 +2,7 @@
 #pragma once
 #include <bearparser/bearparser.h>
 
-#define TITLE "EE-bear"
+#define TITLE "PE-bear"
 #define V_MAJOR 0
 #define V_MINOR 6
 #define V_PATCH 0
