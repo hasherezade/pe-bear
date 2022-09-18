@@ -16,3 +16,12 @@ Signatures for PE-bear:
 
 
 ![](https://community.chocolatey.org/favicon.ico) Available also via [Chocolatey](https://community.chocolatey.org/packages/pebear)
+
+
+## Clone
+
+Use **recursive clone** to get the repo together with the submodule:
+
+```console
+git clone --recursive https://github.com/hasherezade/pe-bear.git
+```
