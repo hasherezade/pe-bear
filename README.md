@@ -2,6 +2,8 @@ PE-bear releases
 -
 <img src="./logo/main_ico.png" alt="PE-bear logo">
 
+[![Build status](https://ci.appveyor.com/api/projects/status/q2smuy32pqqo0oyn?svg=true)](https://ci.appveyor.com/project/hasherezade/pe-bear)
+
 PE-bear is a freeware reversing tool for PE files. Its objective is to deliver fast and flexible “first view” for malware analysts, stable and capable to handle malformed PE files.
 
 Signatures for PE-bear:
