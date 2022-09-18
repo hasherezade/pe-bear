@@ -122,9 +122,9 @@ size_t SecDiagramModel::unitsOfSection(int index, bool isRaw)
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(index);
 	if (sec == NULL) return 0;
 
-	const Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
 	const bufsize_t unitSize = this->getUnitSize(isRaw);
-	const bufsize_t size = sec->getContentSize(aType, true);
+	// always use the RAW section size:
+	const bufsize_t size = sec->getContentSize(Executable::RAW, true);
 	if (!unitSize) return 0;
 
 	return pe_util::unitsCount(size, unitSize);
@@ -138,8 +138,8 @@ double SecDiagramModel::percentFilledInSection(int index, bool isRaw)
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(index);
 	if (!sec) return 0;
 
-	const Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
-	bufsize_t size = sec->getContentSize(aType, true);
+	// always use the RAW section size:
+	bufsize_t size = sec->getContentSize(Executable::RAW, true);
 
 	bufsize_t unitSize = this->getUnitSize(isRaw);
 	size_t units = unitsOfSection(index, isRaw);
