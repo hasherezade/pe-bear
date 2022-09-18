@@ -41,7 +41,7 @@ build_script:
   
 after_build:
   - mkdir %artifactName%
-  - cp -r patcher/%CONFIGURATION%/* %artifactName%
+  - cp -r pe-bear/%CONFIGURATION%/* %artifactName%
   - cp %QT5%\bin\Qt5Core.dll %artifactName%
   - cp %QT5%\bin\Qt5Gui.dll %artifactName%
   - cp %QT5%\bin\Qt5Widgets.dll %artifactName%
