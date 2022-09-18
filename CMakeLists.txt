@@ -3,7 +3,7 @@ project (PE-bear_full)
 
 # modules:
 set ( M_SIGFIND "sig_finder" )
-set ( M_BEARPARSER "bearparser_lib/parser" )
+set ( M_BEARPARSER "bearparser/parser" )
 set ( M_DISASM "disasm" )
 set ( M_CAPSTONE "capstone" )
 
