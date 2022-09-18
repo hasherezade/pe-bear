@@ -6,7 +6,7 @@ platform: x64
 
 branches:
   only:
-    - master
+    - main
    
 install:
   - git submodule update --init --recursive
