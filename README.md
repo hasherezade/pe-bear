@@ -16,7 +16,7 @@ Signatures for PE-bear:
 
 ## Builds
 
-Download the latest [release](https://github.com/hasherezade/pe-bear/releases).
+📦 ⚙️ Download the latest [release](https://github.com/hasherezade/pe-bear/releases).
 
 ![](https://community.chocolatey.org/favicon.ico) Available also via [Chocolatey](https://community.chocolatey.org/packages/pebear)
 
