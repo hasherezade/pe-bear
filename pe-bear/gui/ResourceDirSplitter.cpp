@@ -334,8 +334,7 @@ void ResourcesDirSplitter::init(WrapperTableModel *upModel, WrapperTableModel *d
 	if (downModel) {
 		int num = leafTab.addTab(&dock, "Table");
 		this->contentTab = leafTab.addTab(&contentDock, "Content");
-		dock.setFeatures(0);
-		//contentDock.setFeatures(0);
+		dock.setFeatures(QDockWidget::NoDockWidgetFeatures);
 		
 		downTree.setModel(this->downModel);
 		dock.setWidget(&this->downTree);
