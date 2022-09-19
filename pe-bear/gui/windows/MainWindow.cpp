@@ -221,7 +221,7 @@ void MainWindow::setupWidgets()
 	sectionsTree.setSelectionMode(QAbstractItemView::SingleSelection);
 	sectionsTree.setSelectionBehavior( QAbstractItemView::SelectRows);
 	urlLabel.setProperty("hasUrl",true);
-	urlLabel.setText("<a href=\"https://pe-bear.hasherezade.net/\">Check for updates</a>");
+	urlLabel.setText("<a href=\"" + QString(PEBEAR_LINK) + "\">Check for updates</a>");
 	urlLabel.setTextFormat(Qt::RichText);
 	urlLabel.setTextInteractionFlags(Qt::TextBrowserInteraction);
 	urlLabel.setOpenExternalLinks(true);
@@ -657,7 +657,7 @@ void MainWindow::info()
 	msg += "built on: " + QString(__DATE__) + "\n";
 	msg += "<br/>";
 	msg += "author: Hasherezade (<a href='" + QString(MY_SITE_LINK) + "'>homepage</a>)<br/>";
-	msg += "Sourcecode & more info: <a href='" + QString(SITE_LINK) + "'>here</a><br/>";
+	msg += "Source code & more info: <a href='" + QString(SOURCE_LINK) + "'>here</a><br/>";
 	msg += "<br/>";
 	msg += "<i>using:</i><br/>";
 #if QT_VERSION < 0x050000

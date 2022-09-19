@@ -27,7 +27,9 @@
 
 #define PREVIEW_SIZE 0x200
 
-#define MY_SITE_LINK "https://hasherezade.net"
+#define MY_SITE_LINK "https://hasherezade.net/"
+#define PEBEAR_LINK "https://pe-bear.hasherezade.net/"
+#define SOURCE_LINK "https://github.com/hasherezade/pe-bear/"
+
 #define CAPSTONE_LICENSE "https://github.com/capstone-engine/capstone/blob/master/LICENSE.TXT"
 #define BEARPARSER_LICENSE "https://github.com/hasherezade/bearparser/blob/master/LICENSE"
-#define SITE_LINK "https://github.com/hasherezade/pe-bear/"
