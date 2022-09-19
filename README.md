@@ -42,6 +42,11 @@ Use **recursive clone** to get the repo together with submodules:
 git clone --recursive https://github.com/hasherezade/pe-bear.git
 ```
 
+### Building on Windows
+
+Use [CMake](http://www.cmake.org) to generate a Visual Studio project. Open in Visual Studio and build.
+
+
 ### Building on Linux and MacOS
 
 To build it on Linux or MacOS you can use the given scripts:
@@ -51,6 +56,3 @@ To build it on Linux or MacOS you can use the given scripts:
 
 To generate the `.app` bundle on MacOS you can use:
 +   [macos_wrap.sh](./macos_wrap.sh)
-
-
-
