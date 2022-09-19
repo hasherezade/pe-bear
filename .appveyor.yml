@@ -34,7 +34,7 @@ before_build:
   - if [%env_arch%]==[x64] (
     cmake .. -A x64 )
   - if [%env_arch%]==[x86] (
-    cmake .. )
+    cmake .. -A Win32 )
     
 build_script:
   - cmake --build . --config %CONFIGURATION%
