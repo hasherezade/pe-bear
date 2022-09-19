@@ -12,6 +12,16 @@ public:
 	{
 	}
 
+	bool init(size_t _buf_size)
+	{
+		buf = (BYTE*)calloc(_buf_size, 1);
+		if (!buf) {
+			return false;
+		}
+		buf_size = _buf_size;
+		return true;
+	}
+
 	bool init(const BYTE *_buf, size_t _buf_size)
 	{
 		buf = (BYTE*)calloc(_buf_size, 1);
