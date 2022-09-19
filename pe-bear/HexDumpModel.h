@@ -28,8 +28,8 @@ public:
 	Executable::addr_type getAddrType() { return this->addrType; }
 	bool isHexView() const { return showHex; }
 
-	uint32_t getPageSize() { return pageSize; };
-	uint32_t getStartOff() { return startOff; }
+	bufsize_t getPageSize() { return pageSize; };
+	offset_t getStartOff() { return startOff; }
 
 	int rowCount(const QModelIndex &parent) const;
 	int columnCount(const QModelIndex &parent) const;
@@ -40,9 +40,9 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 
-	virtual offset_t contentIndexAt(const QModelIndex &index) const;
+	virtual offset_t contentOffsetAt(const QModelIndex &index) const;
 	QVariant getRawContentAt(const QModelIndex &index) const;
-	QVariant getElement(size_t offset) const;
+	QVariant getElement(offset_t offset) const;
 
 	virtual ViewSettings* getSettings()
 	{
@@ -60,7 +60,7 @@ protected:
 private:
 	HexViewSettings settings;
 	bool showHex;
-	bufsize_t startOff, endOff;
+	offset_t startOff, endOff;
 	bufsize_t pageSize;
 
 friend class HexTableView;

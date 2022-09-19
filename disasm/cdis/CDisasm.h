@@ -21,8 +21,8 @@ public:
 	bool init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_bits bitMode);
 	bool fillTable();
 	bool clearTable();
-	uint64_t getRawAt(int index) const;
-	uint64_t getArgVA(int index, int argNum, bool &isOk) const;
+	offset_t getRawAt(int index) const;
+	offset_t getArgVA(int index, int argNum, bool &isOk) const;
 	
 	size_t getChunkSize(int index) const
 	{

@@ -23,10 +23,12 @@ void HexDumpModel::setShownContent(offset_t start, bufsize_t size)
 
 int HexDumpModel::rowCount(const QModelIndex &parent) const
 {
-	const bufsize_t peSize = this->m_PE->getRawSize();
+	if (startOff == INVALID_ADDR) return 0;
+
+	const offset_t peSize = this->m_PE->getRawSize();
 	if (peSize < this->startOff) return 0;
 
-	size_t viewSize = pageSize;
+	bufsize_t viewSize = pageSize;
 	size_t diff = peSize - this->startOff;
 	if (diff < pageSize) {
 		viewSize = diff;
@@ -54,7 +56,7 @@ QVariant HexDumpModel::headerData(int section, Qt::Orientation orientation, int 
 			return settings.getVerticalSize();
 		}
 
-		uint32_t offset = this->startOff + (section * HEX_COL_NUM);
+		offset_t offset = this->startOff + (section * HEX_COL_NUM);
 
 		if (role == Qt::DisplayRole) {
 			return QString::number(offset, 16).toUpper();
@@ -78,51 +80,55 @@ Qt::ItemFlags HexDumpModel::flags(const QModelIndex &index) const
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-offset_t HexDumpModel::contentIndexAt(const QModelIndex &index) const
+offset_t HexDumpModel::contentOffsetAt(const QModelIndex &index) const
 {
-	if (!index.isValid()) return (-1);
+	if (!index.isValid()) return INVALID_ADDR;
 
 	offset_t fileSize = m_PE->getRawSize();
 	int x = index.column();
 	int y = index.row();
 
 	y *= HEX_COL_NUM;
-	offset_t indx = (y + x) + startOff;
+	offset_t offset = (y + x) + startOff;
 
-	if (indx >= fileSize) {
-		return (-1); /* out of bounds */
+	if (offset >= fileSize) {
+		return INVALID_ADDR; /* out of bounds */
 	}
-	return indx;
+	return offset;
 }
 
 QVariant HexDumpModel::getRawContentAt(const QModelIndex &index) const
 {
-	uint64_t indx = contentIndexAt(index);
-	if (indx == (-1)) return QVariant();
+	offset_t offset = contentOffsetAt(index);
+	if (offset == INVALID_ADDR) return QVariant();
 
-	BYTE* contentPtr = m_PE->getContent();
-	const QChar c = contentPtr[indx];
+	BYTE* contentPtr = m_PE->getContentAt(offset, 1);
+	if (!contentPtr) {
+		return QVariant();
+	}
+	const QChar c = contentPtr[0];
 	return c;
 }
 
 QVariant HexDumpModel::getElement(size_t offset) const
 {
-	if (!m_PE || offset > m_PE->getContentSize()) {
+	if (!m_PE || offset == INVALID_ADDR || offset > m_PE->getContentSize()) {
 		return QVariant();
 	}
 	BYTE* contentPtr = m_PE->getContentAt(offset, 1);
 	if (!contentPtr) {
 		return QVariant();
 	}
+	const BYTE val = contentPtr[0];
 	if (showHex) {
 #if QT_VERSION >= 0x050000
-		return QString().asprintf("%02X", *contentPtr);
+		return QString().asprintf("%02X", val);
 #else
-		return QString().sprintf("%02X", *contentPtr);
+		return QString().sprintf("%02X", val);
 #endif
 	}
 	
-	const QChar c = QChar(*contentPtr);
+	const QChar c = val;
 	if (c.isPrint() && !c.isSpace())
 		return c;
 	return QChar('.');
@@ -142,7 +148,7 @@ QVariant HexDumpModel::data(const QModelIndex &index, int role) const
 
 	int x = index.column();
 	int y = index.row() * HEX_COL_NUM;
-	size_t offset = (y + x) + this->startOff;
+	offset_t offset = (y + x) + this->startOff;
 	if (offset >= m_PE->getRawSize()) {
 		return QVariant(); /* out of bounds */
 	}
@@ -182,7 +188,7 @@ bool HexDumpModel::setData(const QModelIndex &index, const QVariant &value, int 
 	if (index.isValid() == false) return false;
 	if (!myPeHndl || !m_PE) return false;
 
-	offset_t offset = contentIndexAt(index);
+	offset_t offset = contentOffsetAt(index);
 	if (offset == INVALID_ADDR) return false;
 	
 	QString text = value.toString();
@@ -195,7 +201,7 @@ bool HexDumpModel::setData(const QModelIndex &index, const QVariant &value, int 
 	BYTE* contentPtr = m_PE->getContentAt(offset, 1);
 	if (!contentPtr) return false;
 	
-	BYTE prev_val = (*contentPtr);
+	BYTE prev_val = contentPtr[0];
 	BYTE val = 0;
 
 	if (showHex) {
@@ -214,7 +220,7 @@ bool HexDumpModel::setData(const QModelIndex &index, const QVariant &value, int 
 		return false; // nothing has changed
 	}
 	myPeHndl->backupModification(offset, 1);
-	(*contentPtr) = val;
+	contentPtr[0] = val;
 	myPeHndl->setBlockModified(offset, 1);
 	return true;
 }

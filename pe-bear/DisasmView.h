@@ -195,14 +195,14 @@ public:
 	DisasmModel(PeHandler *peHndl, QObject *parent = 0);
 
 	/* wrappers for Disasm */
-	uint64_t getRawAt(int index) const { return myDisasm.getRawAt(index); }
-	uint64_t getRvaAt(int index) const { return myDisasm.getRvaAt(index); }
+	offset_t getRawAt(int index) const { return myDisasm.getRawAt(index); }
+	offset_t getRvaAt(int index) const { return myDisasm.getRvaAt(index); }
 	size_t getChunkSize(int index) const { return myDisasm.getChunkSize(index); }
 	
-	uint64_t getTargetRVA(const QModelIndex &index) const;
-	uint64_t getArgRVA(const int argNum, const QModelIndex &index) const;
+	offset_t getTargetRVA(const QModelIndex &index) const;
+	offset_t getArgRVA(const int argNum, const QModelIndex &index) const;
 
-	virtual uint64_t contentIndexAt(const QModelIndex &index) const { return getRawAt(index.row()); }
+	virtual offset_t contentOffsetAt(const QModelIndex &index) const { return getRawAt(index.row()); }
 	QVariant getRawContentAt(const QModelIndex &index) const;
 
 	void setMarkedAddress(offset_t cRva, offset_t tRva);

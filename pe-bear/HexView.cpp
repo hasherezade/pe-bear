@@ -36,7 +36,7 @@ QModelIndex getNextIndex(QAbstractItemModel &model, const QModelIndex &index)
 //----
 
 HexItemDelegate::HexItemDelegate(QObject* parent) :
-    QStyledItemDelegate(parent)
+	QStyledItemDelegate(parent)
 {
 	validator.setRegExp(QRegExp("[0-9A-Fa-f]{2,}"));
 }
@@ -285,12 +285,12 @@ bool HexTableView::isIndexListContinuous(QModelIndexList &list)
 	std::sort(list.begin(), list.end());
 
 	bool isContinuous = true;
-	uint64_t prevIndx = (-1);
+	offset_t prevIndx = INVALID_ADDR;
 
 	for (int i = 0; i < list.size(); i++) {
 		QModelIndex index = list.at(i);
-		uint64_t cIndx = hexModel->contentIndexAt(index);
-		if (prevIndx != (-1) && cIndx != prevIndx + 1) {
+		offset_t cIndx = hexModel->contentOffsetAt(index);
+		if (prevIndx != INVALID_ADDR && cIndx != prevIndx + 1) {
 			return false;
 		}
 		prevIndx = cIndx;
@@ -311,7 +311,8 @@ void HexTableView::pasteToSelected()
 		QMessageBox::warning(0, "Warning!", "Select continuous area!");
 		return;
 	}
-	uint64_t first = hexModel->contentIndexAt(list.at(0));
+	offset_t first = hexModel->contentOffsetAt(list.at(0));
+	if (first == INVALID_ADDR) return;
 
 	BYTE *buf = new BYTE[bufSize];
 	bool isHex = this->hexModel->isHexView();
@@ -340,7 +341,9 @@ void HexTableView::fillSelected()
 		return;
 	}
 
-	uint64_t first = hexModel->contentIndexAt(list.at(0));
+	offset_t first = hexModel->contentOffsetAt(list.at(0));
+	if (first == INVALID_ADDR) return;
+
 	if (hexModel->myPeHndl->fillBlock(first, size, 0x90) == false) {
 		QMessageBox::warning(0, "Error!", "Modification in this area in  unacceptable!\n(Causes format corruption)");
 		return;
@@ -361,7 +364,9 @@ void HexTableView::clearSelected()
 		QMessageBox::warning(0,"Warning!", "Select continuous area!");
 		return;
 	}
-	uint64_t first = hexModel->contentIndexAt(list.at(0));
+	offset_t first = hexModel->contentOffsetAt(list.at(0));
+	if (first == INVALID_ADDR) return;
+
 	if (hexModel->myPeHndl->fillBlock(first, size, 0) == false) {
 		QMessageBox::warning(0, "Error!", "Modification in this area in  unacceptable!\n(Causes format corruption)");
 		return;

@@ -116,7 +116,7 @@ bool CDisasm::clearTable()
 	return true;
 }
 
-uint64_t CDisasm::getRawAt(int index) const
+offset_t CDisasm::getRawAt(int index) const
 {
 	if (index >= m_table.size()) {
 		return INVALID_ADDR;
@@ -125,7 +125,7 @@ uint64_t CDisasm::getRawAt(int index) const
 	return m_insn.address;
 }
 
-uint64_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
+offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 {
 	isOk = false;
 	if (index >= m_table.size()) {

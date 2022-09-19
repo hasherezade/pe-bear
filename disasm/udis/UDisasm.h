@@ -24,9 +24,9 @@ public:
 	size_t getChunkSize(int index) const;
 	
 	//get Raw offset of the instruction
-	uint64_t getRawAt(int index) const;
+	offset_t getRawAt(int index) const;
 	
-	uint64_t getArgVA(int index, int argNum, bool &isOk) const;
+	offset_t getArgVA(int index, int argNum, bool &isOk) const;
 	
 	QString translateBranching(int index) const;
 	

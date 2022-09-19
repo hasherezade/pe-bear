@@ -241,7 +241,6 @@ void DisasmTreeView::copySelected()
 	QByteArray bytes;
 	for (int i = 0; i < size; i++) {
 		QModelIndex index = list.at(i);
-		uint64_t indx = myModel->contentIndexAt(index);
 
 		QVariant c = myModel->getRawContentAt(index);
 		if (c.canConvert(QVariant::ByteArray)) {
@@ -267,11 +266,11 @@ void DisasmTreeView::pasteToSelected()
 	}
 	if (list.size() == 0) return;
 
-	uint64_t firstOffset = myModel->contentIndexAt(list.at(0));
+	offset_t firstOffset = myModel->contentOffsetAt(list.at(0));
 	int bufSize = this->blockSize(list);
 
 	BYTE *cntntPtr = myModel->m_PE->getContent();
-	uint64_t cntntSize = myModel->m_PE->getRawSize();
+	offset_t cntntSize = myModel->m_PE->getRawSize();
 
 	BYTE *buf = new BYTE[bufSize];
 
@@ -555,7 +554,7 @@ QModelIndexList DisasmTreeView::uniqOffsets(QModelIndexList list)
 
 	for (int i = 0; i < list.size(); i++) {
 		QModelIndex index = list.at(i);
-		offset_t currOffset = myModel->contentIndexAt(index);
+		offset_t currOffset = myModel->contentOffsetAt(index);
 
 		int sizeBefore = uniqueOffsets.size();
 		uniqueOffsets.insert(currOffset);
@@ -582,7 +581,7 @@ bool DisasmTreeView::isIndexListContinuous(QModelIndexList &uniqList)
 	for (int i = 0; i < uniqList.size(); i++) {
 		QModelIndex index = uniqList.at(i);
 
-		offset_t currOffset = myModel->contentIndexAt(index);
+		offset_t currOffset = myModel->contentOffsetAt(index);
 		if (nextOffset != INVALID_ADDR && nextOffset != currOffset) return false;
 
 		nextOffset = currOffset + myModel->getCurrentChunkSize(index);
@@ -595,8 +594,8 @@ int DisasmTreeView::blockSize(QModelIndexList &uniqList)
 	const int size = uniqList.size();
 	if (size == 0) return 0;
 	
-	offset_t firstOffset = myModel->contentIndexAt(uniqList.at(0));
-	offset_t lastOffset = myModel->contentIndexAt(uniqList.at(size - 1));
+	offset_t firstOffset = myModel->contentOffsetAt(uniqList.at(0));
+	offset_t lastOffset = myModel->contentOffsetAt(uniqList.at(size - 1));
 	if (firstOffset == INVALID_ADDR || lastOffset == INVALID_ADDR) {
 		return 0;
 	}
@@ -605,8 +604,8 @@ int DisasmTreeView::blockSize(QModelIndexList &uniqList)
 		printf ("Warning: list is not sorted!\n");
 		std::sort(uniqList.begin(), uniqList.end());
 
-		firstOffset = myModel->contentIndexAt(uniqList.at(0));
-		lastOffset = myModel->contentIndexAt(uniqList.at(size - 1));
+		firstOffset = myModel->contentOffsetAt(uniqList.at(0));
+		lastOffset = myModel->contentOffsetAt(uniqList.at(size - 1));
 	}
 
 	size_t dif = (lastOffset - firstOffset);
@@ -822,8 +821,6 @@ QVariant DisasmModel::getHint(const QModelIndex &index) const
 	if (index.isValid() == false) return false;
 
 	QStringList hints;
-	//QString hint = "";
-	
 	int y = index.row();
 
 	/* push ... ret = CALL */
@@ -864,41 +861,42 @@ uint32_t DisasmModel::getCurrentChunkSize(const QModelIndex &index) const
 	return myDisasm.getChunkSize(index.row());
 }
 
-uint64_t DisasmModel::getTargetRVA(const QModelIndex &index) const
+offset_t DisasmModel::getTargetRVA(const QModelIndex &index) const
 {
 	if (index.isValid() == false)  {
-		return false;
+		return INVALID_ADDR;
 	}
 	bool isOk = false;
-	uint64_t targetRva = myDisasm.getTargetRVA(index.row(), isOk);
+	offset_t targetRva = myDisasm.getTargetRVA(index.row(), isOk);
 	if (targetRva == INVALID_ADDR || !isOk) return INVALID_ADDR;
 	return targetRva;
 }
 
-uint64_t DisasmModel::getArgRVA(const int argNum, const QModelIndex &index) const
+offset_t DisasmModel::getArgRVA(const int argNum, const QModelIndex &index) const
 {
 	if (index.isValid() == false) {
-		return false;
+		return INVALID_ADDR;
 	}
 	bool isOk = false;
-	uint64_t argRva = myDisasm.getArgRVA(index.row(), argNum, isOk);
+	offset_t argRva = myDisasm.getArgRVA(index.row(), argNum, isOk);
 	if (argRva == INVALID_ADDR || !isOk) return INVALID_ADDR;
 	return argRva;
 }
 
 QVariant DisasmModel::getRawContentAt(const QModelIndex &index) const
 {
-	uint64_t indx = contentIndexAt(index);
-	if (indx == (-1)) return QVariant();
+	offset_t indx = contentOffsetAt(index);
+	if (indx == INVALID_ADDR) return QVariant();
+
+	const size_t chunkSize = this->getCurrentChunkSize(index);
+	if (!chunkSize) return QVariant();
 
 	QByteArray bytes;
-	size_t chunkSize = this->getCurrentChunkSize(index);
-	BYTE* contentPtr = m_PE->getContent();
-	size_t fSize = m_PE->getRawSize();
-	for (int i = 0; i < chunkSize; i++) {
-		if ((indx + i) >= fSize) break;
+	for (size_t i = 0; i < chunkSize; i++) {
+		BYTE* contentPtr = m_PE->getContentAt(indx + i, 1);
+		if (!contentPtr) break;
 
-		char c = contentPtr[indx + i];
+		char c = contentPtr[0];
 		bytes.append(c);
 	}
 	return bytes;
