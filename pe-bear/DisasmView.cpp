@@ -200,7 +200,7 @@ void DisasmTreeView::onSetComment(offset_t offset, Executable::addr_type aT)
 
 void DisasmTreeView::onSetEpAction(offset_t offset, Executable::addr_type aT)
 {
-	if (!myModel) return;
+	if (!myModel || !myModel->m_PE) return;
 	if (aT == Executable::RAW || aT == Executable::NOT_ADDR) return; // TODO...
 	if (aT == Executable::VA) {
 		offset = myModel->m_PE->VaToRva(offset);
@@ -453,13 +453,13 @@ void DisasmTreeView::setModel(DisasmModel *model)
 
 bool DisasmTreeView::markBranching(QModelIndex index)
 {
-	if (!this->myModel->myPeHndl || !this->myModel->m_PE) return false;
 	if (!index.isValid()) return false;
+	if (!this->myModel->myPeHndl || !this->myModel->m_PE) return false;
 
-	uint64_t currentRva = this->myModel->getRvaAt(index.row());
+	offset_t currentRva = this->myModel->getRvaAt(index.row());
 	if (this->myModel->m_PE->toRaw(currentRva, Executable::RVA) == INVALID_ADDR) return false; //unmapped area
 
-	uint64_t targetRva = this->myModel->getTargetRVA(index);
+	offset_t targetRva = this->myModel->getTargetRVA(index);
 	if (this->myModel->m_PE->toRaw(targetRva, Executable::RVA) == INVALID_ADDR) return false; //not convertable target
 
 	if (currentRva == INVALID_ADDR || targetRva == INVALID_ADDR) return false;
@@ -469,10 +469,10 @@ bool DisasmTreeView::markBranching(QModelIndex index)
 
 void DisasmTreeView::followBranching(QModelIndex index)
 {
-	if (!this->myModel->myPeHndl || !this->myModel->m_PE) return;
 	if (!index.isValid()) return;
+	if (!this->myModel->myPeHndl || !this->myModel->m_PE) return;
 
-	uint64_t targetRva = this->myModel->getTargetRVA(index);
+	offset_t targetRva = this->myModel->getTargetRVA(index);
 	if (targetRva == INVALID_ADDR) {
 		return;
 	}
@@ -482,9 +482,9 @@ void DisasmTreeView::followBranching(QModelIndex index)
 
 void DisasmTreeView::emitArgsRVA(const QModelIndex &index)
 {
-	static uint64_t prevTargetRVA = INVALID_ADDR;
+	static offset_t prevTargetRVA = INVALID_ADDR;
 	for (int argNum = 0; argNum < Disasm::MAX_ARG_NUM; argNum++) {
-		uint64_t argRVA = myModel->getArgRVA(argNum, index);
+		offset_t argRVA = myModel->getArgRVA(argNum, index);
 		emit argRvaChanged(argNum, argRVA);
 	}
 }
@@ -500,7 +500,7 @@ void DisasmTreeView::mouseMoveEvent(QMouseEvent *event)
 		if (myModel->isClickable(index)) {
 			this->setCursor(Qt::PointingHandCursor);
 			return;
-		} 
+		}
 	}
 	this->setCursor(Qt::ArrowCursor);
 }
@@ -536,6 +536,7 @@ void DisasmTreeView::setHovered(QModelIndexList list)
 
 	bufsize_t bytesNum = myModel->getCurrentChunkSize(indexEnd) + (rvaEnd - rvaStart);
 	if (bytesNum == 0) return;
+
 	myModel->myPeHndl->setHovered(true, rvaStart, bytesNum);
 }
 
@@ -742,7 +743,7 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 	/* dependend from value */
 	int y = section;
 	if (y >= myDisasm.chunksCount()) return QVariant();
-	uint64_t rva = this->getRvaAt(y);
+	offset_t rva = this->getRvaAt(y);
 
 	if (rva == INVALID_ADDR) {
 		if (role == Qt::DisplayRole) return "<invalid>";
@@ -756,7 +757,7 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 	//rva valid
 	if (role == Qt::DisplayRole) {
 		if (this->addrType == Executable::VA) {
-			rva += this->m_PE->getImageBase();
+			rva = m_PE->rvaToVa(rva);
 		}
 		return QString::number(rva, 16).toUpper();
 	}
@@ -817,8 +818,7 @@ QString DisasmModel::getAsm(int index) const
 
 QVariant DisasmModel::getHint(const QModelIndex &index) const
 {
-	bool isValid = false;
-	if (index.isValid() == false) return false;
+	if (!index.isValid()) return false;
 
 	QStringList hints;
 	int y = index.row();
@@ -830,15 +830,18 @@ QVariant DisasmModel::getHint(const QModelIndex &index) const
 	}
 	if (myDisasm.isAddrOperand(y)) {
 		bool isOk = false;
-		uint64_t targetRva = myDisasm.getTargetRVA(y, isOk);
+		offset_t targetRva = myDisasm.getTargetRVA(y, isOk);
 		if (targetRva != INVALID_ADDR) {
 			QString str = myDisasm.getStringAt(targetRva);
-			if (str.length() > 0) hints.append(str);
+			if (str.length() > 0) {
+				hints.append(str);
+			}
 		}
 	}
 	QString comment = getComment(myDisasm.getRvaAt(y));
-	if (comment.length() > 0) hints.append(comment);
-
+	if (comment.length() > 0) {
+		hints.append(comment);
+	}
 	if (hints.size()) {
 		return hints.join(" ; ");
 	}
@@ -911,11 +914,10 @@ void DisasmModel::setMarkedAddress(uint64_t cRva, uint64_t tRva)
 
 bool DisasmModel::setHexData(offset_t offset, const size_t bytesCount, const QString &data)
 {
-	if (!myPeHndl || !m_PE) return false;
-	
-	if (offset == INVALID_ADDR) {
+	if (offset == INVALID_ADDR || !myPeHndl || !m_PE) {
 		return false;
 	}
+
 	BYTE* contentPtr = m_PE->getContentAt(offset, bytesCount);
 	if (!contentPtr) {
 		return false;
@@ -951,10 +953,9 @@ bool DisasmModel::setHexData(offset_t offset, const size_t bytesCount, const QSt
 
 bool DisasmModel::setData(const QModelIndex &index, const QVariant &val, int role)
 {
-	if (!index.isValid()) return false;
-	if (!myPeHndl) return false;
-	PEFile *m_PE = myPeHndl->getPe();
-	if (!m_PE) return false;
+	if (!index.isValid() || !myPeHndl) {
+		return false;
+	}
 
 	const int y = index.row();
 	const int x = index.column();
@@ -979,12 +980,10 @@ bool DisasmModel::setData(const QModelIndex &index, const QVariant &val, int rol
 
 QVariant DisasmModel::data(const QModelIndex &index, int role) const
 {
-	if (!myPeHndl) return QVariant();
-	PEFile *m_PE = myPeHndl->getPe();
-	if (!m_PE) return QVariant();
+	if (!index.isValid() || !myPeHndl) {
+		return QVariant();
+	}
 
-	if (index.isValid() == false) return QVariant();
-	
 	if (role == Qt::FontRole) {
 		return settings.myFont;
 	}
@@ -1006,7 +1005,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 	const size_t disChunk = this->getChunkSize(y);
 
 	/* TAG */
-	if  (x == TAG_COL) {
+	if (x == TAG_COL) {
 		if (role != Qt::DecorationRole && role != Qt::ToolTipRole) return QVariant();
 		QString comment = this->getComment(rva);
 		if (comment.size() > 0 ) {
@@ -1022,17 +1021,20 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 		}
 
 		if (rva > myPeHndl->markedOrigin && rva < myPeHndl->markedTarget 
-		    || rva > myPeHndl->markedTarget && rva < myPeHndl->markedOrigin) {
+			|| rva > myPeHndl->markedTarget && rva < myPeHndl->markedOrigin)
+		{
 			return tracerIcon;
 		}
 
 		if ((myPeHndl->markedTarget == rva && myPeHndl->markedTarget > myPeHndl->markedOrigin) 
-		    || (myPeHndl->markedOrigin == rva && myPeHndl->markedTarget < myPeHndl->markedOrigin)) {
+			|| (myPeHndl->markedOrigin == rva && myPeHndl->markedTarget < myPeHndl->markedOrigin))
+		{
 			return tracerUpIcon;
 		}
 
 		if ((myPeHndl->markedTarget == rva && myPeHndl->markedTarget < myPeHndl->markedOrigin) 
-		    || (myPeHndl->markedOrigin == rva && myPeHndl->markedTarget > myPeHndl->markedOrigin)) {
+			|| (myPeHndl->markedOrigin == rva && myPeHndl->markedTarget > myPeHndl->markedOrigin))
+		{
 			return tracerDownIcon;
 		}
 	}
@@ -1047,7 +1049,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 	
 	//---------------------
 	bool isOk = false;
-	uint64_t tRva =  myDisasm.getTargetRVA(y, isOk);
+	offset_t tRva =  myDisasm.getTargetRVA(y, isOk);
 
 	if (isClickable(index) && isOk) {
 		if (role == Qt::BackgroundColorRole) return settings.branchingColor;
