@@ -30,7 +30,7 @@ Signatures for PE-bear:
 
 +   [git](https://git-scm.com/downloads)
 +   [cmake](http://www.cmake.org)
-+   [Qt5](https://www.qt.io/download) (eventually Qt4)
++   [Qt5](https://www.qt.io/download) (optionally Qt4)
 +   bearparser (submodule of the current repository)
 +   capstone (submodule of the current repository)
 
