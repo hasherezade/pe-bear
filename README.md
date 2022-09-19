@@ -14,14 +14,6 @@ PE-bear is a multiplatform reversing tool for PE files. Its objective is to deli
 Signatures for PE-bear:
 + [SIG.txt](SIG.txt) (updated: 22.01.2014) - *contains signatures from [PEid's UserDB](http://www.softpedia.com/get/Programming/Packers-Crypters-Protectors/PEiD-updated.shtml) - converted by a script provided by [crashish](http://crashish.blogspot.com/2013/09/peid-signature-conversion-for-pe-bear.html)*
 
-## Clone
-
-Use **recursive clone** to get the repo together with the submodule:
-
-```console
-git clone --recursive https://github.com/hasherezade/pe-bear.git
-```
-
 ## Builds
 
 Download the latest [release](https://github.com/hasherezade/pe-bear/releases).
@@ -30,7 +22,35 @@ Download the latest [release](https://github.com/hasherezade/pe-bear/releases).
 
 🧪 Fresh **test builds** (ahead of the official release) can be downloaded from the [AppVeyor build server](https://ci.appveyor.com/project/hasherezade/pe-bear). They are created on each commit to the `main` branch. You can download them by clicking on the build version, then choosing the tab `Artifacts`. WARNING: those builds may be unstable.
 
----
+> An archive of **old releases** is available here: https://github.com/hasherezade/pe-bear-releases
 
-An archive of **old releases** is available here: https://github.com/hasherezade/pe-bear-releases
+## How to build
+
+### Requires:
+
++   [git](https://git-scm.com/downloads)
++   [cmake](http://www.cmake.org)
++   [Qt5](https://www.qt.io/download) (eventually Qt4)
++   bearparser (submodule of the current repository)
++   capstone (submodule of the current repository)
+
+### Clone
+
+Use **recursive clone** to get the repo together with submodules:
+
+```console
+git clone --recursive https://github.com/hasherezade/pe-bear.git
+```
+
+### Building on Linux and MacOS
+
+To build it on Linux or MacOS you can use the given scripts:
++   [build.sh](./build.sh) - default, builds with Qt5
++   [build_qt5.sh](./build_qt5.sh) - builds with Qt5
++   [build_qt4.sh](./build_qt4.sh) - builds with Qt4
+
+To generate the `.app` bundle on MacOS you can use:
++   [macos_wrap.sh](./macos_wrap.sh)
+
+
 
