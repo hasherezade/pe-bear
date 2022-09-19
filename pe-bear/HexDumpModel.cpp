@@ -110,7 +110,7 @@ QVariant HexDumpModel::getRawContentAt(const QModelIndex &index) const
 	return c;
 }
 
-QVariant HexDumpModel::getElement(size_t offset) const
+QVariant HexDumpModel::getElement(offset_t offset) const
 {
 	if (!m_PE || offset == INVALID_ADDR || offset > m_PE->getContentSize()) {
 		return QVariant();
