@@ -25,7 +25,7 @@ QVariant SignaturesBrowseModel::headerData(int section, Qt::Orientation orientat
 
 Qt::ItemFlags SignaturesBrowseModel::flags(const QModelIndex &index) const
 {	
-	if (!index.isValid()) return 0;
+	if (!index.isValid()) return Qt::NoItemFlags;
 	Qt::ItemFlags fl = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	return fl;
 }

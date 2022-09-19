@@ -258,7 +258,7 @@ QVariant RichHdrTreeModel::headerData(int section, Qt::Orientation /* orientatio
 Qt::ItemFlags RichHdrTreeModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 		
 	RichHdrTreeItem item(myPeHndl, RichHdrWrapper::FieldID(index.row()));
 	return item.flags(index.column());

@@ -246,10 +246,10 @@ QVariant FileHdrTreeModel::headerData(int section, Qt::Orientation /* orientatio
 Qt::ItemFlags FileHdrTreeModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 
 	FileHdrTreeItem *item = static_cast<FileHdrTreeItem*>(index.internalPointer());
-	if (item == NULL) return 0;
+	if (item == NULL) return Qt::NoItemFlags;
 	return item->flags(index.column());
 }
 

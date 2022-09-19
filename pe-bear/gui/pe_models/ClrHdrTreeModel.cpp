@@ -233,7 +233,7 @@ QVariant ClrTreeModel::headerData(int section, Qt::Orientation /* orientation */
 Qt::ItemFlags ClrTreeModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 
 	ClrHdrTreeItem *item = static_cast<ClrHdrTreeItem*>(index.internalPointer());
 	if (item == NULL) return 0;

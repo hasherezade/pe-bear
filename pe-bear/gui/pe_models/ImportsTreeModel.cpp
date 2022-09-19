@@ -118,7 +118,7 @@ bool ImportsTreeModel::setData(const QModelIndex &index, const QVariant &value, 
 Qt::ItemFlags ImportsTreeModel::flags(const QModelIndex &index) const
 { 
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 	int column = index.column();
 	if (column == NAME || column >= ADDED_COLS_NUM) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -260,7 +260,7 @@ bool ImportedFuncModel::setData(const QModelIndex &index, const QVariant &value,
 		case ORDINAL:
 			if (!entry->isByOrdinal()) return false;
 			return false;
-			//break;
+
 		default:
 		{
 			bool isOk = false;
@@ -286,19 +286,18 @@ bool ImportedFuncModel::setData(const QModelIndex &index, const QVariant &value,
 Qt::ItemFlags ImportedFuncModel::flags(const QModelIndex &index) const
 { 
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 
 	QString myData = data(index, Qt::DisplayRole).toString();
-	if (myData == NOT_FILLED) return 0;
+	if (myData == NOT_FILLED) return Qt::NoItemFlags;
 
 	static Qt::ItemFlags editable = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 
 	int column = index.column();
 	if (column >= ADDED_COLS_NUM) return editable;
-	
 
 	ImportedFuncWrapper* entry =  dynamic_cast<ImportedFuncWrapper*>(this->wrapperAt(index));
-	if (!entry) return 0;
+	if (!entry) return Qt::NoItemFlags;
 	
 	bool byOrd = entry->isByOrdinal();
 	if (byOrd) {

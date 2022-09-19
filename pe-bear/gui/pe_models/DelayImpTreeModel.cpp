@@ -268,10 +268,10 @@ bool DelayImpFuncModel::setData(const QModelIndex &index, const QVariant &value,
 Qt::ItemFlags DelayImpFuncModel::flags(const QModelIndex &index) const
 { 
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 
 	QString myData = data(index, Qt::DisplayRole).toString();
-	if (myData == NOT_FILLED) return 0;
+	if (myData == NOT_FILLED) return Qt::NoItemFlags;
 
 	static Qt::ItemFlags editable = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 

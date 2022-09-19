@@ -215,7 +215,7 @@ Executable::addr_type ExportedFuncTreeModel::addrTypeAt(QModelIndex index) const
 Qt::ItemFlags ExportedFuncTreeModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 
 	static Qt::ItemFlags editable = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 	static const  Qt::ItemFlags selectable = Qt::ItemIsEnabled | Qt::ItemIsSelectable;

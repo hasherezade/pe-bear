@@ -449,11 +449,11 @@ QVariant SecHdrsTreeModel::headerData(int section, Qt::Orientation /* orientatio
 Qt::ItemFlags SecHdrsTreeModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 	
 	SecTreeItem *item = static_cast<SecTreeItem*>(index.internalPointer());
-	if (item == NULL)
-		return 0;
+	if (!item)
+		return Qt::NoItemFlags;
 	
 	return item->flags(index.column());
 }

@@ -493,11 +493,11 @@ QVariant OptionalHdrTreeModel::headerData(int section, Qt::Orientation orien, in
 Qt::ItemFlags OptionalHdrTreeModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 	
 	OptionalHdrTreeItem *item = static_cast<OptionalHdrTreeItem*>(index.internalPointer());
-	if (item == NULL)
-		return 0;
+	if (!item)
+		return Qt::NoItemFlags;
 	
 	return item->flags(index.column());
 }
