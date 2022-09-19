@@ -11,6 +11,7 @@
 #define MIN_FIELD_WIDTH 10
 
 #include <iostream>
+#include "TempBuffer.h"
 
 //----
 QModelIndex getNextIndex(QAbstractItemModel &model, const QModelIndex &index)
@@ -314,13 +315,15 @@ void HexTableView::pasteToSelected()
 	offset_t first = hexModel->contentOffsetAt(list.at(0));
 	if (first == INVALID_ADDR) return;
 
-	BYTE *buf = new BYTE[bufSize];
+	TempBuffer temp;
+	temp.init(bufSize);
+	BYTE *buf = temp.getContent();
+	if (!buf) return;
+
 	bool isHex = this->hexModel->isHexView();
 	size_t clipSize = ClipboardUtil::getFromClipboard(isHex, buf, bufSize);
 	
 	bool success = hexModel->myPeHndl->substBlock(first, clipSize, buf);
-	delete []buf; buf = NULL;
-	
 	if (success == false) {
 		QMessageBox::warning(0, "Error!", "Modification in this area in  unacceptable!\n(Causes format corruption)");
 		return;

@@ -3,6 +3,7 @@
 #include <bearparser/Util.h>
 #include <set>
 #include "gui/CommentView.h"
+#include "TempBuffer.h"
 
 #define VHDR_WIDTH 50
 #define COL_WIDTH 18
@@ -272,11 +273,13 @@ void DisasmTreeView::pasteToSelected()
 	BYTE *cntntPtr = myModel->m_PE->getContent();
 	offset_t cntntSize = myModel->m_PE->getRawSize();
 
-	BYTE *buf = new BYTE[bufSize];
+	TempBuffer temp;
+	temp.init(bufSize);
+	BYTE *buf = temp.getContent();
+	if (!buf) return;
 
 	size_t clipSize = ClipboardUtil::getFromClipboard(false, buf, bufSize);
 	myModel->myPeHndl->substBlock(firstOffset, clipSize, buf);
-	delete []buf; buf = NULL;
 }
 
 
@@ -923,8 +926,12 @@ bool DisasmModel::setHexData(offset_t offset, const size_t bytesCount, const QSt
 		return false;
 	}
 
-	BYTE *chunk = new BYTE[bytesCount];
-	memcpy(chunk, contentPtr, bytesCount); //fill the buffer with the previous content
+	TempBuffer temp;
+	const size_t chunkSize = bytesCount;
+	temp.init(contentPtr, chunkSize); //alloc & fill the buffer with the previous content
+
+	BYTE *chunk = temp.getContent();
+	if (!chunk) return false;
 	
 	// convert hex string to bytes:
 	size_t modifBytes = 0;
@@ -934,20 +941,18 @@ bool DisasmModel::setHexData(offset_t offset, const size_t bytesCount, const QSt
 		bool isConv = false;
 		BYTE number = text.toUShort(&isConv, 16);
 		if (!isConv) {
-			delete[]chunk;
 			return false;
 		}
+		if (modifBytes >= chunkSize) break;
 		chunk[modifBytes++] = number;
 	}
 	if (memcmp(contentPtr, chunk, modifBytes) == 0) {
 		// not modified
-		delete[]chunk;
 		return false;
 	}
 	myPeHndl->backupModification(offset, modifBytes);
 	memcpy(contentPtr, chunk, modifBytes);
 	myPeHndl->setBlockModified(offset, modifBytes);
-	delete[]chunk;
 	return true;
 }
 
