@@ -3,6 +3,7 @@ PE-bear
 <img src="./logo/main_ico.png" alt="PE-bear logo">
 
 [![Build status](https://ci.appveyor.com/api/projects/status/q2smuy32pqqo0oyn?svg=true)](https://ci.appveyor.com/project/hasherezade/pe-bear)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/14648384b52b4d979bc1f2246edbd496)](https://www.codacy.com/gh/hasherezade/pe-bear/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hasherezade/pe-bear&amp;utm_campaign=Badge_Grade)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 [![GitHub release](https://img.shields.io/github/release/hasherezade/pe-bear.svg)](https://github.com/hasherezade/pe-bear/releases) 
