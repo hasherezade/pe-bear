@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Trying to build PE-bear..."
 
 #QT check
