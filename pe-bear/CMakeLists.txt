@@ -257,7 +257,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF()
 
 IF(MACOSX)
-	add_executable (${PROJECT_NAME} MACOSX_BUNDLE REbear.rc ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
+	add_executable (${PROJECT_NAME} MACOSX_BUNDLE resources.rc ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
 
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 	    BUNDLE True
@@ -268,7 +268,7 @@ IF(MACOSX)
 	    #MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/customtemplate.plist.in
 	)
 ELSE()
-	add_executable (${PROJECT_NAME} REbear.rc ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
+	add_executable (${PROJECT_NAME} resources.rc ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
 ENDIF()
 
 target_link_libraries( ${PROJECT_NAME} ${SIGFIND_LIB} ${PARSER_LIB} )
