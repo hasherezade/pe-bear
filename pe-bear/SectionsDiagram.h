@@ -29,8 +29,8 @@ public:
 	bufsize_t getUnitSize(bool isRaw);
 	size_t getUnitsNum(bool isRaw);
 
-	size_t unitsOfSection(int index, bool isRaw);
-	double percentFilledInSection(int index, bool isRaw);
+	size_t unitsOfSection(int index, bool isRaw, bool showMapped);
+	double percentFilledInSection(int index, bool isRaw, bool showMapped);
 	
 	double unitOfEntryPoint(bool isRaw);
 	double unitOfHeadersEnd(bool isRaw);
@@ -63,6 +63,7 @@ public:
 	SectionsDiagramSettings(bool _isRaw, QObject *parent)
 		: QObject(parent),
 		isRaw(_isRaw),
+		showMapped(true),
 		isGridEnabled(false), isDrawEPEnabled(true), isDrawSecHdrsEnabled(true), isDrawOffsets(true), isDrawSecNames(true)
 	{
 		loadDefaultColors();
@@ -74,6 +75,7 @@ public slots:
 	void setDrawSecHdrs(bool enable) { isDrawSecHdrsEnabled = enable; refreshParent(); }
 	void setDrawOffsets(bool enable) { isDrawOffsets = enable;  refreshParent(); }
 	void setDrawSecNames(bool enable) { isDrawSecNames = enable; refreshParent(); }
+	void setShowMapped(bool enable) { showMapped = enable; refreshParent(); }
 
 protected:
 	void loadDefaultColors()
@@ -91,6 +93,7 @@ protected:
 	}
 
 	bool isRaw;
+	bool showMapped;
 	bool isGridEnabled;
 	bool isDrawEPEnabled;
 	bool isDrawSecHdrsEnabled;
@@ -139,6 +142,7 @@ protected:
 
 	int unitAtPosY(int y);
 
+	QAction *dataViewAction;
 	QAction *enableGridAction, *enableDrawEPAction, *enableDrawSecHdrsAction;
 	QAction *enableOffsetsAction, *enableSecNamesAction;
 	QMenu menu;

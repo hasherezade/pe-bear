@@ -115,7 +115,7 @@ size_t SecDiagramModel::getUnitsNum(bool isRaw)
 	return pe_util::unitsCount(size, unitSize);
 }
 
-size_t SecDiagramModel::unitsOfSection(int index, bool isRaw)
+size_t SecDiagramModel::unitsOfSection(int index, bool isRaw, bool showMapped)
 {
 	if (this->m_PE == NULL) return 0;
 	if (index > this->m_PE->getSectionsCount()) return 0;
@@ -124,13 +124,14 @@ size_t SecDiagramModel::unitsOfSection(int index, bool isRaw)
 
 	const bufsize_t unitSize = this->getUnitSize(isRaw);
 	// always use the RAW section size:
-	const bufsize_t size = sec->getContentSize(Executable::RAW, true);
+	Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
+	const bufsize_t size = showMapped ? sec->getContentSize(Executable::RAW, true) : sec->getContentSize(aType, true);
 	if (!unitSize) return 0;
 
 	return pe_util::unitsCount(size, unitSize);
 }
 
-double SecDiagramModel::percentFilledInSection(int index, bool isRaw)
+double SecDiagramModel::percentFilledInSection(int index, bool isRaw, bool showMapped)
 {
 	if (!this->m_PE) return 0;
 	if (index > this->m_PE->getSectionsCount()) return 0;
@@ -139,10 +140,11 @@ double SecDiagramModel::percentFilledInSection(int index, bool isRaw)
 	if (!sec) return 0;
 
 	// always use the RAW section size:
-	bufsize_t size = sec->getContentSize(Executable::RAW, true);
+	Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
+	const bufsize_t size = showMapped ? sec->getContentSize(Executable::RAW, true) : sec->getContentSize(aType, true);
 
 	bufsize_t unitSize = this->getUnitSize(isRaw);
-	size_t units = unitsOfSection(index, isRaw);
+	size_t units = unitsOfSection(index, isRaw, showMapped);
 	bufsize_t roundedSize = units * unitSize;
 	if (roundedSize == 0) return 0;
 	
@@ -237,6 +239,10 @@ size_t SecDiagramModel::getSecNum()
 
 void SectionsDiagram::createActions()
 {
+	this->dataViewAction = new QAction("Show mapped raw", this);
+	this->dataViewAction->setCheckable(true);
+	connect(this->dataViewAction, SIGNAL(triggered(bool)), &settings, SLOT(setShowMapped(bool)));
+
 	this->enableDrawEPAction = new QAction("Entry Point", this);
 	this->enableDrawEPAction->setCheckable(true);
 	connect(this->enableDrawEPAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawEP(bool)));
@@ -262,6 +268,7 @@ void SectionsDiagram::createActions()
 
 void SectionsDiagram::destroyActions()
 {
+	delete this->dataViewAction;
 	delete this->enableGridAction;
 	delete this->enableDrawEPAction;
 	delete this->enableDrawSecHdrsAction;
@@ -280,12 +287,18 @@ SectionsDiagram::SectionsDiagram(SecDiagramModel *model, bool viewRawAddresses ,
 
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	createActions();
+	menu.addAction(this->dataViewAction);
 	menu.addAction(this->enableGridAction);
 	menu.addAction(this->enableDrawEPAction);
 	menu.addAction(this->enableDrawSecHdrsAction);
 	menu.addAction(this->enableOffsetsAction);
 	menu.addAction(this->enableSecNamesAction);
 
+	if (isRaw) {
+		dataViewAction->setEnabled(false);
+	}
+
+	this->dataViewAction->setChecked(settings.showMapped);
 	this->enableGridAction->setChecked(settings.isGridEnabled);
 	this->enableDrawEPAction->setChecked(settings.isDrawEPEnabled);
 	this->enableDrawSecHdrsAction->setChecked(settings.isDrawSecHdrsEnabled);
@@ -441,11 +454,15 @@ void SectionsDiagram::drawSections(QPainter *painter)
 
 	if (secNum > 0) {
 		size_t secUnits = 0;
+
 		const size_t colorsNum = settings.colors.size();
+
 		/* draw sections */
 		painter->setPen(textPen);
 		int secIndex = -1;
 		for (int j = 0; j < secNum; j++) {
+			const QColor currColor = settings.colors[j % colorsNum];
+
 			double startPosition = this->myModel->unitOfSectionBegin(j, isRaw);
 			int yBgn = rect.top() + (startPosition * (rect.height() - 1) / totalUnits);
 			if (settings.isDrawOffsets) {
@@ -454,13 +471,13 @@ void SectionsDiagram::drawSections(QPainter *painter)
 				painter->drawText(5, yBgn, name);
 			}
 			painter->drawLine(rect.left(), yBgn, rect.right(), yBgn);
-			secUnits = this->myModel->unitsOfSection(j, isRaw);
+			secUnits = this->myModel->unitsOfSection(j, isRaw, settings.showMapped);
 			if (secUnits > 0) {
 				int h = (secUnits * rect.height()) / totalUnits;
-				h = h * this->myModel->percentFilledInSection(j, isRaw);
+				h = h * this->myModel->percentFilledInSection(j, isRaw, settings.showMapped);
 				h += (h > 0)? 1: 0; 
 				int w = rect.right() - rect.left();
-				painter->fillRect(QRect(rect.left() + 1, yBgn, w, h), settings.colors[j % colorsNum]);
+				painter->fillRect(QRect(rect.left() + 1, yBgn, w, h), currColor);
 			}
 			if (settings.isDrawSecNames) {
 				QString secName = this->myModel->nameOfSection(j);
