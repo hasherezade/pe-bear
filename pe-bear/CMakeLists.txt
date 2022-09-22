@@ -4,7 +4,7 @@ project (PE-bear)
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
 set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
-SET(COMMIT_HASH "" CACHE STRING "Commit Hash")
+set(COMMIT_HASH "" CACHE STRING "Commit Hash")
 
 message(STATUS "sigfind_dir='${SIGFIND_DIR}'")
 message(STATUS "sigfind_lib='${SIGFIND_LIB}'")
@@ -250,6 +250,7 @@ IF (WIN32)
 	ENDIF()
 ENDIF()
 
+add_definitions(-DCOMMIT_HASH=${COMMIT_HASH})
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(MACOSX TRUE)
