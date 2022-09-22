@@ -441,14 +441,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 
 	if (secNum > 0) {
 		size_t secUnits = 0;
-		const size_t COLORS_NUM = 5;
-			QColor colors[COLORS_NUM] = {
-			QColor(0, 0, 255, 100),
-			QColor(255, 255, 0, 100),
-			QColor(25, 255, 0, 100),
-			QColor(255, 34, 0, 100),
-			QColor(200, 0, 255, 100)
-		};
+		const size_t colorsNum = settings.colors.size();
 		/* draw sections */
 		painter->setPen(textPen);
 		int secIndex = -1;
@@ -467,7 +460,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 				h = h * this->myModel->percentFilledInSection(j, isRaw);
 				h += (h > 0)? 1: 0; 
 				int w = rect.right() - rect.left();
-				painter->fillRect(QRect(rect.left() + 1, yBgn, w, h), colors[j % COLORS_NUM]);
+				painter->fillRect(QRect(rect.left() + 1, yBgn, w, h), settings.colors[j % colorsNum]);
 			}
 			if (settings.isDrawSecNames) {
 				QString secName = this->myModel->nameOfSection(j);

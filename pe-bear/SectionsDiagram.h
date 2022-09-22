@@ -1,5 +1,6 @@
 #pragma once
 #include <QtGlobal>
+#include <vector>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
@@ -64,6 +65,7 @@ public:
 		isRaw(_isRaw),
 		isGridEnabled(false), isDrawEPEnabled(true), isDrawSecHdrsEnabled(true), isDrawOffsets(true), isDrawSecNames(true)
 	{
+		loadDefaultColors();
 	}
 
 public slots:
@@ -74,6 +76,15 @@ public slots:
 	void setDrawSecNames(bool enable) { isDrawSecNames = enable; refreshParent(); }
 
 protected:
+	void loadDefaultColors()
+	{
+		colors.push_back(QColor(0, 0, 255, 100));
+		colors.push_back(QColor(255, 255, 0, 100));
+		colors.push_back(QColor(25, 255, 0, 100));
+		colors.push_back(QColor(255, 34, 0, 100));
+		colors.push_back(QColor(200, 0, 255, 100));
+	}
+
 	void refreshParent()
 	{
 		emit settingsUpdated();
@@ -85,6 +96,7 @@ protected:
 	bool isDrawSecHdrsEnabled;
 	bool isDrawOffsets;
 	bool isDrawSecNames;
+	std::vector<QColor> colors;
 
 	friend class SectionsDiagram;
 	friend class SelectableSecDiagram;
