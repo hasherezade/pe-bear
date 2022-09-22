@@ -36,18 +36,18 @@ public:
 	double unitOfHeadersEnd(bool isRaw);
 	double unitOfSectionBegin(int index, bool isRaw);
 	DWORD getSectionBegin(int index, bool isRaw);
-	double unitOfAddress(uint32_t address, bool isRaw);
+	double unitOfAddress(offset_t address, bool isRaw);
 
 	DWORD getEntryPoint(bool isRaw);
 
 	QString nameOfSection(int index);
 	int secIndexAtUnit(int unitNum, bool isRaw);
 
-	void selectFromAddress(uint32_t offset);
+	void selectFromAddress(offset_t offset);
 	SectionHdrWrapper* getSectionAtUnit(int unitNum, bool isRaw);
 
 protected:
-	DWORD selectedStart, selectedEnd;
+	offset_t selectedStart, selectedEnd;
 friend class SelectableSecDiagram;
 };
 //--------------------------------------------------------------------------------------

@@ -86,10 +86,10 @@ void SecDiagramModel::setSelectedArea(offset_t selStart, bufsize_t pageSize)
 	emit modelUpdated();
 }
 
-void SecDiagramModel::selectFromAddress(uint32_t offset)
+void SecDiagramModel::selectFromAddress(offset_t offset)
 {
 	if (!this->myPeHndl) return;
-	if (offset < 0 || offset >= m_PE->getRawSize()) return;
+	if (offset == INVALID_ADDR || offset >= m_PE->getRawSize()) return;
 	
 	this->selectedStart = offset;
 	this->myPeHndl->setPageOffset(this->selectedStart);
@@ -123,10 +123,12 @@ size_t SecDiagramModel::unitsOfSection(int index, bool isRaw, bool showMapped)
 	if (sec == NULL) return 0;
 
 	const bufsize_t unitSize = this->getUnitSize(isRaw);
-	// always use the RAW section size:
-	Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
-	const bufsize_t size = showMapped ? sec->getContentSize(Executable::RAW, true) : sec->getContentSize(aType, true);
 	if (!unitSize) return 0;
+
+	Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
+	const bufsize_t size = showMapped 
+		? sec->getContentSize(Executable::RAW, true) // always use the RAW section size:
+		: sec->getContentSize(aType, true);
 
 	return pe_util::unitsCount(size, unitSize);
 }
@@ -139,16 +141,17 @@ double SecDiagramModel::percentFilledInSection(int index, bool isRaw, bool showM
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(index);
 	if (!sec) return 0;
 
-	// always use the RAW section size:
 	Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
-	const bufsize_t size = showMapped ? sec->getContentSize(Executable::RAW, true) : sec->getContentSize(aType, true);
+	const bufsize_t size = showMapped 
+		? sec->getContentSize(Executable::RAW, true) // always use the RAW section size:
+		: sec->getContentSize(aType, true);
 
 	bufsize_t unitSize = this->getUnitSize(isRaw);
 	size_t units = unitsOfSection(index, isRaw, showMapped);
 	bufsize_t roundedSize = units * unitSize;
 	if (roundedSize == 0) return 0;
 	
-	double res = double(size)/ double(roundedSize);
+	const double res = double(size)/ double(roundedSize);
 	return res;
 }
 
@@ -174,13 +177,13 @@ DWORD SecDiagramModel::getSectionBegin(int index, bool isRaw)
 	if (!sec) return 0;
 
 	const Executable::addr_type aType = isRaw ? Executable::RAW : Executable::RVA;
-	DWORD bgn = sec->getContentOffset(aType);
+	const offset_t bgn = sec->getContentOffset(aType);
 	return bgn;
 }
 
-double SecDiagramModel::unitOfAddress(uint32_t address, bool isRaw)
+double SecDiagramModel::unitOfAddress(offset_t address, bool isRaw)
 {
-	if (!this->m_PE) return (-1);
+	if (!this->m_PE || address == INVALID_ADDR) return (-1);
 
 	bufsize_t unitSize = this->getUnitSize(isRaw);
 	if (!unitSize) return (-1);
@@ -204,7 +207,7 @@ double SecDiagramModel::unitOfEntryPoint(bool isRaw)
 double SecDiagramModel::unitOfHeadersEnd(bool isRaw)
 {
 	if (!this->m_PE) return -1;
-	uint32_t secHdrsOffset = m_PE->secHdrsEndOffset();
+	offset_t secHdrsOffset = m_PE->secHdrsEndOffset();
 	return unitOfAddress(secHdrsOffset, isRaw);
 }
 
@@ -466,7 +469,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 			double startPosition = this->myModel->unitOfSectionBegin(j, isRaw);
 			int yBgn = rect.top() + (startPosition * (rect.height() - 1) / totalUnits);
 			if (settings.isDrawOffsets) {
-				DWORD secBgn = this->myModel->getSectionBegin(j, isRaw);
+				offset_t secBgn = this->myModel->getSectionBegin(j, isRaw);
 				QString name = QString::number(secBgn, 16).toUpper();
 				painter->drawText(5, yBgn, name);
 			}
@@ -633,7 +636,7 @@ void SelectableSecDiagram::mousePressEvent(QMouseEvent *event)
 	int unitNum = unitAtPosY(currY);
 	if (unitNum == (-1)) return;
 
-	int unitSize = this->myModel->getUnitSize(true);
+	bufsize_t unitSize = this->myModel->getUnitSize(true);
 	if (unitSize <= 0) unitSize = PAGE_SIZE;
 	int value = unitSize * unitNum;
 
