@@ -64,9 +64,14 @@ public:
 		: QObject(parent),
 		isRaw(_isRaw),
 		showMapped(true),
-		isGridEnabled(false), isDrawEPEnabled(true), isDrawSecHdrsEnabled(true), isDrawOffsets(true), isDrawSecNames(true)
+		isGridEnabled(false), isDrawEPEnabled(true), isDrawSecHdrsEnabled(true), isDrawOffsets(true), isDrawSecNames(true),
+		isDrawSelected(false)
 	{
 		loadDefaultColors();
+
+		bgColor = QColor(DIAGRAM_BG);
+		selectionColor = QColor(DIAGRAM_BG);
+		selectionColor.setAlpha(150);
 	}
 
 public slots:
@@ -99,7 +104,10 @@ protected:
 	bool isDrawSecHdrsEnabled;
 	bool isDrawOffsets;
 	bool isDrawSecNames;
+	bool isDrawSelected;
+
 	std::vector<QColor> colors;
+	QColor bgColor, selectionColor;
 
 	friend class SectionsDiagram;
 	friend class SelectableSecDiagram;
@@ -119,7 +127,6 @@ public:
 	void setBackgroundColor(QColor bgColor);
 	
 	QColor contourColor;
-	bool isDrawSelected;
 
 public slots:
 	void showMenu(QPoint p);
@@ -149,7 +156,6 @@ protected:
 
 	SecDiagramModel *myModel;
 	QPixmap pixmap;
-	QColor bgColor, selectionColor;
 	int curZoom;
 	SectionsDiagramSettings settings;
 	bool isRaw;

@@ -331,7 +331,7 @@ void SectionsDiagram::mouseMoveEvent(QMouseEvent *event)
 
 void SectionsDiagram::setBackgroundColor(QColor bgColor)
 {
-	this->bgColor = bgColor;
+	this->settings.bgColor = bgColor;
 	QPalette p = this->palette();
 	p.setColor(QPalette::Base, bgColor);
 	setPalette(p);
@@ -407,7 +407,7 @@ void SectionsDiagram::refreshPixmap()
 	needRefresh = false;
 	this->setMinimumWidth(minimumSizeHint().width());
 	pixmap = QPixmap(size());
-	pixmap.fill(this->bgColor);
+	pixmap.fill(this->settings.bgColor);
 	
 	QPainter painter(&pixmap);
 	if (this->myModel) 
@@ -488,7 +488,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 
 	if (settings.isDrawEPEnabled) drawEntryPoint(painter, rect, LEFT_PAD, RIGHT_PAD);
 	if (settings.isDrawSecHdrsEnabled) drawSecHeaders(painter, rect, LEFT_PAD, RIGHT_PAD);
-	if (isDrawSelected) drawSelected(painter, rect, LEFT_PAD, RIGHT_PAD);
+	if (settings.isDrawSelected) drawSelected(painter, rect, LEFT_PAD, RIGHT_PAD);
 
 	/* draw grid */
 	const int MAX_TO_DRAW = 1000;
@@ -586,13 +586,10 @@ SelectableSecDiagram::SelectableSecDiagram(SecDiagramModel *model, bool isRawVie
 	this->setMouseTracking(true);
 
 	// default settings for this type of diagram:
-	this->isDrawSelected = true;
+	settings.isDrawSelected = true;
 	settings.setDrawOffsets(false);
 	settings.setDrawSecNames(false);
 
-	bgColor = QColor(DIAGRAM_BG);
-	selectionColor = QColor(DIAGRAM_BG);
-	selectionColor.setAlpha(150);
 	cursorUpPix = QPixmap(":/icons/arr_up.ico");
 	cursorDownPix = QPixmap(":/icons/arr_down.ico");
 	upCursor = QCursor(cursorUpPix, 0, 0);
@@ -608,7 +605,7 @@ void SelectableSecDiagram::drawSelected(QPainter *painter, QRect &rect, int LEFT
 		return;
 	}
 	
-	QPen epPen(selectionColor);
+	QPen epPen(settings.selectionColor);
 	
 	epPen.setWidth(3);
 	painter->setPen(epPen);
@@ -625,7 +622,7 @@ void SelectableSecDiagram::drawSelected(QPainter *painter, QRect &rect, int LEFT
 	QRect rect1( QPoint(rect.left() - LEFT_PAD, y1), QPoint(rect.right() + RIGHT_PAD, y2) );
 	selY1 = y1;
 	selY2 = y2;
-	painter->fillRect(rect1, selectionColor);
+	painter->fillRect(rect1, settings.selectionColor);
 }
 
 void SelectableSecDiagram::mousePressEvent(QMouseEvent *event)
