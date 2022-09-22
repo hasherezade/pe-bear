@@ -190,10 +190,6 @@ void PEDockedWidget::updateModifActions()
 
 void PEDockedWidget::setupDiagram()
 {
-	this->diagram->isDrawSelected = true;
-	this->diagram->setDrawOffsets(false);
-	this->diagram->setDrawSecNames(false);
-	this->diagram->setDrawEP(true);
 	this->diagram->setBackgroundColor(Qt::black);
 	this->diagram->contourColor = Qt::lightGray;
 	this->diagram->setMaximumWidth(this->diagram->minimumSizeHint().width());

@@ -49,9 +49,48 @@ protected:
 	DWORD selectedStart, selectedEnd;
 friend class SelectableSecDiagram;
 };
-
 //--------------------------------------------------------------------------------------
 
+class SectionsDiagramSettings : public QObject
+{
+	Q_OBJECT
+
+signals:
+	void settingsUpdated();
+
+public:
+	SectionsDiagramSettings(bool _isRaw, QObject *parent)
+		: QObject(parent),
+		isRaw(_isRaw),
+		isGridEnabled(false), isDrawEPEnabled(true), isDrawSecHdrsEnabled(true), isDrawOffsets(true), isDrawSecNames(true)
+	{
+	}
+
+public slots:
+	void setEnableGrid(bool enable) { isGridEnabled = enable; refreshParent(); }
+	void setDrawEP(bool enable) { isDrawEPEnabled = enable; refreshParent(); }
+	void setDrawSecHdrs(bool enable) { isDrawSecHdrsEnabled = enable; refreshParent(); }
+	void setDrawOffsets(bool enable) { isDrawOffsets = enable;  refreshParent(); }
+	void setDrawSecNames(bool enable) { isDrawSecNames = enable; refreshParent(); }
+
+protected:
+	void refreshParent()
+	{
+		emit settingsUpdated();
+	}
+
+	bool isRaw;
+	bool isGridEnabled;
+	bool isDrawEPEnabled;
+	bool isDrawSecHdrsEnabled;
+	bool isDrawOffsets;
+	bool isDrawSecNames;
+
+	friend class SectionsDiagram;
+	friend class SelectableSecDiagram;
+};
+
+//--------------------------------------------------------------------------------------
 class SectionsDiagram : public QMainWindow
 {
 	Q_OBJECT
@@ -68,12 +107,6 @@ public:
 	bool isDrawSelected;
 
 public slots:
-	void setEnableGrid(bool enable) { isGridEnabled = enable; refreshPixmap(); }
-	void setDrawEP(bool enable) { isDrawEPEnabled = enable; refreshPixmap(); }
-	void setDrawSecHdrs(bool enable) { isDrawSecHdrsEnabled = enable; refreshPixmap(); }
-	void setDrawOffsets(bool enable) { isDrawOffsets = enable; this->setMinimumWidth(minimumSizeHint().width()); refreshPixmap(); }
-	void setDrawSecNames(bool enable) { isDrawSecNames = enable; this->setMinimumWidth(minimumSizeHint().width()); refreshPixmap(); }
-
 	void showMenu(QPoint p);
 	void refreshPixmap();
 
@@ -102,8 +135,7 @@ protected:
 	QPixmap pixmap;
 	QColor bgColor, selectionColor;
 	int curZoom;
-	bool isGridEnabled;
-	bool isDrawEPEnabled, isDrawSecHdrsEnabled, isDrawOffsets, isDrawSecNames;
+	SectionsDiagramSettings settings;
 	bool isRaw;
 
 	int selY1, selY2;
