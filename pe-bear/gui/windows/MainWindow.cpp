@@ -656,6 +656,12 @@ void MainWindow::info()
 	msg += "<br/>";
 	msg += "built on: " + QString(__DATE__) + "\n";
 	msg += "<br/>";
+#ifdef COMMIT_HASH
+	QString hash = QString(COMMIT_HASH);
+	if (hash.length() > 0) {
+		msg += "commit hash: " + QString(COMMIT_HASH) + "<br/>";
+	}
+#endif
 	msg += "author: Hasherezade (<a href='" + QString(MY_SITE_LINK) + "'>homepage</a>)<br/>";
 	msg += "Source code & more info: <a href='" + QString(SOURCE_LINK) + "'>here</a><br/>";
 	msg += "<br/>";
