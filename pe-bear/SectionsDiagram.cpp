@@ -426,7 +426,6 @@ void SectionsDiagram::drawSections(QPainter *painter)
 	if (!rect.isValid())
 		return;
 
-	QPen borderPen(Qt::lightGray);
 	QPen descPen(Qt::red);
 	QPen textPen(this->contourColor);
 
@@ -439,16 +438,6 @@ void SectionsDiagram::drawSections(QPainter *painter)
 	int textY = 0;
 	int prevSecNum = 0;
 	size_t secNum = this->myModel->getSecNum();
-
-	/* draw grid */
-	painter->setPen(borderPen);
-	const int MAX_TO_DRAW = 1000;
-	if (settings.isGridEnabled ) {
-		for (int j = 0; j < totalUnits && j < MAX_TO_DRAW; j++) {
-			int y = rect.top() + (j * (rect.height() - 1) / totalUnits);
-			painter->drawLine(rect.left(), y, rect.right(), y);
-		}
-	}
 
 	if (secNum > 0) {
 		size_t secUnits = 0;
@@ -490,6 +479,20 @@ void SectionsDiagram::drawSections(QPainter *painter)
 	if (settings.isDrawEPEnabled) drawEntryPoint(painter, rect, LEFT_PAD, RIGHT_PAD);
 	if (settings.isDrawSecHdrsEnabled) drawSecHeaders(painter, rect, LEFT_PAD, RIGHT_PAD);
 	if (isDrawSelected) drawSelected(painter, rect, LEFT_PAD, RIGHT_PAD);
+
+	/* draw grid */
+	const int MAX_TO_DRAW = 1000;
+	if (settings.isGridEnabled) {
+		
+		QPen borderPen(Qt::lightGray);
+		borderPen.setStyle(Qt::DotLine);
+		painter->setPen(borderPen);
+
+		for (int j = 0; j < totalUnits && j < MAX_TO_DRAW; j++) {
+			int y = rect.top() + (j * (rect.height() - 1) / totalUnits);
+			painter->drawLine(rect.left(), y, rect.right(), y);
+		}
+	}
 }
 
 void SectionsDiagram::drawSecHeaders(QPainter *painter, QRect &rect, int LEFT_PAD, int RIGHT_PAD)
