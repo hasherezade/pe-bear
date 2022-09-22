@@ -239,23 +239,25 @@ void SectionsDiagram::createActions()
 {
 	this->enableDrawEPAction = new QAction("Entry Point", this);
 	this->enableDrawEPAction->setCheckable(true);
-	connect(this->enableDrawEPAction, SIGNAL(triggered(bool)), this, SLOT(setDrawEP(bool)));
+	connect(this->enableDrawEPAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawEP(bool)));
 
 	this->enableDrawSecHdrsAction = new QAction("Sections Headers end", this);
 	this->enableDrawSecHdrsAction->setCheckable(true);
-	connect(this->enableDrawSecHdrsAction, SIGNAL(triggered(bool)), this, SLOT(setDrawSecHdrs(bool)));
+	connect(this->enableDrawSecHdrsAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawSecHdrs(bool)));
 
 	this->enableGridAction = new QAction("Grid", this);
 	this->enableGridAction->setCheckable(true);
-	connect(this->enableGridAction, SIGNAL(triggered(bool)), this, SLOT(setEnableGrid(bool)));
+	connect(this->enableGridAction, SIGNAL(triggered(bool)), &settings, SLOT(setEnableGrid(bool)));
 
 	this->enableOffsetsAction = new QAction("Sections &Offsets", this);
 	this->enableOffsetsAction->setCheckable(true);
-	connect(this->enableOffsetsAction, SIGNAL(triggered(bool)), this, SLOT(setDrawOffsets(bool)));
+	connect(this->enableOffsetsAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawOffsets(bool)));
 
 	this->enableSecNamesAction = new QAction("Sections &Names", this);
 	this->enableSecNamesAction->setCheckable(true);
-	connect(this->enableSecNamesAction, SIGNAL(triggered(bool)), this, SLOT(setDrawSecNames(bool)));
+	connect(this->enableSecNamesAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawSecNames(bool)));
+
+	connect(&settings, SIGNAL(settingsUpdated()), this, SLOT(refreshPixmap()));
 }
 
 void SectionsDiagram::destroyActions()
@@ -268,9 +270,8 @@ void SectionsDiagram::destroyActions()
 }
 
 SectionsDiagram::SectionsDiagram(SecDiagramModel *model, bool viewRawAddresses , QWidget *parent)
-	: QMainWindow(parent), myModel(NULL), isRaw(viewRawAddresses), menu(this),
-	isDrawSecNames(true), isDrawOffsets(true), isDrawSelected(false),
-	selY1(0), selY2(0),  needRefresh(true)
+	: QMainWindow(parent), myModel(NULL), isRaw(viewRawAddresses), settings(viewRawAddresses, this), menu(this),
+	selY1(0), selY2(0), needRefresh(true)
 {
 	setModel(model);
 	this->setMouseTracking(true);
@@ -285,12 +286,9 @@ SectionsDiagram::SectionsDiagram(SecDiagramModel *model, bool viewRawAddresses ,
 	menu.addAction(this->enableOffsetsAction);
 	menu.addAction(this->enableSecNamesAction);
 
-	isGridEnabled = false;
-	isDrawEPEnabled = true;
-	isDrawSecHdrsEnabled = true;
-	this->enableGridAction->setChecked(isGridEnabled);
-	this->enableDrawEPAction->setChecked(isDrawEPEnabled);
-	this->enableDrawSecHdrsAction->setChecked(isDrawSecHdrsEnabled);
+	this->enableGridAction->setChecked(settings.isGridEnabled);
+	this->enableDrawEPAction->setChecked(settings.isDrawEPEnabled);
+	this->enableDrawSecHdrsAction->setChecked(settings.isDrawSecHdrsEnabled);
 	
 	QColor bgColor(DIAGRAM_BG);
 	bgColor.setAlpha(140);
@@ -339,7 +337,7 @@ QSize SectionsDiagram::minimumSizeHint() const
 
 	const int Y_TOP = getHPad();
 	
-	if (!this->isDrawOffsets && !this->isDrawSecNames)
+	if (!this->settings.isDrawOffsets && !this->settings.isDrawSecNames)
 		return QSize((MIN_LEFT_PAD + MIN_BAR_WIDTH + MIN_RIGHT_PAD), Y_TOP);
 
 	return QSize((MAX_LEFT_PAD + MIN_BAR_WIDTH + MAX_RIGHT_PAD), 4 * Y_TOP);
@@ -378,12 +376,12 @@ void SectionsDiagram::setModel(SecDiagramModel *model)
 
 void SectionsDiagram::showMenu(QPoint p)
 { 
-	this->enableDrawEPAction->setChecked(isDrawEPEnabled);
-	this->enableDrawSecHdrsAction->setChecked(this->isDrawSecHdrsEnabled);
-	this->enableGridAction->setChecked(this->isGridEnabled);
+	this->enableDrawEPAction->setChecked(settings.isDrawEPEnabled);
+	this->enableDrawSecHdrsAction->setChecked(this->settings.isDrawSecHdrsEnabled);
+	this->enableGridAction->setChecked(this->settings.isGridEnabled);
 
-	this->enableOffsetsAction->setChecked(this->isDrawOffsets);
-	this->enableSecNamesAction->setChecked(this->isDrawSecNames);
+	this->enableOffsetsAction->setChecked(this->settings.isDrawOffsets);
+	this->enableSecNamesAction->setChecked(this->settings.isDrawSecNames);
 	menu.exec(mapToGlobal(p)); 
 }
 
@@ -394,6 +392,7 @@ void SectionsDiagram::refreshPixmap()
 		return;
 	}
 	needRefresh = false;
+	this->setMinimumWidth(minimumSizeHint().width());
 	pixmap = QPixmap(size());
 	pixmap.fill(this->bgColor);
 	
@@ -418,7 +417,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 	int LEFT_PAD = MAX_LEFT_PAD;
 	int RIGHT_PAD = MAX_RIGHT_PAD;
 	
-	if (!this->isDrawSecNames && !this->isDrawOffsets) {
+	if (!this->settings.isDrawSecNames && !this->settings.isDrawOffsets) {
 		LEFT_PAD = MIN_LEFT_PAD;
 		RIGHT_PAD = MIN_RIGHT_PAD;
 	}
@@ -444,7 +443,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 	/* draw grid */
 	painter->setPen(borderPen);
 	const int MAX_TO_DRAW = 1000;
-	if (isGridEnabled ) {
+	if (settings.isGridEnabled ) {
 		for (int j = 0; j < totalUnits && j < MAX_TO_DRAW; j++) {
 			int y = rect.top() + (j * (rect.height() - 1) / totalUnits);
 			painter->drawLine(rect.left(), y, rect.right(), y);
@@ -467,7 +466,7 @@ void SectionsDiagram::drawSections(QPainter *painter)
 		for (int j = 0; j < secNum; j++) {
 			double startPosition = this->myModel->unitOfSectionBegin(j, isRaw);
 			int yBgn = rect.top() + (startPosition * (rect.height() - 1) / totalUnits);
-			if (isDrawOffsets) {
+			if (settings.isDrawOffsets) {
 				DWORD secBgn = this->myModel->getSectionBegin(j, isRaw);
 				QString name = QString::number(secBgn, 16).toUpper();
 				painter->drawText(5, yBgn, name);
@@ -481,15 +480,15 @@ void SectionsDiagram::drawSections(QPainter *painter)
 				int w = rect.right() - rect.left();
 				painter->fillRect(QRect(rect.left() + 1, yBgn, w, h), colors[j % COLORS_NUM]);
 			}
-			if (isDrawSecNames) {
+			if (settings.isDrawSecNames) {
 				QString secName = this->myModel->nameOfSection(j);
 				painter->drawText(rect.left() + MIN_BAR_WIDTH, yBgn + HPAD, secName);
 			}
 		}
 	}
 
-	if (isDrawEPEnabled) drawEntryPoint(painter, rect, LEFT_PAD, RIGHT_PAD);
-	if (isDrawSecHdrsEnabled) drawSecHeaders(painter, rect, LEFT_PAD, RIGHT_PAD);
+	if (settings.isDrawEPEnabled) drawEntryPoint(painter, rect, LEFT_PAD, RIGHT_PAD);
+	if (settings.isDrawSecHdrsEnabled) drawSecHeaders(painter, rect, LEFT_PAD, RIGHT_PAD);
 	if (isDrawSelected) drawSelected(painter, rect, LEFT_PAD, RIGHT_PAD);
 }
 
@@ -544,7 +543,7 @@ int SectionsDiagram::unitAtPosY(int posY)
 	int LEFT_PAD = MAX_LEFT_PAD;
 	int RIGHT_PAD = MAX_RIGHT_PAD;
 	
-	if (!this->isDrawSecNames && !this->isDrawOffsets) {
+	if (!this->settings.isDrawSecNames && !this->settings.isDrawOffsets) {
 		LEFT_PAD = MIN_LEFT_PAD;
 		RIGHT_PAD = MIN_RIGHT_PAD;
 	}
@@ -572,7 +571,12 @@ SelectableSecDiagram::SelectableSecDiagram(SecDiagramModel *model, bool isRawVie
 	: SectionsDiagram(model, isRawView, parent)
 {
 	this->setMouseTracking(true);
-	
+
+	// default settings for this type of diagram:
+	this->isDrawSelected = true;
+	settings.setDrawOffsets(false);
+	settings.setDrawSecNames(false);
+
 	bgColor = QColor(DIAGRAM_BG);
 	selectionColor = QColor(DIAGRAM_BG);
 	selectionColor.setAlpha(150);
