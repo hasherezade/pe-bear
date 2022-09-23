@@ -34,11 +34,11 @@ HexInputDialog::HexInputDialog(QString title, QString caption, QWidget *parent)
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(rejected()));
 }
 
-long long HexInputDialog::getNumValue(bool *isValid)
+qulonglong HexInputDialog::getNumValue(bool *isValid)
 {
 	bool is_converted = false;
 	QString textVal = le->text();
-	long long value = textVal.toLongLong(&is_converted, 16);
+	qulonglong value = textVal.toULongLong(&is_converted, 16);
 
 	if (isValid != nullptr) {
 		(*isValid) = is_converted;
@@ -46,7 +46,7 @@ long long HexInputDialog::getNumValue(bool *isValid)
 	return value;
 }
 
-void HexInputDialog::setDefaultValue(long long number)
+void HexInputDialog::setDefaultValue(qulonglong number)
 {
 	le->setText(QString::number(number, 16).toUpper());
 }

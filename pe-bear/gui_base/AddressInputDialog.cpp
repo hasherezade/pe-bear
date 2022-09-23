@@ -79,17 +79,17 @@ void AddressInputDialog::validateAddr()
 {
 	bool isAccepted = false;
 
-	if (!myExe) {
-		isAccepted = false;
-	} else {
+	if (myExe) {
 		Executable::addr_type aT = getAddrType();
 
 		bool isValid = false;
-		long long val = getNumValue(&isValid);
-		offset_t otherFmt = convertToOther(val, aT);
+		qulonglong val = getNumValue(&isValid);
+		const offset_t otherFmt = convertToOther(val, aT);
 		
-		if (isValid && otherFmt != INVALID_ADDR && myExe->toRaw(val, aT) != INVALID_ADDR) {
+		if (isValid && myExe->toRaw(val, aT) != INVALID_ADDR) {
 			isAccepted = true;
+		}
+		if (otherFmt != INVALID_ADDR) {
 			otherEdit->setText(QString::number(otherFmt, 16).toUpper());
 		} else {
 			otherEdit->setText("<invalid>");
@@ -99,7 +99,6 @@ void AddressInputDialog::validateAddr()
 	if (isAccepted == false) {
 		this->le->setStyleSheet("border: 2px solid red;");
 	} else {
-
 		this->le->setStyleSheet("");
 	}
 

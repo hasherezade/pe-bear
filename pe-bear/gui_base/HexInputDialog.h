@@ -23,8 +23,8 @@ public:
 		delete vbox;
 	}
 
-	long long getNumValue(bool *isValid = NULL);
-	void setDefaultValue(long long number);
+	qulonglong getNumValue(bool *isValid = NULL);
+	void setDefaultValue(qulonglong number);
 
 	void setRegex(const QRegExp &regex) { validator->setRegExp(regex); }
 	void setMaxLength(int len) { le->setMaxLength(len); }
