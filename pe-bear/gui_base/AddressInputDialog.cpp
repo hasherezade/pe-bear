@@ -86,9 +86,9 @@ void AddressInputDialog::validateAddr()
 
 		bool isValid = false;
 		long long val = getNumValue(&isValid);
-		long long otherFmt = convertToOther(val, aT);
+		offset_t otherFmt = convertToOther(val, aT);
 		
-		if (isValid && myExe->toRaw(val, aT) != INVALID_ADDR) {
+		if (isValid && otherFmt != INVALID_ADDR && myExe->toRaw(val, aT) != INVALID_ADDR) {
 			isAccepted = true;
 			otherEdit->setText(QString::number(otherFmt, 16).toUpper());
 		} else {
