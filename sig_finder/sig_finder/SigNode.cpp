@@ -35,7 +35,7 @@ SigNode::~SigNode()
 	}
 }
 
-SigNode* SigNode::getWildc(uint8_t val)
+SigNode* SigNode::getWildc()
 {
 	/* TODO: value masking */
 	SigNode srchd(WILD_ONE, WILDC);
