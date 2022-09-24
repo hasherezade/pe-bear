@@ -82,8 +82,8 @@ public:
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	virtual QVariant data(const QModelIndex &index, int role) const;
 	
-	uint32_t getParentId() { return parentId; }
-	uint32_t getLeafId() { return leafId; }
+	long getParentId() { return parentId; }
+	long getLeafId() { return leafId; }
 
 	Executable::addr_type addrTypeAt(QModelIndex index) const;
 	offset_t getFieldOffset(QModelIndex index) const;
@@ -105,6 +105,6 @@ protected:
 		COLS_NUM
 	};
 
-	size_t parentId;
-	uint32_t leafId;
+	long parentId;
+	long leafId;
 };

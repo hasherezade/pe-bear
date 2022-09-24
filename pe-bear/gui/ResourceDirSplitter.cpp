@@ -246,7 +246,7 @@ void ResourcesDirSplitter::refreshLeafContent()
 	if (leafModel == NULL) return;
 
 	size_t childId = leafModel->getLeafId();
-	int x = leafModel->getParentId();
+	long x = leafModel->getParentId();
 
 	ResourceEntryWrapper* eDir = dynamic_cast<ResourceEntryWrapper*> (myPeHndl->resourcesDirWrapper.getEntryAt(x));
 	if (eDir == NULL) return; //should never happen!
