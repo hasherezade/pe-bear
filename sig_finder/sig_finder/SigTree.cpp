@@ -100,7 +100,7 @@ void SigTree::insertPckrSign(PckrSign* sign)
 }
 
 
-matched SigTree::getMatching(char *buf, size_t buf_len, bool skipNOPs)
+matched SigTree::getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs)
 {
 	matched matchedSet;
 	matchedSet.match_offset = 0;
@@ -113,7 +113,7 @@ matched SigTree::getMatching(char *buf, size_t buf_len, bool skipNOPs)
 	long checked = 0;
 	long skipped = 0;
 	for (int indx = 0; indx < buf_len; indx++) {
-		char b = buf[indx];
+		uint8_t b = buf[indx];
 
 		std::vector<SigNode*> level2;
 		std::vector<SigNode*>::iterator lvlI;

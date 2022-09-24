@@ -7,7 +7,7 @@
 namespace sig_ma {
 	namespace util {
 
-		std::string to_hex(const unsigned char val)
+		std::string to_hex(const uint8_t val)
 		{
 			std::stringstream ss;
 			ss << std::setw(2) << std::setfill('0') << std::hex << (unsigned int)(val);
@@ -17,7 +17,7 @@ namespace sig_ma {
 	};
 };
 
-bool sig_ma::PckrSign::addNode(unsigned char val, sig_type type)
+bool sig_ma::PckrSign::addNode(uint8_t val, sig_type type)
 {
 	nodes.push_back(SigNode(val, type));
 

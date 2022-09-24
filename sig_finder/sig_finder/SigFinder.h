@@ -9,9 +9,9 @@ namespace sig_ma {
 class FoundPacker {
 
 public:
-	FoundPacker(long offs, sig_ma::PckrSign* sig) : offset(offs), signaturePtr(sig) { }
+	FoundPacker(uint64_t offs, sig_ma::PckrSign* sig) : offset(offs), signaturePtr(sig) { }
 
-	long offset;
+	uint64_t offset;
 	sig_ma::PckrSign* signaturePtr; // do not delete it - belongs to SignFinder
 
 	bool operator== (const FoundPacker& f2) { return (this->offset == f2.offset && this->signaturePtr == f2.signaturePtr);}
@@ -30,9 +30,9 @@ public:
 	SigFinder(void) {}
 	~SigFinder(void){}
 
-	PckrSign* getFirstMatch(char *buf, long buf_size, long start_offset = 0, match_direction md = FIXED);
+	PckrSign* getFirstMatch(uint8_t *buf, long buf_size, long start_offset = 0, match_direction md = FIXED);
 
-	matched getMatching(char *buf, long buf_size, long start_offset, match_direction md = FIXED);
+	matched getMatching(uint8_t *buf, long buf_size, long start_offset, match_direction md = FIXED);
 
 	size_t loadSignatures(const std::string &fname);
 

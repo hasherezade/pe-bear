@@ -7,11 +7,12 @@ using namespace sig_ma;
 
 //--------------------------------------
 
-bool SigNode::sig_compare::operator() (const SigNode* el1, const SigNode* el2 ) const {
+bool SigNode::sig_compare::operator() (const SigNode* el1, const SigNode* el2 ) const
+{
 	return (*el1) < (*el2); 
 }
 
-SigNode::SigNode(char val, sig_type type)
+SigNode::SigNode(uint8_t val, sig_type type)
 {
 	this->v =val;
 	this->type = type;
@@ -34,7 +35,7 @@ SigNode::~SigNode()
 	}
 }
 
-SigNode* SigNode::getWildc(char val)
+SigNode* SigNode::getWildc(uint8_t val)
 {
 	/* TODO: value masking */
 	SigNode srchd(WILD_ONE, WILDC);
@@ -43,7 +44,7 @@ SigNode* SigNode::getWildc(char val)
 	return (*found);
 }
 
-SigNode* SigNode::getChild(char val)
+SigNode* SigNode::getChild(uint8_t val)
 {
 	SigNode srchd(val, IMM);
 	std::set<SigNode*, sig_compare>::iterator found = childs.find(&srchd);
@@ -53,7 +54,7 @@ SigNode* SigNode::getChild(char val)
 
 //-----------------------------------------
 
-SigNode* SigNode::putChild(char val)
+SigNode* SigNode::putChild(uint8_t val)
 {
 	SigNode* f_node = NULL;
 	SigNode* srchd = new SigNode(val, IMM);
@@ -72,7 +73,7 @@ SigNode* SigNode::putChild(char val)
 	return f_node;
 }
 
-SigNode* SigNode::putWildcard(char val)
+SigNode* SigNode::putWildcard(uint8_t val)
 {
 	SigNode* f_node = NULL;
 	SigNode *srchd = new SigNode(val, WILDC);

@@ -21,7 +21,7 @@ size_t SigFinder::loadSignatures(const std::string &fname)
 }
 
 
-PckrSign* SigFinder::getFirstMatch(char *buf, long buf_size, long start_offset, match_direction md)
+PckrSign* SigFinder::getFirstMatch(uint8_t *buf, long buf_size, long start_offset, match_direction md)
 {
 	matched mtchd = getMatching(buf, buf_size, start_offset, md);
 	if (mtchd.signs.size() == 0) return NULL;
@@ -30,10 +30,10 @@ PckrSign* SigFinder::getFirstMatch(char *buf, long buf_size, long start_offset, 
 	return sign;
 }
 
-matched SigFinder::getMatching(char *buf, long buf_size, long start_offset, match_direction md)
+matched SigFinder::getMatching(uint8_t *buf, long buf_size, long start_offset, match_direction md)
 {
 	long srch_size = buf_size - start_offset;
-	char* srch_bgn = buf + start_offset;
+	uint8_t* srch_bgn = buf + start_offset;
 	size_t min_sig_len = tree.getMinLen();
 	
 	matched matched;

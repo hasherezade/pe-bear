@@ -218,7 +218,7 @@ PckrSign* PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT
 	offset_t startingRaw = m_PE->toRaw(startAddr, aT);
 	if (startingRaw == INVALID_ADDR) return NULL;
 
-	sig_ma::matched matchedSet = signFinder->getMatching((char*)content, contentSize, startingRaw, md);
+	sig_ma::matched matchedSet = signFinder->getMatching(content, contentSize, startingRaw, md);
 	int foundCount = matchedSet.signs.size();
 	if (foundCount == 0) return NULL;
 
@@ -249,19 +249,19 @@ PckrSign* PeHandler::findPackerInArea(offset_t rawOff, size_t areaSize, sig_ma::
 	BYTE *content = NULL;
 
 	bool isDeepSearch = false;
-	uint32_t foundOffset = 0;
+	offset_t foundOffset = 0;
 	PckrSign* packer = NULL;
 	int foundCount = 0;
 
 	for (size_t step = 0; step < areaSize; step++) {
 
 		size_t size = areaSize - step;
-		content = (BYTE*) m_PE->getContentAt(rawOff + step, Executable::RAW, size);
+		content = m_PE->getContentAt(rawOff + step, Executable::RAW, size);
 		if (content == NULL) {
 			//printf("content is NULL\n");
 			break;
 		}
-		sig_ma::matched matchedSet = signFinder->getMatching((char*) content, size, 0, md);
+		sig_ma::matched matchedSet = signFinder->getMatching(content, size, 0, md);
 		
 		foundCount += matchedSet.signs.size();
 		if (matchedSet.signs.size() == 0) break;

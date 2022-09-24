@@ -34,7 +34,7 @@ public:
 	bool addPckrSign(PckrSign *sign);
 	size_t loadFromFile(std::ifstream& input);
 
-	matched getMatching(char *buf, size_t buf_len, bool skipNOPs);
+	matched getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs);
 
 	size_t getMinLen() { return min_siglen; }
 	size_t getMaxLen() { return max_siglen; }

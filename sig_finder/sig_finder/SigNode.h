@@ -40,21 +40,21 @@ public:
 		bool operator()(const SigNode* el1, const SigNode* el2 ) const;
 	};
 
-	SigNode(char val, sig_type type = IMM);
+	SigNode(uint8_t val, sig_type type = IMM);
 	~SigNode();
 
-	SigNode* getWildc(char val);
-	SigNode* getChild(char val);
+	SigNode* getWildc(uint8_t val);
+	SigNode* getChild(uint8_t val);
 
-	SigNode* putChild(char val);
-	SigNode* putWildcard(char val);
+	SigNode* putChild(uint8_t val);
+	SigNode* putWildcard(uint8_t val);
 
 	bool operator==(const SigNode &el) const { return el.v == this->v; }
 	bool operator!=(const SigNode &el) const { return el.v != this->v; }
 	bool operator<(const SigNode &el) const { return el.v < this->v; }
 
 private:
-	char v;
+	uint8_t v;
 	sig_type type;
 	std::set<SigNode*, sig_compare> childs;
 	std::set<SigNode*, sig_compare> wildcards;
