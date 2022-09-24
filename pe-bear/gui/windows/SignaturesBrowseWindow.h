@@ -45,6 +45,7 @@ public:
 		COL_ID = 0,
 		COL_NAME,
 		COL_SIZE,
+		COL_PREVIEW,
 		MAX_COL
 	};
 

@@ -7,6 +7,7 @@ set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
 
 set (sig_srcs
 	sig_finder/SigNode.cpp
+	sig_finder/PckrSign.cpp
 	sig_finder/SigTree.cpp
 	sig_finder/SigFinder.cpp
 )

@@ -34,7 +34,7 @@ matched SigFinder::getMatching(char *buf, long buf_size, long start_offset, matc
 {
 	long srch_size = buf_size - start_offset;
 	char* srch_bgn = buf + start_offset;
-	long min_sig_len = tree.getMinLen();
+	size_t min_sig_len = tree.getMinLen();
 	
 	matched matched;
 	matched.match_offset = 0;

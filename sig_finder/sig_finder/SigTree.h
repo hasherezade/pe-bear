@@ -21,7 +21,7 @@ namespace sig_ma {
 
 struct matched {
 	std::set<PckrSign*> signs;
-	long match_offset;
+	uint64_t match_offset;
 };
 //------------------
 
@@ -36,8 +36,8 @@ public:
 
 	matched getMatching(char *buf, size_t buf_len, bool skipNOPs);
 
-	long getMinLen() { return min_siglen; }
-	long getMaxLen() { return max_siglen; }
+	size_t getMinLen() { return min_siglen; }
+	size_t getMaxLen() { return max_siglen; }
 
 protected:
 	void insertPckrSign(PckrSign* sign);
@@ -48,8 +48,8 @@ protected:
 	std::vector<PckrSign*> signaturesVec;
 	SigNode root;
 	
-	long min_siglen;
-	long max_siglen;
+	size_t min_siglen;
+	size_t max_siglen;
 
 private:
 	void clear(); //destroys all the signatures!

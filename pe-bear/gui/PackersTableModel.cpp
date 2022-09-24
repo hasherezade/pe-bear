@@ -69,7 +69,7 @@ QVariant PackersTableModel::data(const QModelIndex &index, int role) const
 	SectionHdrWrapper *sec = m_PE->getSecHdrAtOffset(offset, Executable::RAW);
 	switch (column) {
 		case COL_OFFSET: return QString::number(offset, 16);
-		case COL_NAME: return QString::fromStdString(sign->get_name());
+		case COL_NAME: return QString::fromStdString(sign->getName());
 		case COL_SECTION: {
 			if (sec) return sec->mappedName;
 		}

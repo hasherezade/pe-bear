@@ -175,7 +175,7 @@ size_t SigTree::loadFromFile(std::ifstream& input)
 
 		bool isFin = false;
 		// read signature chunks:
-		while ( !input.eof() && (sign->nodes.size() < signSize) ){
+		while ( !input.eof() && (sign->length() < signSize) ){
 
 			// parse all chunks from the line
 			char chunk[3] = { 0, 0, 0 };
@@ -193,11 +193,11 @@ size_t SigTree::loadFromFile(std::ifstream& input)
 			}
 			else break;
 
-			sign->nodes.push_back(SigNode(val, type));
+			sign->addNode(val, type);
 		}
 
 		// check if the signature is valid:
-		if (sign->nodes.size() == signSize) {
+		if (sign->length() == signSize) {
 			if (this->addPckrSign(sign)) { // <- new signature stored
 				loadedNum++;
 				continue; // success

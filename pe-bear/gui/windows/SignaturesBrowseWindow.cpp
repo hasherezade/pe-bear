@@ -19,6 +19,7 @@ QVariant SignaturesBrowseModel::headerData(int section, Qt::Orientation orientat
 			case COL_ID: return "ID";
 			case COL_NAME : return "Name";
 			case COL_SIZE: return "Size";
+			case COL_PREVIEW: return "Signature Content Preview";
 		}
 	}
 	return QVariant();
@@ -56,9 +57,11 @@ QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
 		case COL_ID:
 			return row;
 		case COL_NAME : 
-			return QString::fromStdString(sign->get_name());
+			return QString::fromStdString(sign->getName());
 		case COL_SIZE: 
 			return sign->length();
+		case COL_PREVIEW:
+			return QString::fromStdString(sign->getContent());
 	}
 	return QVariant();
 }
