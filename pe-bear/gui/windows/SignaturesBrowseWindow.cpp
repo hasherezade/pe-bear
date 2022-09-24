@@ -59,7 +59,7 @@ QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
 		case COL_NAME : 
 			return QString::fromStdString(sign->getName());
 		case COL_SIZE: 
-			return sign->length();
+			return  (qulonglong)sign->length();
 		case COL_PREVIEW:
 			return QString::fromStdString(sign->getContent());
 	}
