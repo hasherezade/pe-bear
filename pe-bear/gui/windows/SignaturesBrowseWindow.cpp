@@ -6,7 +6,7 @@ using namespace std;
 
 
 SignaturesBrowseModel::SignaturesBrowseModel(sig_ma::SigFinder *signs, QObject *parent)
-    : QAbstractTableModel(parent)
+	: QAbstractTableModel(parent)
 {
 	this->signs = signs;
 }
@@ -16,8 +16,9 @@ QVariant SignaturesBrowseModel::headerData(int section, Qt::Orientation orientat
 	if (role != Qt::DisplayRole) return QVariant();
 	if (orientation == Qt::Horizontal) {
 		switch (section) {
-			case COL_ID: return "Number";
+			case COL_ID: return "ID";
 			case COL_NAME : return "Name";
+			case COL_SIZE: return "Size";
 		}
 	}
 	return QVariant();
@@ -56,6 +57,8 @@ QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
 			return row;
 		case COL_NAME : 
 			return QString::fromStdString(sign->get_name());
+		case COL_SIZE: 
+			return sign->length();
 	}
 	return QVariant();
 }
@@ -63,7 +66,7 @@ QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
 //------------------------------------------------------------------------------------
 
 SignaturesBrowseWindow::SignaturesBrowseWindow(sig_ma::SigFinder* vSign, QWidget *parent)
-    : QMainWindow(parent), signsTree(this), vSign(NULL)
+	: QMainWindow(parent), signsTree(this), vSign(NULL)
 {
 	if (vSign == NULL) return;
 	this->vSign = vSign;

@@ -44,6 +44,7 @@ public:
 	enum COLS {
 		COL_ID = 0,
 		COL_NAME,
+		COL_SIZE,
 		MAX_COL
 	};
 
