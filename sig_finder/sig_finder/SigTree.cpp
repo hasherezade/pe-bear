@@ -4,16 +4,33 @@
 
 #include "SigTree.h"
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 //--------------------------------------
 /* Util*/
 #include <ctype.h>
 
-void inline trim(char *buf) {
-	size_t len = 0;
-	while ((len = strlen(buf)) > 0) {
-		if (isspace(buf[len-1])) buf[len-1] = '\0';
-		else break;
-	}
+namespace util {
+
+    std::string& ltrim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
+    {
+        str.erase(0, str.find_first_not_of(chars));
+        return str;
+    }
+
+    std::string& rtrim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
+    {
+        str.erase(str.find_last_not_of(chars) + 1);
+        return str;
+    }
+
+    std::string& trim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
+    {
+        return ltrim(rtrim(str, chars), chars);
+    }
 }
 
 //--------------------------------------
@@ -74,7 +91,7 @@ void SigTree::insertPckrSign(PckrSign* sign)
 		signaturesVec.push_back(sign);
 	}
 
-	long len = sign->length();
+	size_t len = sign->length();
 	if (this->min_siglen == 0 || this->min_siglen > len) 
 		this->min_siglen = len;
 	
@@ -132,65 +149,64 @@ matched SigTree::getMatching(char *buf, size_t buf_len, bool skipNOPs)
 	return matchedSet;
 }
 
-long SigTree::loadFromFile(FILE* fp)
+size_t SigTree::loadFromFile(std::ifstream& input)
 {
-	if (!fp) return 0;
+	if (!input.is_open()) return 0;
 
-	//init buffers
-	const size_t LINE_SIZE = 101;
-	char line[LINE_SIZE];
-	memset(line, 0, sizeof(line));
-
-	const size_t NAME_SIZE = 101;
-	char name[NAME_SIZE];
-
-	size_t sigSize = 0, maskSize = 0;
-	char *sign = NULL, *mask = NULL;
 	sig_type type = ROOT;
+	size_t loadedNum = 0;
 
-	int signSize = 0;
-	int loadedNum = 0;
+	while (!input.eof()) {
+		std::string line;
 
-	while (!feof(fp)) {
-		memset(name, 0, NAME_SIZE);
-		memset(line, 0, LINE_SIZE);
-		
-		if (!fgets(name, NAME_SIZE - 1, fp)) break;
-		trim(name);
+		// read signature name
+		if (!std::getline(input, line)) break;
+		std::string name = util::trim(line);
 
-		signSize = 0;
-		fscanf(fp, "%d", &signSize); //read the expected size
+		// read signature size
+		if (!std::getline(input, line)) break;
+		int signSize = 0;
+		std::stringstream iss1;
+		iss1 << std::dec << line;
+		iss1 >> signSize; //read the expected size
 		if (signSize == 0) continue;
 
 		PckrSign *sign = new PckrSign(name); // <- new signature created
 
-		for (int i = 0; i < signSize; i++) {
-			char chunk[3] = {0, 0, 0};
-			if (feof(fp)) break;
+		bool isFin = false;
+		// read signature chunks:
+		while ( !input.eof() && (sign->nodes.size() < signSize) ){
 
-			fscanf(fp, "%2s", chunk);
+			// parse all chunks from the line
+			char chunk[3] = { 0, 0, 0 };
+			input >> chunk[0];
+			input >> chunk[1];
+
 			unsigned int val = 0;
-
-			if ( is_hex(chunk[0]) && is_hex(chunk[1]) ) {
+			if (is_hex(chunk[0]) && is_hex(chunk[1])) {
 				type = IMM;
 				sscanf(chunk, "%X", &val);
-			} else if (chunk[0] == WILD_ONE) {
+			}
+			else if (chunk[0] == WILD_ONE) {
 				type = WILDC;
 				val = chunk[0];
-			} else break;
+			}
+			else break;
 
 			sign->nodes.push_back(SigNode(val, type));
 		}
 
+		// check if the signature is valid:
 		if (sign->nodes.size() == signSize) {
-			if (this->addPckrSign(sign)) // <- new signature stored
+			if (this->addPckrSign(sign)) { // <- new signature stored
 				loadedNum++;
 				continue; // success
+			}
 		}
-
 		//failure:
 		delete sign;
 		sign = NULL;
 	}
+
 	return loadedNum;
 }

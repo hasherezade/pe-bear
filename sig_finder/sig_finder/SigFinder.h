@@ -18,9 +18,9 @@ public:
 };
 
 enum match_direction {
-    FIXED,
-    FRONT_TO_BACK,
-    BACK_TO_FRONT
+	FIXED,
+	FRONT_TO_BACK,
+	BACK_TO_FRONT
 };
 
 
@@ -33,7 +33,8 @@ public:
 	PckrSign* getFirstMatch(char *buf, long buf_size, long start_offset = 0, match_direction md = FIXED);
 
 	matched getMatching(char *buf, long buf_size, long start_offset, match_direction md = FIXED);
-	int loadSignatures(std::string fileName);
+
+	size_t loadSignatures(const std::string &fname);
 
 	std::set<PckrSign*>& signatures() { return tree.all_signatures; };
 	std::vector<PckrSign*>& signaturesVec() { return tree.signaturesVec; }

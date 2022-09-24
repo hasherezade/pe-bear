@@ -10,6 +10,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <iostream>
+#include <fstream>
+
 #include "SigNode.h"
 #include "PckrSign.h"
 
@@ -29,7 +32,7 @@ public:
 	~SigTree() { clear(); }
 
 	bool addPckrSign(PckrSign *sign);
-	long loadFromFile(FILE* f);
+	size_t loadFromFile(std::ifstream& input);
 
 	matched getMatching(char *buf, size_t buf_len, bool skipNOPs);
 

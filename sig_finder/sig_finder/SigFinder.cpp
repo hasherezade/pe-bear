@@ -1,15 +1,22 @@
 #include "SigFinder.h"
 
+#include <iostream>
+#include <fstream>
+
 using namespace sig_ma;
+
 //----------------------------------------------------
 
-int SigFinder::loadSignatures(std::string fname)
+/* read file with signatures */
+size_t SigFinder::loadSignatures(const std::string &fname)
 {
-	/* read file with signatures */
-	FILE* f = fopen(fname.c_str(), "r");
-	if (!f) return 0;
-	int num = tree.loadFromFile(f);
-	fclose(f);
+	std::ifstream input;
+	input.open(fname);
+	if (!input.is_open()) {
+		return 0;
+	}
+	size_t num = tree.loadFromFile(input);
+	input.close();
 	return num;
 }
 
