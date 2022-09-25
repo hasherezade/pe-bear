@@ -406,6 +406,8 @@ void DisasmTreeView::resetFont(const QFont &f)
 	setIconSize(QSize(fontDim, fontDim));
 
 	QHeaderView *verticalHeader = this->verticalHeader();
+	if (!verticalHeader) return;
+
 	verticalHeader->setContentsMargins(QMargins(0, 0, 0, 0));
 
 	if (verticalHeader) {
