@@ -8,13 +8,14 @@
 
 std::string PART = "file\\shell\\Open with ";
 
-bool RegKeyManager::removeRegPath(std::string extension, std::string appName)
+bool RegKeyManager::removeRegPath(const std::string &extension, const std::string &appName)
 {
 #ifdef _WINDOWS
 	int res1 = 0, res2 = 0;
 	HKEY hKey = 0;
 
-	std::string fullName = extension.append(PART).append(appName);
+	std::string fullName = extension;
+	fullName.append(PART).append(appName);
 	LPCSTR lpSubKey = fullName.c_str();
 
 	LONG res = RegCreateKeyA(HKEY_CLASSES_ROOT, lpSubKey, &hKey);
@@ -36,14 +37,15 @@ bool RegKeyManager::removeRegPath(std::string extension, std::string appName)
 	return false;
 }
 
-bool RegKeyManager::addRegPath(std::string extension, std::string appName, std::string path)
+bool RegKeyManager::addRegPath(const std::string &extension, const std::string &appName, const std::string &path)
 {
 #ifdef _WINDOWS
 
 	int res1 = 0, res2 = 0;
 	HKEY hKey = 0;
 
-	const std::string fullName = extension.append(PART).append(appName); // example: "dllfile\\shell\\Open with PE-bear";
+	std::string fullName = extension;
+	fullName.append(PART).append(appName); // example: "dllfile\\shell\\Open with PE-bear";
 	const std::string cmdName = fullName + "\\command";
 
 	// set command:
@@ -80,12 +82,13 @@ bool RegKeyManager::addRegPath(std::string extension, std::string appName, std::
 }
 
 
-bool RegKeyManager::isKeySet(std::string extension, std::string appName)
+bool RegKeyManager::isKeySet(const std::string &extension, const std::string &appName)
 {
 #ifdef _WINDOWS
 
 	HKEY hKey = 0;
-	std::string fullName = extension.append(PART).append(appName);
+	std::string fullName = extension;
+	fullName.append(PART).append(appName);
 	LPCSTR lpSubKey = fullName.c_str();
 
 	LONG res = RegOpenKeyExA(HKEY_CLASSES_ROOT, lpSubKey, 0, KEY_READ, &hKey);
