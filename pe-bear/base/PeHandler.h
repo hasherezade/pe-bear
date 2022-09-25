@@ -26,7 +26,7 @@ public:
 		HASHES_NUM
 	};
 
-	CalcThread(hash_type hType, PEFile* pe, uint64_t checksumOffset = 0);
+	CalcThread(hash_type hType, PEFile* pe, offset_t checksumOffset = 0);
 	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
 
 signals:

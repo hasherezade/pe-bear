@@ -10,7 +10,7 @@ using namespace pe;
 enum operation_ids { SIMPLE = 0, OP_ADD_SECTION = 1 };
 
 
-CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, uint64_t checksumOffset)
+CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, offset_t checksumOffset)
 	: m_PE(pe), hashType(hType), checksumOff(checksumOffset)
 {
 }
@@ -181,14 +181,14 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 		return; //previous thread didn't finished
 	}
 	const char* content = (char*) m_PE->getContent();
-	int size = m_PE->getRawSize();
+	const offset_t size = m_PE->getRawSize();
+	const bool isSizeAcceptable = (offset_t(int(size)) == size) ? true : false;
 
-	if ((int64_t) size != m_PE->getRawSize() || size < 0) {
+	if (!content || !size || !isSizeAcceptable) {
 		hash[type] = "Cannot calculate!";
 	} else {
 		hash[type] = "Calculating...";
-		uint64_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		
+		offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
 		this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
 		QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
 		QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));

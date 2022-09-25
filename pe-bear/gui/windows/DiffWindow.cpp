@@ -337,8 +337,6 @@ void DiffWindow::file2Selected(const QString &text)
 	setTreeModel(treeView[RIGHT], text);
 	setPEContent(text, 0, RIGHT);
 
-	QItemSelectionModel *currSelectModel = treeView[RIGHT].selectionModel();
-
 	connect(treeView[RIGHT].selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), 
 		this, SLOT( item2Marked(const QModelIndex &, const QModelIndex &) ) );
 
@@ -350,8 +348,6 @@ void DiffWindow::file1Selected(const QString &text)
 {
 	setTreeModel(treeView[LEFT], text);
 	setPEContent(text, 0, LEFT);
-
-	QItemSelectionModel *currSelectModel = treeView[LEFT].selectionModel();
 
 	connect(treeView[LEFT].selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
 		this, SLOT( item1Marked(const QModelIndex &, const QModelIndex &) ) );
