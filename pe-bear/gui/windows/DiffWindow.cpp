@@ -388,7 +388,7 @@ void DiffWindow::setPEContent(const QString &name, int offset, ContentIndx conte
 	if (name.size() == 0) return;
 
 	PeHandler* hndl = this->peManger.getByName(name);
-	if (hndl) {
+	if (hndl == NULL) {
 		return;
 	}
 	currName[contentIndx] = name;
