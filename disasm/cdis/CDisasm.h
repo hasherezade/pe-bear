@@ -36,12 +36,12 @@ public:
 	bool isPushRet(int push_index,/*out*/ int* ret_index = NULL) const;
 	
 	//---
-    
+
 	size_t chunksCount() const
 	{
 		return _chunksCount();
 	}
-    
+
 	QString mnemStr(size_t index) const
 	{
 		if (index >= this->_chunksCount()) {
@@ -117,15 +117,15 @@ protected:
 	minidis::mnem_type fetchMnemType(const x86_insn cMnem) const;
 	
 	size_t disasmNext();
-    bool init_capstone(Executable::exe_bits bitMode);
+	bool init_capstone(Executable::exe_bits bitMode);
 	
-    //capstone stuff:
-    std::vector<cs_insn> m_table;
+	//capstone stuff:
+	std::vector<cs_insn> m_table;
 	std::vector<cs_detail> m_details;
 	
-    csh handle;
-    cs_insn* m_insn;
-        
+	csh handle;
+	cs_insn* m_insn;
+
 }; /* class Disasm */
 
 }; /* namespace pe_bear */

@@ -7,7 +7,7 @@ using namespace pe_bear;
 PeDisasm::PeDisasm(PEFile *pe)
 	: __disasm_super(),
 	m_PE(pe), previewSize(PREVIEW_SIZE), 
-	firstOffset(0), isInit(false)
+	firstOffset(0), isInit(false), isBitModeAuto(true)
 {
 	if (pe == NULL) throw CustomException("PE not initialized!");
 }

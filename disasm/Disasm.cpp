@@ -22,7 +22,7 @@ void pe_bear::resetCond(cond_buf &buf)
 
 Disasm::Disasm() 
 	: is_init(false), m_buf(NULL), m_bufSize(0),
-	startOffset(0), m_offset(0),
+	startOffset(0), m_offset(0), m_disasmSize(0),
 	m_iptr(0)
 {
 }
