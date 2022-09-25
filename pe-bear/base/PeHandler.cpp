@@ -362,12 +362,16 @@ void PeHandler::advanceOffset(int increment)
 
 	if (increment < 0) {
 		increment *= (-1);
-		if (increment > page) page = 0;
-		else page -= increment;
+		if (increment > page) 
+			page = 0;
+		else 
+			page -= increment;
 	} else {
 		offset_t max = m_PE->getRawSize();
-		if (page + increment > max) page = max;
-		else page += increment;
+		if (page + increment > max) 
+			page = max;
+		else 
+			page += increment;
 	}
 
 	setPageOffset(page);
@@ -383,7 +387,7 @@ bool PeHandler::setDisplayedEP()
 	offset_t epOff = 0;
 	try {
 		epOff = m_PE->rvaToRaw(epRVA);
-	} catch (CustomException e) {
+	} catch (CustomException &e) {
 		isOk = false;
 	}
 	if (!isOk) return false;

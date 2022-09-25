@@ -637,10 +637,11 @@ void SelectableSecDiagram::mousePressEvent(QMouseEvent *event)
 	if (unitNum == (-1)) return;
 
 	bufsize_t unitSize = this->myModel->getUnitSize(true);
-	if (unitSize <= 0) unitSize = PAGE_SIZE;
-	int value = unitSize * unitNum;
-
-	this->myModel->selectFromAddress(unitSize * unitNum);
+	if (unitSize <= 0) {
+		unitSize = PAGE_SIZE;
+	}
+	const offset_t value = unitSize * unitNum;
+	this->myModel->selectFromAddress(value);
 }
 
 void SelectableSecDiagram::mouseMoveEvent(QMouseEvent *event)
