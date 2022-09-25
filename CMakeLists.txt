@@ -63,7 +63,7 @@ option(CAPSTONE_X86_ATT_DISABLE "Disable x86 AT&T syntax" ON)
 # libs
 
 add_subdirectory(${M_CAPSTONE})
-set(CAPSTONE_LIB $<TARGET_FILE:capstone> CACHE PATH "Capstone library path")
+set(CAPSTONE_LIB $<TARGET_FILE:capstone-static> CACHE PATH "Capstone library path")
 
 add_subdirectory(${M_BEARPARSER})
 set(PARSER_LIB $<TARGET_FILE:bearparser> CACHE PATH "BearParser library path")
@@ -77,6 +77,6 @@ set(SIGFIND_LIB $<TARGET_FILE:sig_finder> CACHE PATH "SigFinder library path")
 # executables
 add_subdirectory(pe-bear)
 
-add_dependencies(libdisasm bearparser capstone)
-add_dependencies(PE-bear bearparser sig_finder libdisasm capstone)
+add_dependencies(libdisasm bearparser capstone-static)
+add_dependencies(PE-bear bearparser sig_finder libdisasm capstone-static)
 
