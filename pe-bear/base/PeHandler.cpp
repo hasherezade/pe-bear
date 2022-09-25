@@ -516,7 +516,7 @@ offset_t PeHandler::loadSectionContent(SectionHdrWrapper* sec, QFile &fIn, bool 
 	backupModification(modifOffset, modifSize, continueLastOperation);
 
 	AbstractByteBuffer *buf = m_PE->getFileBuffer();
-	if (buf) return 0;
+	if (!buf) return 0;
 
 	offset_t loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
 
