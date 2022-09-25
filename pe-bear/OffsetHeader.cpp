@@ -1,12 +1,9 @@
 #include "OffsetHeader.h"
 
 OffsetHeader::OffsetHeader(QWidget *parent)
-	: QHeaderView(Qt::Vertical, parent)
+	: QHeaderView(Qt::Vertical, parent),
+	hexModel(NULL), selectedOffset(INVALID_ADDR), selectedType(Executable::RAW)
 {
-	hexModel = NULL;
-	selectedOffset = INVALID_ADDR;
-	selectedType = Executable::RAW;
-
 #if QT_VERSION >= 0x050000
 	setSectionsClickable(true);
 	setSectionsMovable(false);

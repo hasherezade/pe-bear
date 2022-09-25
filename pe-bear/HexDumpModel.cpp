@@ -6,9 +6,9 @@
 HexDumpModel::HexDumpModel(PeHandler *peHndl, bool isHexFormat, QObject *parent)
 	: PeTableModel(peHndl, parent),
 	showHex(isHexFormat),
-	startOff(0), endOff(0), pageSize(PREVIEW_SIZE)
+	startOff(0), endOff(0), pageSize(PREVIEW_SIZE),
+	addrType(Executable::RAW)
 {
-	addrType = Executable::RAW;
 	connectSignals();
 	connect(myPeHndl, SIGNAL(marked()), this, SLOT (onNeedReset()));
 }

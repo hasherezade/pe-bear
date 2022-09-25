@@ -1,14 +1,10 @@
 #include "BearVers.h"
 using namespace pe_bear;
 
-BearVers::BearVers(int ma, int mi, int p, int s, QString desc)
+BearVers::BearVers(int ma, int mi, int p, int s, const QString &desc)
+	: vMajor(ma), vMinor(mi), vPatch(p), vSub(s), vDesc(desc), 
+	valid(true)
 {
-	vMajor = ma;
-	vMinor = mi;
-	vPatch = p;
-	vSub = s;
-	vDesc = desc;
-	valid = true;
 }
 
 BearVers::BearVers(QString replyString)

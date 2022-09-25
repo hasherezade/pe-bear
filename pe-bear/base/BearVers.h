@@ -8,7 +8,7 @@ class BearVers
 public:
 	enum VersionStatus { VER_INVALID = (-1), VER_OK, VER_OLD, VER_NEW };
 
-	BearVers(int major, int minor, int patch, int sub, QString desc="");
+	BearVers(int major, int minor, int patch, int sub, const QString &desc="");
 	BearVers(QString s);
 	bool isValid() { return valid; }
 
