@@ -122,7 +122,7 @@ void ClrFlagsTreeItem::loadChildren()
 	DWORD allFlags = getAllFlags();
 	std::set<DWORD> flagsSet = ClrDirWrapper::getFlagsSet(allFlags);
 	std::set<DWORD>::iterator chIter;
-	for (chIter = flagsSet.begin(); chIter != flagsSet.end(); chIter++) {
+	for (chIter = flagsSet.begin(); chIter != flagsSet.end(); ++chIter) {
 		DWORD splitedFlag = *chIter;
 		this->appendChild(new ClrFlagsTreeItem(myPeHndl, DETAILS, splitedFlag, this));
 	}

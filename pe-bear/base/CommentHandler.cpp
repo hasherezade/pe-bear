@@ -50,7 +50,7 @@ void CommentHandler::LoaderThread::loadFromQFile(QString path)
 	
 	std::map<offset_t, QString>::iterator itr;
 	
-	for (itr = all_comments.begin(); itr != all_comments.end(); itr++) {
+	for (itr = all_comments.begin(); itr != all_comments.end(); ++itr) {
 		
 		QMutexLocker locker(&m_readMutex);
 		if (isBreakReading) break;
@@ -163,7 +163,7 @@ bool CommentHandler::saveToFile(QString fileName)
 	QTextStream out(&fOut);
 
 	std::vector<Comment*>::iterator vecItr;
-    for (vecItr = this->commentsVec.begin(); vecItr != this->commentsVec.end(); vecItr++ ) {
+    for (vecItr = this->commentsVec.begin(); vecItr != this->commentsVec.end(); ++vecItr ) {
 		Comment* cmnt = *vecItr;
 		QString offsetStr = QString::number(cmnt->offset, 16);
 		QString qComment = cmnt->content;

@@ -44,7 +44,7 @@ PeHandlersManager::~PeHandlersManager()
 {
 	clear();
 	std::map<ExeFactory::exe_type, ExeHandlerFactory*>::iterator stItr;
-	for (stItr = this->supportedTypes.begin(); stItr != this->supportedTypes.end(); stItr++) {
+	for (stItr = this->supportedTypes.begin(); stItr != this->supportedTypes.end(); ++stItr) {
 		ExeHandlerFactory* factory = stItr->second;
 		delete factory;
 	}
@@ -135,7 +135,7 @@ void PeHandlersManager::clear()
 		QMutexLocker locker(&this->m_loadMutex);
 
 		std::map<PEFile*, PeHandler*>::iterator histItr;
-		for ( histItr = PeHandlers.begin(); histItr != PeHandlers.end(); histItr++) {
+		for ( histItr = PeHandlers.begin(); histItr != PeHandlers.end(); ++histItr) {
 			PeHandler* hndl = histItr->second;
 			hndl->release();
 		}

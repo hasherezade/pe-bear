@@ -356,7 +356,7 @@ void MainWindow::createMenus()
 	QMenu *styleMenu = this->viewMenu->addMenu("Style");
 	QList<QString> myStyles = this->guiSettings.getStyles();
 	QList<QString>::iterator itr;
-	for (itr = myStyles.begin(); itr != myStyles.end(); itr++) {
+	for (itr = myStyles.begin(); itr != myStyles.end(); ++itr) {
 		const QString style = *itr;
 		QAction *action = new QAction(styleMenu);
 		if (!action) continue; // should never happen
@@ -553,7 +553,7 @@ bool MainWindow::selectCurrentStyle()
 	
 	QList<QAction *>actions = this->stylesGroup->actions();
 	QList<QAction *>::iterator itr;
-	for (itr = actions.begin(); itr != actions.end(); itr++) {
+	for (itr = actions.begin(); itr != actions.end(); ++itr) {
 		QAction *a = *itr;
 		QString style = a->text();
 		if (style == this->guiSettings.currentStyleName()) {
@@ -579,7 +579,7 @@ void MainWindow::autoSaveAllTags()
 
 	std::map<PEFile*, PeHandler*> &handlers = m_PEHandlers.getHandlersMap();
 	std::map<PEFile*, PeHandler*>::iterator iter;
-	for (iter = handlers.begin(); iter != handlers.end(); iter++) {
+	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
 		autoSaveTags(iter->second);
 	}
 }
@@ -590,7 +590,7 @@ void MainWindow::unloadAllPEs()
 	std::map<PEFile*, PeHandler*>::iterator iter;
 	for (iter = handlers.begin(); iter != handlers.end();) {
 		PeHandler *oldHndl = iter->second;
-		iter++;
+		++iter;
 		closePE(oldHndl);
 	}
 	m_PEHandlers.clear();

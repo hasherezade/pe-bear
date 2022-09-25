@@ -133,7 +133,7 @@ void FileHdrCharactTreeItem::loadChildren()
 {
 	//create subrecords
 	auto charactSet = FileHdrWrapper::splitCharact(this->characteristics);
-	for (auto chIter = charactSet.begin(); chIter != charactSet.end(); chIter++) {
+	for (auto chIter = charactSet.begin(); chIter != charactSet.end(); ++chIter) {
 		DWORD splitedCharacter = *chIter;
 		this->appendChild(new FileHdrCharactTreeItem(myPeHndl, DETAILS, splitedCharacter, this));
 	}

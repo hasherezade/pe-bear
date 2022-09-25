@@ -48,7 +48,7 @@ bool PEViewsManager::removePeDockWidget(PeHandler* peHndl)
 	this->PeViews.erase(found);
 
 	std::vector<PEDockedWidget*>::iterator itr;
-	for (itr = lastDock.begin(); itr != lastDock.end(); itr++) {
+	for (itr = lastDock.begin(); itr != lastDock.end(); ++itr) {
 		if (*itr == peDock) {
 			lastDock.erase(itr);
 			break;
@@ -61,7 +61,7 @@ bool PEViewsManager::removePeDockWidget(PeHandler* peHndl)
 void PEViewsManager::clear()
 {
 	std::map<PeHandler*, PEDockedWidget*>::iterator vItr;
-	for (vItr = this->PeViews.begin(); vItr != this->PeViews.end(); vItr++) {
+	for (vItr = this->PeViews.begin(); vItr != this->PeViews.end(); ++vItr) {
 		PeHandler* hndl = vItr->first;
 		PEDockedWidget *peDock = vItr->second;
 		if (peDock) peDock->close();

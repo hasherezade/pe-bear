@@ -62,7 +62,7 @@ void OperationBackup::deleteChildren()
 
 	while (itr != modifs.end()) {
 		ModifBackup* modif = *itr;
-		itr++;
+		++itr;
 		delete modif;
 	}
 	this->clear();

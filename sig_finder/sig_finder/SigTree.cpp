@@ -42,7 +42,7 @@ void SigTree::clear()
 	nodeToSign.clear();
 
 	std::set<PckrSign*>::iterator sigItr;
-	for (sigItr = this->all_signatures.begin(); sigItr != this->all_signatures.end(); sigItr++ ) {
+	for (sigItr = this->all_signatures.begin(); sigItr != this->all_signatures.end(); ++sigItr ) {
 		PckrSign* sign = (*sigItr);
 		delete sign;
 	}
@@ -118,7 +118,7 @@ matched SigTree::getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs)
 		std::vector<SigNode*> level2;
 		std::vector<SigNode*>::iterator lvlI;
 		
-		for (lvlI = level.begin(); lvlI != level.end();lvlI++) {
+		for (lvlI = level.begin(); lvlI != level.end(); ++lvlI) {
 			std::vector<SigNode*>::iterator curr = lvlI;
 
 			//TODO: allow for alternate sig search paths: with wildcards AND with exact matches

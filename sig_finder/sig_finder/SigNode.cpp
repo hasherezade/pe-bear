@@ -24,13 +24,13 @@ SigNode::~SigNode()
 	
 	for (itr = childs.begin(); itr != childs.end();) {
 		SigNode* node = *itr;
-		itr++;
+		++itr;
 		delete node;
 	}
 
 	for (itr = wildcards.begin(); itr != wildcards.end(); ) {
 		SigNode* node = *itr;
-		itr++;
+		++itr;
 		delete node;
 	}
 }

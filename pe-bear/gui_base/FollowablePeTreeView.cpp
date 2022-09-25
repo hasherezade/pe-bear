@@ -96,7 +96,7 @@ bool FollowablePeTreeView::hasAnyActionEnabled()
 {
 	QList<QAction*> actions = defaultMenu.actions();
 	QList<QAction*>::Iterator itr;
-	for (itr = actions.begin(); itr != actions.end(); itr++) {
+	for (itr = actions.begin(); itr != actions.end(); ++itr) {
 		if ( (*itr)->isEnabled() == true) return true;
 	}
 	return false;

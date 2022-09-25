@@ -150,7 +150,7 @@ QStringList SecTreeItem::fetchSecHdrCharact(DWORD characteristics)
 	std::vector<DWORD> secHdrCharact = SectionHdrWrapper::splitCharacteristics(characteristics);
 	QStringList nameSet;
 	std::vector<DWORD>::iterator iter;
-	for (iter = secHdrCharact.begin(); iter != secHdrCharact.end(); iter++) {
+	for (iter = secHdrCharact.begin(); iter != secHdrCharact.end(); ++iter) {
 		DWORD currC = *iter;
 		if (characteristics & currC) {
 			QString info = QString::number(currC, 16).rightJustified(8, '0') + " : " + SectionHdrWrapper::translateCharacteristics(currC);

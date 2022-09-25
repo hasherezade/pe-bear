@@ -57,7 +57,7 @@ void TreeItem::detachChild(TreeItem *child)
 void TreeItem::removeAllChildren()
 {
 	QList<TreeItem*>::iterator chIter;
-	for (chIter = m_childItems.begin(); chIter != m_childItems.end(); chIter++) {
+	for (chIter = m_childItems.begin(); chIter != m_childItems.end(); ++chIter) {
 		TreeItem* child = *chIter;
 		this->detachChild(child);
 		delete child;
