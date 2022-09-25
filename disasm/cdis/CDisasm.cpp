@@ -272,7 +272,6 @@ bool CDisasm::isAddrOperand(int index) const
 	mnem_type mnem = this->getMnemType(index);
 	if (mnem == MT_PUSH || mnem == MT_MOV) return true;
 
-	const cs_insn m_insn = m_table.at(index);
 	const cs_detail *detail = &m_details.at(index);
 	const size_t cnt = static_cast<size_t>(detail->x86.op_count);
 
@@ -304,7 +303,6 @@ bool CDisasm::isFollowable(const int y) const
 	if (isBranching(y) == false && isPushRet(y) == false) {
 		return false;
 	}
-	const cs_insn m_insn = m_table.at(y);
 	const cs_detail *detail = &m_details.at(y);
 	const size_t argNum = 0;
 
@@ -337,7 +335,6 @@ QString CDisasm::translateBranching(const int y) const
 		return "";
 	}
 	const cs_insn m_insn = m_table.at(y);
-	const cs_detail *m_detail = &m_details.at(y);
 	const minidis::mnem_type mType = this->fetchMnemType(static_cast<x86_insn>(m_insn.id));
 
 	if (!this->isBranching(mType) || !m_insn.mnemonic) {
