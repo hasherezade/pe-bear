@@ -37,7 +37,6 @@ option(CAPSTONE_BUILD_SHARED "Build shared library" OFF)
 option(CAPSTONE_BUILD_DIET "Build diet library" OFF)
 option(CAPSTONE_BUILD_TESTS "Build tests" OFF)
 option(CAPSTONE_USE_DEFAULT_ALLOC "Use default memory allocation functions" ON)
-
 option(CAPSTONE_ARM_SUPPORT "ARM support" OFF)
 option(CAPSTONE_ARM64_SUPPORT "ARM64 support" OFF)
 option(CAPSTONE_MIPS_SUPPORT "MIPS support" OFF)
@@ -51,6 +50,9 @@ option(CAPSTONE_MOS65XX_SUPPORT "MOS65XX support" OFF)
 option(CAPSTONE_M680X_SUPPORT "M680X support" OFF)
 option(CAPSTONE_TMS320C64X_SUPPORT "TMS320C64X support" OFF)
 option(CAPSTONE_EVM_SUPPORT "EVM support" OFF)
+option(CAPSTONE_WASM_SUPPORT "WASM support" OFF)
+option(CAPSTONE_BPF_SUPPORT "BPF support" OFF)
+option(CAPSTONE_RISCV_SUPPORT "RISCV support" OFF)
  
 option(CAPSTONE_X86_SUPPORT "x86 support" ON)
 option(CAPSTONE_X86_REDUCE "x86 with reduce instruction sets to minimize library" OFF)
@@ -61,7 +63,7 @@ option(CAPSTONE_X86_ATT_DISABLE "Disable x86 AT&T syntax" ON)
 # libs
 
 add_subdirectory(${M_CAPSTONE})
-set(CAPSTONE_LIB $<TARGET_FILE:capstone-static> CACHE PATH "Capstone library path")
+set(CAPSTONE_LIB $<TARGET_FILE:capstone> CACHE PATH "Capstone library path")
 
 add_subdirectory(${M_BEARPARSER})
 set(PARSER_LIB $<TARGET_FILE:bearparser> CACHE PATH "BearParser library path")
@@ -75,6 +77,6 @@ set(SIGFIND_LIB $<TARGET_FILE:sig_finder> CACHE PATH "SigFinder library path")
 # executables
 add_subdirectory(pe-bear)
 
-add_dependencies(libdisasm bearparser capstone-static)
-add_dependencies(PE-bear bearparser sig_finder libdisasm capstone-static)
+add_dependencies(libdisasm bearparser capstone)
+add_dependencies(PE-bear bearparser sig_finder libdisasm capstone)
 
