@@ -4,9 +4,9 @@
 
 //---------------------------------------------------------
 FollowablePeTreeView::FollowablePeTreeView(QWidget *parent)
-	: MainSettingsHolder(), PeTreeView(parent)
+	: MainSettingsHolder(), PeTreeView(parent),
+	selectedOffset(INVALID_ADDR)
 {
-	selectedOffset = INVALID_ADDR;
 	enableMenu(true);
 
 	setSelectionBehavior(QAbstractItemView::SelectItems);
