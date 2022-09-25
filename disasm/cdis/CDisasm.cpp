@@ -138,7 +138,6 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 	size_t cnt = static_cast<size_t>(m_detail->x86.op_count);
 	if (argNum >= cnt) return INVALID_ADDR;
 
-	offset_t startVA = getVaAt(0);
 	offset_t currVA = getVaAt(index);
 	minidis::mnem_type mType = this->getMnemType(index);
 
