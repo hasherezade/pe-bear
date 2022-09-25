@@ -154,7 +154,7 @@ void PeHandlersManager::checkAllSignatures()
 	
 	{ //lock:
 		QMutexLocker locker(&this->m_loadMutex);
-		for (peIter = map.begin(); peIter != map.end(); peIter++) {
+		for (peIter = map.begin(); peIter != map.end(); ++peIter) {
 			PEFile *pe = peIter->first;
 			PeHandler* hndl = peIter->second;
 			if (hndl->findPackerSign(pe->getEntryPoint(), Executable::RVA, sig_ma::FIXED) != NULL) {

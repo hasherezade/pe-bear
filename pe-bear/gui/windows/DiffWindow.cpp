@@ -320,7 +320,7 @@ void DiffWindow::refresh()
 	QList<QString> stringsList;
 	std::map<PEFile*, PeHandler*> hndlMap = this->peManger.getHandlersMap();
 	std::map<PEFile*, PeHandler*>::iterator peItr;
-	for (peItr = hndlMap.begin(); peItr != hndlMap.end(); peItr++) {
+	for (peItr = hndlMap.begin(); peItr != hndlMap.end(); ++peItr) {
 		QString name = peItr->second->getFullName();
 		stringsList.append(name);
 	}
@@ -366,7 +366,7 @@ void DiffWindow::removeUnusedTreeModels()
 	std::map<QString, PEFileTreeModel*>::iterator peIter;
 	std::set<QString> toErase;
 
-	for (peIter = peModels.begin(); peIter != peModels.end(); peIter++) {
+	for (peIter = peModels.begin(); peIter != peModels.end(); ++peIter) {
 		const QString &name = peIter->first;
 
 		if (!this->peManger.getByName(name)) {
@@ -375,7 +375,7 @@ void DiffWindow::removeUnusedTreeModels()
 		}
 	}
 	std::set<QString>::iterator eraseIter;
-	for (eraseIter = toErase.begin(); eraseIter != toErase.end(); eraseIter++) {
+	for (eraseIter = toErase.begin(); eraseIter != toErase.end(); ++eraseIter) {
 		const QString name = *eraseIter;
 		PEFileTreeModel* model = peModels[name];
 		peModels.erase(name);
