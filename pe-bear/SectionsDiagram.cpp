@@ -254,7 +254,7 @@ void SectionsDiagram::createActions()
 	this->enableDrawSecHdrsAction->setCheckable(true);
 	connect(this->enableDrawSecHdrsAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawSecHdrs(bool)));
 
-	this->enableGridAction = new QAction("Grid", this);
+	this->enableGridAction = new QAction("Grid (Alignment Units)", this);
 	this->enableGridAction->setCheckable(true);
 	connect(this->enableGridAction, SIGNAL(triggered(bool)), &settings, SLOT(setEnableGrid(bool)));
 
