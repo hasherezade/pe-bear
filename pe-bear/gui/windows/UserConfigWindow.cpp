@@ -124,11 +124,11 @@ void UserConfigWindow::onDirChose()
 	dialog.setFileMode(QFileDialog::Directory);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 	dialog.setDirectory(settings->userDataDir());
-	int ret = dialog.exec();
-
-	QDir dir = dialog.directory();
-	QString fName = dir.absolutePath();
-	if (fName.length() > 0) {
-		uddDirEdit.setText(fName);
+	if (dialog.exec()) {
+		QDir dir = dialog.directory();
+		QString fName = dir.absolutePath();
+		if (fName.length() > 0) {
+			uddDirEdit.setText(fName);
+		}
 	}
 }
