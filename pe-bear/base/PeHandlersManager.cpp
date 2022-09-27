@@ -148,12 +148,12 @@ void PeHandlersManager::clear()
 
 void PeHandlersManager::checkAllSignatures()
 {
-	std::map<PEFile*, PeHandler*> &map = PeHandlers;
-	std::map<PEFile*, PeHandler*>::iterator peIter;
 	bool foundAny = false;
 	
 	{ //lock:
 		QMutexLocker locker(&this->m_loadMutex);
+		std::map<PEFile*, PeHandler*> &map = PeHandlers;
+		std::map<PEFile*, PeHandler*>::iterator peIter;
 		for (peIter = map.begin(); peIter != map.end(); ++peIter) {
 			PEFile *pe = peIter->first;
 			PeHandler* hndl = peIter->second;

@@ -161,7 +161,6 @@ bool DataDirTreeItem::setDataValue(int column, const QVariant &value)
 
 QVariant DataDirTreeItem::toolTip(int column) const
 {
-	int fieldIndx = column;
 	if (m_PE == NULL) return QVariant();
 
 	if (this->level == DESC) return QVariant();

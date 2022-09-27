@@ -124,7 +124,6 @@ QVariant LdEntryTreeModel::data(const QModelIndex &index, int role) const
 	if (role == Qt::ToolTipRole) return toolTip(index);
 	if (role == Qt::FontRole) return offsetFont;
 
-	int row = index.row();
 	int column = index.column();
 	int sId = this->getSID(index);
 

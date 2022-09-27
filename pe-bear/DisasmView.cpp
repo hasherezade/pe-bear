@@ -1143,7 +1143,6 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 	if (x == HINT_COL) {
 		if (role == Qt::EditRole) {
 			return this->getComment(rva);
-			return this->getComment(rva);
 		}
 		if (role == Qt::DisplayRole || role == Qt::ToolTipRole) {
 			return getHint(index);
