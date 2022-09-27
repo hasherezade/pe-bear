@@ -142,7 +142,7 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 	minidis::mnem_type mType = this->getMnemType(index);
 
 	const x86_reg reg = static_cast<x86_reg>(m_detail->x86.operands[argNum].mem.base);
-	const size_t opSize = m_detail->x86.operands[argNum].size;
+	//const size_t opSize = m_detail->x86.operands[argNum].size;
 	const x86_op_type type = m_detail->x86.operands[argNum].type;
 
 	size_t instrLen = getChunkSize(index);
@@ -304,11 +304,12 @@ bool CDisasm::isFollowable(const int y) const
 		return false;
 	}
 	const cs_detail *detail = &m_details.at(y);
-	const size_t argNum = 0;
+	if (!detail) return false;
 
 	const size_t cnt = static_cast<size_t>(detail->x86.op_count);
-	if (argNum >= cnt) return false;
+	if (!cnt) return false;
 
+	const size_t argNum = 0;
 	const x86_op_type type = detail->x86.operands[argNum].type;
 	const x86_reg reg = static_cast<x86_reg>(detail->x86.operands[argNum].mem.base);
 

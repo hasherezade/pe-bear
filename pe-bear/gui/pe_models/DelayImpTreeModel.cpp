@@ -54,7 +54,6 @@ bool DelayImpTreeModel::setData(const QModelIndex &index, const QVariant &value,
 {
 	if (!index.isValid()) return false;
 
-	size_t fId = index.row();
 	uint32_t sID = this->columnToFID(index.column());
 
 	if (!wrapper()) return false;
