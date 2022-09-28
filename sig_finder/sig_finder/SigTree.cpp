@@ -188,7 +188,7 @@ size_t SigTree::loadFromFile(std::ifstream& input)
 			unsigned int val = 0;
 			if (is_hex(chunk[0]) && is_hex(chunk[1])) {
 				type = IMM;
-				sscanf(chunk, "%X", &val);
+				sscanf(chunk, "%2X", &val);
 			}
 			else if (chunk[0] == WILD_ONE) {
 				type = WILDC;
