@@ -442,7 +442,6 @@ QVariant OptionalHdrTreeModel::data(const QModelIndex &index, int role) const
 	if (!index.isValid()) return QVariant();
 	if (role == Qt::ForegroundRole) {
 		int fId = getFID(index);
-		Executable::addr_type aType = this->wrapperAt(index)->containsAddrType(fId);
 		return this->addrColor(index);
 	}
 	if (role == Qt::ToolTipRole) return toolTip(index);
