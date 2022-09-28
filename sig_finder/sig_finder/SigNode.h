@@ -10,6 +10,7 @@
 #include <string>
 #include <string.h>
 #include <stdlib.h>
+#include "../win_types.h"
 
 #define OP_NOP 0x90
 
