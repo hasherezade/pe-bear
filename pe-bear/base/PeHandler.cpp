@@ -184,7 +184,7 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 	const offset_t size = m_PE->getRawSize();
 	const bool isSizeAcceptable = (offset_t(int(size)) == size) ? true : false;
 
-	if (!content || !size || !isSizeAcceptable || m_PE->isTruncated()) {
+	if (!content || !size || !isSizeAcceptable) {
 		hash[type] = "Cannot calculate!";
 	} else {
 		hash[type] = "Calculating...";
