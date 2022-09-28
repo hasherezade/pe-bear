@@ -32,6 +32,10 @@ int main(int argc, char *argv[])
 	// workaround for a bug in Qt (not setting default font properly)
 	QApplication::setFont(QApplication::font("QMessageBox"));
 
+#if QT_VERSION >= 0x050000
+	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
 	app.setApplicationName(TITLE);
 	app.setWindowIcon(QIcon(":/main_ico.ico"));
 	app.setQuitOnLastWindowClosed(true);
