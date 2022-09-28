@@ -22,7 +22,7 @@ rm -rf $APP_PATH/PE-bear.app
 strip $APP_PATH/PE-bear.app/Contents/MacOS/PE-bear
 
 #wrap by macdeployqt:
-$P2 ./build_qt5/pe-bear/PE-bear.app
+$P2 $APP_PATH/PE-bear.app
 
 # if wrapping succeeded, zip and store:
 if [[ $? == 0 ]]; then
