@@ -2,8 +2,6 @@
 
 //-----------------------------------------------------------------------------
 
-#define NOT_FILLED  "-"
-
 QVariant SecurityTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role != Qt::DisplayRole) return QVariant();
@@ -25,7 +23,10 @@ QVariant SecurityTreeModel::data(const QModelIndex &index, int role) const
 	int column = index.column();
 	if (role == Qt::ForegroundRole) return this->addrColor(index);
 	if (role == Qt::FontRole) {
-		if (this->containsOffset(index) || this->containsValue(index)) return offsetFont;
+		if (this->containsOffset(index) || this->containsValue(index)) {
+			return offsetFont;
+		}
+		return QVariant();
 	}
 	if (role == Qt::ToolTipRole) return toolTip(index);
 
@@ -34,23 +35,7 @@ QVariant SecurityTreeModel::data(const QModelIndex &index, int role) const
 	switch (column) {
 		case OFFSET: return QString::number(getFieldOffset(index), 16);
 		case NAME: return (wrap->getFieldName(fId));
-		case VALUE2: {
-			if (fId == SecurityDirWrapper::TYPE) {
-				bool isOk = false;
-				int type = wrap->getNumValue(fId, &isOk);
-				if (!isOk) return "";
-
-				return wrap->translateType(type);
-			}
-			if (fId == SecurityDirWrapper::REVISION) {
-				bool isOk = false;
-				int type = wrap->getNumValue(fId, &isOk);
-				if (!isOk) return "";
-				return "";
-				//return wrap->translateRevision(type);
-			}
-			return "";
-		}
+		case VALUE2: return wrap->translateFieldContent(fId);
 	}
 	return dataValue(index);
 }
