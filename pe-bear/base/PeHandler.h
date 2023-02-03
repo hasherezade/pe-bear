@@ -42,6 +42,9 @@ private:
 	offset_t checksumOff;
 };
 
+//---
+
+//---
 class PeHandler : public QObject, public Releasable
 {
 	Q_OBJECT
@@ -230,6 +233,8 @@ protected slots:
 	void onCalcThreadFinished();
 
 protected:
+	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, offset_t &storageOffset); //throws CustomException
+	
 	~PeHandler() {
 		deleteThreads();
 		if (m_PE) {

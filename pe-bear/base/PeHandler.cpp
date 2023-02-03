@@ -604,13 +604,44 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 	return true;
 }
 
+ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, offset_t &storageOffset)
+{
+    //add new library wrapper:
+    ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (pe->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+    ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
+    if (libWr == NULL) return NULL;
+
+    const size_t PADDING = libWr->getSize() * 5; // leave space for 5 entries
+    storageOffset = imports->getOffset() +  imports->getContentSize() + PADDING;
+
+    offset_t nameOffset = storageOffset;
+
+    if (pe->setStringValue(storageOffset, name) == false) {
+		throw CustomException("Failed to fill library name!");
+        return NULL;
+    }
+    storageOffset += name.length() + PADDING;
+
+    offset_t firstThunk = pe->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
+
+    libWr->setNumValue(ImportEntryWrapper::FIRST_THUNK, firstThunk);
+    libWr->setNumValue(ImportEntryWrapper::ORIG_FIRST_THUNK, firstThunk);
+    libWr->wrap();
+
+    storageOffset += PADDING;
+    offset_t nameRva = pe->convertAddr(nameOffset, Executable::RAW, Executable::RVA);
+    libWr->setNumValue(ImportEntryWrapper::NAME, nameRva);
+
+    return libWr;
+}
+
 bool PeHandler::autoAddImports(bool addNewSec)
 {
 	const size_t SEC_PADDING = 10;
 	size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
 	if (!impDirSize) return false;
 	
-	size_t newImpSize = impDirSize * 2;
+	size_t newImpSize = pe_util::roundup(impDirSize * 2, 0x1000);;
 	
 	SectionHdrWrapper *stubHdr = NULL;
 	offset_t newImpOffset = INVALID_ADDR;
@@ -651,6 +682,21 @@ bool PeHandler::autoAddImports(bool addNewSec)
 		throw CustomException("Cannot move the data dir");
 		return false;
 	}
+	
+	offset_t storageOffset = 0;
+	QString library = "this_is_just_a_placeholder.dll";
+
+	ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, storageOffset);
+	if (libWr == NULL) {
+		throw CustomException("Adding library failed!");
+		return false;
+	}
+	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+	if (imports == NULL) {
+		throw CustomException("Cannot fetch imports!");
+		return false;
+	}
+	importDirWrapper.wrap();
 	return true;
 }
 
