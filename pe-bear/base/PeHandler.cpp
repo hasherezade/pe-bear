@@ -572,8 +572,9 @@ size_t PeHandler::getDirSize(dir_entry dirNum)
 	return dirSize;
 }
 
-bool PeHandler::addImportLib(bool continueLastOperation)
+bool PeHandler::canAddImportsLib(size_t libsCount)
 {
+	const size_t kRequiredFreeRecords = libsCount + 1;
 	const bufsize_t tableSize = importDirWrapper.getSize();
 
 	offset_t impDirOffset = importDirWrapper.getOffset();
@@ -584,10 +585,30 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 	if (!m_PE->getContentAt(impDirOffset, tableSize + fieldSize)) return false;
 
 	offset_t fieldOffset = (tableSize < fieldSize) ? impDirOffset : impDirOffset + tableSize - fieldSize; // substract the terminator record from the table
-	BYTE *ptr = m_PE->getContentAt(fieldOffset, fieldSize * 2); // space for the new record + terminator
+	BYTE *ptr = m_PE->getContentAt(fieldOffset, fieldSize * kRequiredFreeRecords); // space for the new records + the terminator
 	if (!ptr) return false;
 
-	if (!pe_util::isSpaceClear(ptr, fieldSize)) return false;
+	if (!pe_util::isSpaceClear(ptr, fieldSize * kRequiredFreeRecords)) {
+		return false;
+	}
+	return true;
+}
+
+bool PeHandler::addImportLib(bool continueLastOperation)
+{
+	if (!canAddImportsLib(1)) {
+		return false;
+	}
+	const bufsize_t tableSize = importDirWrapper.getSize();
+
+	offset_t impDirOffset = importDirWrapper.getOffset();
+	if (impDirOffset == INVALID_ADDR) return false;
+
+	const bufsize_t fieldSize = sizeof(IMAGE_IMPORT_DESCRIPTOR);
+
+	offset_t fieldOffset = (tableSize < fieldSize) ? impDirOffset : (impDirOffset + tableSize - fieldSize); // substract the terminator record from the table
+	BYTE *ptr = m_PE->getContentAt(fieldOffset, fieldSize * 2); // space for the new record + terminator
+	if (!ptr) return false;
 
 	backupModification(fieldOffset, fieldSize, continueLastOperation); // backup Section Header
 
@@ -604,23 +625,34 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 	return true;
 }
 
-ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, offset_t &storageOffset)
+ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, offset_t &storageOffset)
 {
-    //add new library wrapper:
-    ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (pe->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
-    ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
-    if (libWr == NULL) return NULL;
+	//add new library wrapper:
+	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (pe->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
+	if (libWr == NULL) return NULL;
 
-    const size_t PADDING = libWr->getSize() * 5; // leave space for 5 entries
-    storageOffset = imports->getOffset() +  imports->getContentSize() + PADDING;
-
-    offset_t nameOffset = storageOffset;
-
-    if (pe->setStringValue(storageOffset, name) == false) {
+	const size_t PADDING = libWr->getSize() * 5; // leave space for 5 entries
+	storageOffset = imports->getOffset() + imports->getContentSize() + PADDING;
+	offset_t nameOffset = storageOffset;
+	
+	const size_t kNameRecordPadding = (libWr->getFieldSize(ImportEntryWrapper::FIRST_THUNK) * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
+	const size_t nameTotalSize = name.length() + 1;
+	while (true) {
+		BYTE *ptr = pe->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
+		if (!ptr) return NULL;
+		if (!pe_util::isSpaceClear(ptr, nameTotalSize + kNameRecordPadding)) {
+			nameOffset++; //move the pointer...
+			continue;
+		}
+		nameOffset += kNameRecordPadding; //leave the padding between the previous element and the current record
+		break;
+	}
+	if (pe->setStringValue(nameOffset, name) == false) {
 		throw CustomException("Failed to fill library name!");
-        return NULL;
+		return NULL;
     }
-    storageOffset += name.length() + PADDING;
+    storageOffset = nameOffset + nameTotalSize;
 
     offset_t firstThunk = pe->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
 
@@ -628,7 +660,7 @@ ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, o
     libWr->setNumValue(ImportEntryWrapper::ORIG_FIRST_THUNK, firstThunk);
     libWr->wrap();
 
-    storageOffset += PADDING;
+    storageOffset += kNameRecordPadding;
     offset_t nameRva = pe->convertAddr(nameOffset, Executable::RAW, Executable::RVA);
     libWr->setNumValue(ImportEntryWrapper::NAME, nameRva);
 
@@ -637,6 +669,8 @@ ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, o
 
 bool PeHandler::autoAddImports(bool addNewSec)
 {
+	const bool shouldMoveTable = (canAddImportsLib(1)) ? false : true;
+	
 	const size_t SEC_PADDING = 10;
 	size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
 	if (!impDirSize) return false;
@@ -645,6 +679,7 @@ bool PeHandler::autoAddImports(bool addNewSec)
 	
 	SectionHdrWrapper *stubHdr = NULL;
 	offset_t newImpOffset = INVALID_ADDR;
+
 	if (addNewSec) {
 		QString name = "new_imp";
 		stubHdr = this->addSection(name, newImpSize, newImpSize);
@@ -671,22 +706,24 @@ bool PeHandler::autoAddImports(bool addNewSec)
 		const offset_t SEC_RVA = stubHdr->getContentOffset(Executable::RVA);
 		newImpOffset  = secROffset + realSecSize;
 	}
-	if (newImpOffset == INVALID_ADDR) {
-		return false;
-	}
 
-	const DWORD oldCharact = stubHdr->getCharacteristics();
-	stubHdr->setCharacteristics(oldCharact | 0xE0000000);
-	
-	if (!this->moveDataDirEntry(pe::DIR_IMPORT, newImpOffset)) {
-		throw CustomException("Cannot move the data dir");
-		return false;
+	if (shouldMoveTable) {
+		if (newImpOffset == INVALID_ADDR) {
+			return false;
+		}
+		const DWORD oldCharact = stubHdr->getCharacteristics();
+		stubHdr->setCharacteristics(oldCharact | 0xE0000000);
+		
+		if (!this->moveDataDirEntry(pe::DIR_IMPORT, newImpOffset)) {
+			throw CustomException("Cannot move the data dir");
+			return false;
+		}
 	}
 	
 	offset_t storageOffset = 0;
 	QString library = "this_is_just_a_placeholder.dll";
 
-	ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, storageOffset);
+	ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, 5, storageOffset);
 	if (libWr == NULL) {
 		throw CustomException("Adding library failed!");
 		return false;
@@ -697,6 +734,8 @@ bool PeHandler::autoAddImports(bool addNewSec)
 		return false;
 	}
 	importDirWrapper.wrap();
+	//---
+	emit modified();
 	return true;
 }
 

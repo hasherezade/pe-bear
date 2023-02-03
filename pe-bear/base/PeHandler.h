@@ -123,6 +123,7 @@ public:
 	bool moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw);
 
 	size_t getDirSize(pe::dir_entry dirNum);
+	bool canAddImportsLib(size_t libsCount);
 	bool addImportLib(bool continueLastOperation = false);
 	bool addImportFunc(size_t parentLibNum);
 	
@@ -233,7 +234,7 @@ protected slots:
 	void onCalcThreadFinished();
 
 protected:
-	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, offset_t &storageOffset); //throws CustomException
+	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, offset_t &storageOffset); //throws CustomException
 	
 	~PeHandler() {
 		deleteThreads();
