@@ -42,6 +42,7 @@ protected slots:
 	void onFitSections();
 	void onAddImportLib();
 	void onAddImportFunc();
+	void onAutoAddImports();
 
 	void setDisasmTabText(offset_t raw);
 
@@ -120,7 +121,11 @@ protected:
 	QDockWidget* dockedRDiagram, *dockedVDiagram;
 	
 	QToolBar *sectionsToolBar;
-	QAction *addSection, *fitSections, *addImportLib, *addImportFunc;
+	QAction *addSection, 
+		*fitSections, 
+		*addImportLib, 
+		*addImportFunc,
+		*autoAddImports;
 
 	SectionAddWindow winAddSec;
 	QMutex fontMutex;

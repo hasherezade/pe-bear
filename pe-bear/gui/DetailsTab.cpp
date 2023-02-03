@@ -296,6 +296,11 @@ void DetailsTab::onAddImportFunc()
 	}
 }
 
+void DetailsTab::onAutoAddImports()
+{
+	QMessageBox::warning(NULL, "Info", "Auto add triggered!");
+}
+
 void DetailsTab::onGlobalFontChanged()
 {
 	QMutexLocker locker(&fontMutex);
@@ -323,6 +328,9 @@ void DetailsTab::setScaledIcons()
 
 	QIcon addSubIco = ViewSettings::makeScaledIcon(":/icons/add_subentry.ico", iconDim, iconDim);
 	this->addImportFunc->setIcon(addSubIco);
+
+	QIcon magicAddIco = ViewSettings::makeScaledIcon(":/icons/magic_wand.ico", iconDim, iconDim);
+	this->autoAddImports->setIcon(magicAddIco);
 	
 	sectionsToolBar->setFont(QApplication::font());
 	sectionsToolBar->setMaximumHeight(iconDim * 2);
@@ -368,9 +376,13 @@ void DetailsTab::setupImportsToolbar()
 
 	this->addImportFunc = new QAction(QString("&Add a function to the library"), this);
 	connect(addImportFunc, SIGNAL(triggered()), this, SLOT(onAddImportFunc()) );
+	
+	this->autoAddImports = new QAction(QString("&Auto add imports"), this);
+	connect(autoAddImports, SIGNAL(triggered()), this, SLOT(onAutoAddImports()) );
 
 	toolBar->addAction(addImportLib);
 	toolBar->addAction(addImportFunc);
+	toolBar->addAction(autoAddImports);
 }
 
 void DetailsTab::setDisasmTabText(offset_t raw)

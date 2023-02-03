@@ -45,5 +45,6 @@
         <file>icons/reload.ico</file>
         <file>icons/dump.ico</file>
         <file>icons/information.ico</file>
+        <file>icons/magic_wand.ico</file>
     </qresource>
 </RCC>
