@@ -604,6 +604,56 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 	return true;
 }
 
+bool PeHandler::autoAddImports(bool addNewSec)
+{
+	const size_t SEC_PADDING = 10;
+	size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
+	if (!impDirSize) return false;
+	
+	size_t newImpSize = impDirSize * 2;
+	
+	SectionHdrWrapper *stubHdr = NULL;
+	offset_t newImpOffset = INVALID_ADDR;
+	if (addNewSec) {
+		QString name = "new_imp";
+		stubHdr = this->addSection(name, newImpSize, newImpSize);
+		if (!stubHdr) {
+			throw CustomException("Cannot add a new section");
+			return false;
+		}
+		newImpOffset = stubHdr->getRawPtr();
+	} else {
+		stubHdr = m_PE->getLastSection();
+		if (stubHdr == NULL) {
+			throw CustomException("Cannot fetch last section!");
+			return false;
+		}
+		// resize section
+		offset_t secROffset = stubHdr->getContentOffset(Executable::RAW, true);
+		offset_t realSecSize = m_PE->getContentSize() - secROffset;
+		//startOffset += SEC_PADDING;
+		stubHdr = m_PE->extendLastSection(newImpSize + SEC_PADDING);
+		if (stubHdr == NULL) {
+			throw CustomException("Cannot fetch last section!");
+			return false;
+		}
+		const offset_t SEC_RVA = stubHdr->getContentOffset(Executable::RVA);
+		newImpOffset  = secROffset + realSecSize;
+	}
+	if (newImpOffset == INVALID_ADDR) {
+		return false;
+	}
+
+	const DWORD oldCharact = stubHdr->getCharacteristics();
+	stubHdr->setCharacteristics(oldCharact | 0xE0000000);
+	
+	if (!this->moveDataDirEntry(pe::DIR_IMPORT, newImpOffset)) {
+		throw CustomException("Cannot move the data dir");
+		return false;
+	}
+	return true;
+}
+
 bool PeHandler::addImportFunc(size_t libNum)
 {
 	//ImportEntryWrapper 

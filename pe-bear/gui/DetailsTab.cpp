@@ -298,7 +298,15 @@ void DetailsTab::onAddImportFunc()
 
 void DetailsTab::onAutoAddImports()
 {
-	QMessageBox::warning(NULL, "Info", "Auto add triggered!");
+	try {
+		if (!myPeHndl->autoAddImports(false)) {
+			QMessageBox::critical(this, "Error", "Auto adding imports failed!");
+		}
+	} catch (CustomException e) {
+		QMessageBox::critical(this, "Error", e.what());
+		return;
+	}
+	
 }
 
 void DetailsTab::onGlobalFontChanged()

@@ -122,6 +122,8 @@ public:
 	size_t getDirSize(pe::dir_entry dirNum);
 	bool addImportLib(bool continueLastOperation = false);
 	bool addImportFunc(size_t parentLibNum);
+	
+	bool autoAddImports(bool addNewSec); //throws CustomException
 
 	void setEP(offset_t newEpRva);
 	void wrapAlbum() { resourcesAlbum.wrapLeafsContent(); }
