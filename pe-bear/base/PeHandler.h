@@ -50,13 +50,11 @@ struct ImportsAutoadderSettings
 	
 	void addImport(const QString &dll, const QString &func)
 	{
-		this->dlls << dll;
-		this->dlls.removeDuplicates();
 		dllFunctions[dll].append(func);
+		dllFunctions[dll].removeDuplicates();
 	}
 
 	bool addNewSec;
-	QStringList dlls;
 	QMap<QString, QStringList> dllFunctions;
 };
 
@@ -143,7 +141,7 @@ public:
 	bool addImportLib(bool continueLastOperation = false);
 	bool addImportFunc(size_t parentLibNum);
 	
-	bool autoAddImports(ImportsAutoadderSettings &settings); //throws CustomException
+	bool autoAddImports(const ImportsAutoadderSettings &settings); //throws CustomException
 
 	void setEP(offset_t newEpRva);
 	void wrapAlbum() { resourcesAlbum.wrapLeafsContent(); }

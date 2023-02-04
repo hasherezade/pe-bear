@@ -690,9 +690,10 @@ bool PeHandler::autoFillFunction(PEFile *pe, ImportEntryWrapper* libWr, Imported
     return true;
 }
 
-bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
+bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 {
-	const size_t dllsCount = settings.dlls.size();
+	const QStringList dllsList = settings.dllFunctions.keys();
+	const size_t dllsCount = dllsList.size();
 	const bool shouldMoveTable = (canAddImportsLib(dllsCount)) ? false : true;
 	
 	const size_t SEC_PADDING = 10;
@@ -724,7 +725,7 @@ bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
 		// resize section
 		offset_t secROffset = stubHdr->getContentOffset(Executable::RAW, true);
 		offset_t realSecSize = m_PE->getContentSize() - secROffset;
-		//startOffset += SEC_PADDING;
+
 		stubHdr = m_PE->extendLastSection(newImpSize + SEC_PADDING);
 		if (stubHdr == NULL) {
 			throw CustomException("Cannot fetch last section!");
@@ -749,7 +750,8 @@ bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
 
 	QMap<QString, ImportEntryWrapper*> addedWrappers;
 	offset_t storageOffset = 0;
-	for (auto itr = settings.dlls.begin(); itr != settings.dlls.end(); ++itr) {
+
+	for (auto itr = dllsList.begin(); itr != dllsList.end(); ++itr) {
 		
 		QString library = *itr;
 		const size_t funcCount = settings.dllFunctions[library].size();
