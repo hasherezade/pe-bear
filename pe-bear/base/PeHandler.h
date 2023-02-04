@@ -52,10 +52,12 @@ struct ImportsAutoadderSettings
 	{
 		this->dlls << dll;
 		this->dlls.removeDuplicates();
+		dllFunctions[dll].append(func);
 	}
 
 	bool addNewSec;
 	QStringList dlls;
+	QMap<QString, QStringList> dllFunctions;
 };
 
 //---
@@ -249,6 +251,9 @@ protected slots:
 
 protected:
 	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset); //throws CustomException
+	static bool autoFillFunction(PEFile *pe, ImportEntryWrapper* libWr, ImportedFuncWrapper* func, const QString& name, offset_t &storageOffset); //throws CustomException
+	
+	ImportedFuncWrapper* _addImportFunc(ImportEntryWrapper *lib, bool continueLastOperation = false);
 	
 	~PeHandler() {
 		deleteThreads();

@@ -667,6 +667,29 @@ ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, s
     return libWr;
 }
 
+bool PeHandler::autoFillFunction(PEFile *pe, ImportEntryWrapper* libWr, ImportedFuncWrapper* fWr, const QString& name, offset_t &storageOffset)
+{
+    if (pe == NULL) return false;
+
+    if (fWr == NULL) {
+		throw CustomException("Cannot fill the function");
+        return false;
+    }
+
+    const offset_t thunkRVA = pe->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
+
+    fWr->setNumValue(ImportedFuncWrapper::THUNK, thunkRVA);
+    fWr->setNumValue(ImportedFuncWrapper::ORIG_THUNK, thunkRVA);
+
+    storageOffset += sizeof(WORD); //add sizeof Hint
+    if (pe->setStringValue(storageOffset, name) == false) {
+		throw CustomException("Failed to fill the function name");
+        return false;
+    }
+    storageOffset += name.length() + 1;
+    return true;
+}
+
 bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
 {
 	const size_t dllsCount = settings.dlls.size();
@@ -674,8 +697,11 @@ bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
 	
 	const size_t SEC_PADDING = 10;
 	size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
-	if (!impDirSize) return false;
-	
+	if (!impDirSize) {
+		throw CustomException("Import Directory does not exist");
+		return false;
+	}
+
 	size_t newImpSize = pe_util::roundup(impDirSize * 2, 0x1000);;
 	
 	SectionHdrWrapper *stubHdr = NULL;
@@ -720,70 +746,101 @@ bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
 			return false;
 		}
 	}
-	
+
+	QMap<QString, ImportEntryWrapper*> addedWrappers;
 	offset_t storageOffset = 0;
 	for (auto itr = settings.dlls.begin(); itr != settings.dlls.end(); ++itr) {
+		
 		QString library = *itr;
-		ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, 5, dllsCount, storageOffset);
+		const size_t funcCount = settings.dllFunctions[library].size();
+		if (!funcCount) continue;
+		
+		ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, funcCount + 1, dllsCount, storageOffset);
 		if (libWr == NULL) {
 			throw CustomException("Adding library failed!");
 			return false;
 		}
-		ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
-		if (imports == NULL) {
-			throw CustomException("Cannot fetch imports!");
-			return false;
-		}
-		importDirWrapper.wrap();
+		addedWrappers[library] = libWr;
 	}
-	//---
+
+	for (auto itr = addedWrappers.begin(); itr != addedWrappers.end(); ++itr) {
+		ImportEntryWrapper* libWr = itr.value();
+		const QString library = itr.key();
+		for (auto fItr = settings.dllFunctions[library].begin(); fItr != settings.dllFunctions[library].end(); ++fItr) {
+			ImportedFuncWrapper* func = _addImportFunc(libWr, true);
+			if (!func) break;
+			
+			QString funcName = *fItr;
+			autoFillFunction(m_PE, libWr, func, funcName, storageOffset);
+			delete func; func = NULL; // delete the temporary wrapper
+			libWr->wrap();
+		}
+	}
+	
+	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+	if (imports == NULL) {
+		throw CustomException("Cannot fetch imports!");
+		return false;
+	}
+	importDirWrapper.wrap();
+	
 	emit modified();
 	return true;
 }
 
-bool PeHandler::addImportFunc(size_t libNum)
+ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool continueLastOperation)
 {
-	//ImportEntryWrapper 
-	ImportEntryWrapper *lib = dynamic_cast<ImportEntryWrapper*>(importDirWrapper.getEntryAt(libNum));
-	if (!lib) return false;
+	if (!lib) return NULL;
 
 	const size_t funcNum = lib->getEntriesCount();
 	
 	bool isOk = false;
 	offset_t callVia = lib->getNumValue(ImportEntryWrapper::FIRST_THUNK, &isOk);
-	if (!isOk) return false;
+	if (!isOk) return NULL;
 
 	{ //scope0
 		// create a temporary wrapper to check if adding a terminating record is possible:
-		ImportedFuncWrapper *nextFunc = new ImportedFuncWrapper(m_PE, lib, funcNum + 1);
-		if (nextFunc->getThunkValue()) {
+		ImportedFuncWrapper *nextFuncSpacer = new ImportedFuncWrapper(m_PE, lib, funcNum + 1);
+		if (nextFuncSpacer->getThunkValue()) {
 			// not an empty space
-			delete nextFunc;
-			return false;
+			delete nextFuncSpacer;
+			return NULL;
 		}
-		// space check - OK! enough space for terminate record
-		delete nextFunc;
-	}
+		// space check - OK! enough space for the terminating record
+		delete nextFuncSpacer;
+	} //!scope0
 
+	ImportedFuncWrapper *nextFunc = NULL;
 	bool isSet = false;
 
 	{ //scope1
 		// create a temporary wrapper to help filling in the space:
-		ImportedFuncWrapper *nextFunc = new ImportedFuncWrapper(m_PE, lib, funcNum);
+		nextFunc = new ImportedFuncWrapper(m_PE, lib, funcNum);
 		offset_t offset = nextFunc->getFieldOffset(ImportEntryWrapper::FIRST_THUNK);
 		bufsize_t fieldSize = nextFunc->getFieldSize(ImportEntryWrapper::FIRST_THUNK);
 
 		if (offset && fieldSize) {
-			backupModification(offset, fieldSize);
+			backupModification(offset, fieldSize, continueLastOperation);
 			isSet = nextFunc->setNumValue(ImportEntryWrapper::FIRST_THUNK, (-1));
 		}
-		delete nextFunc;
-	}
+	} //!scope1
+	
 	if (!isSet) {
+		delete nextFunc; nextFunc = NULL;
 		this->unbackupLastModification();
+		return NULL;
+	}
+	return nextFunc;
+}
+
+bool PeHandler::addImportFunc(size_t libNum)
+{
+	ImportEntryWrapper *lib = dynamic_cast<ImportEntryWrapper*>(importDirWrapper.getEntryAt(libNum));
+	ImportedFuncWrapper* func = _addImportFunc(lib);
+	if (!func) {
 		return false;
 	}
-
+	delete func; //delete the temporary wrapper
 	lib->wrap();
 	//---
 	emit modified();
