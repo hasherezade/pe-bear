@@ -248,10 +248,11 @@ protected slots:
 	void onCalcThreadFinished();
 
 protected:
-	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset); //throws CustomException
-	static bool autoFillFunction(PEFile *pe, ImportEntryWrapper* libWr, ImportedFuncWrapper* func, const QString& name, offset_t &storageOffset); //throws CustomException
+	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset); //throws CustomException
+	bool _autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper* func, const QString& name, offset_t &storageOffset); //throws CustomException
 	
 	ImportedFuncWrapper* _addImportFunc(ImportEntryWrapper *lib, bool continueLastOperation = false);
+	bool _moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw, bool continueLastOperation = false);
 	
 	~PeHandler() {
 		deleteThreads();
