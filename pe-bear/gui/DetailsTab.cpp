@@ -298,8 +298,12 @@ void DetailsTab::onAddImportFunc()
 
 void DetailsTab::onAutoAddImports()
 {
+	ImportsAutoadderSettings settings;
+	settings.addImport("placeholder1.dll", "demo");
+	settings.addImport("placeholder2.dll", "demo");
+	settings.addImport("placeholder3.dll", "demo");
 	try {
-		if (!myPeHndl->autoAddImports(false)) {
+		if (!myPeHndl->autoAddImports(settings)) {
 			QMessageBox::critical(this, "Error", "Auto adding imports failed!");
 		}
 	} catch (CustomException e) {

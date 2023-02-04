@@ -44,6 +44,20 @@ private:
 
 //---
 
+struct ImportsAutoadderSettings
+{
+	ImportsAutoadderSettings() : addNewSec(false) {}
+	
+	void addImport(const QString &dll, const QString &func)
+	{
+		this->dlls << dll;
+		this->dlls.removeDuplicates();
+	}
+
+	bool addNewSec;
+	QStringList dlls;
+};
+
 //---
 class PeHandler : public QObject, public Releasable
 {
@@ -127,7 +141,7 @@ public:
 	bool addImportLib(bool continueLastOperation = false);
 	bool addImportFunc(size_t parentLibNum);
 	
-	bool autoAddImports(bool addNewSec); //throws CustomException
+	bool autoAddImports(ImportsAutoadderSettings &settings); //throws CustomException
 
 	void setEP(offset_t newEpRva);
 	void wrapAlbum() { resourcesAlbum.wrapLeafsContent(); }
@@ -234,7 +248,7 @@ protected slots:
 	void onCalcThreadFinished();
 
 protected:
-	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, offset_t &storageOffset); //throws CustomException
+	static ImportEntryWrapper* autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset); //throws CustomException
 	
 	~PeHandler() {
 		deleteThreads();

@@ -625,14 +625,14 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 	return true;
 }
 
-ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, offset_t &storageOffset)
+ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset)
 {
 	//add new library wrapper:
 	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (pe->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
 	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
 	if (libWr == NULL) return NULL;
 
-	const size_t PADDING = libWr->getSize() * 5; // leave space for 5 entries
+	const size_t PADDING = libWr->getSize() * (expectedDllsCount + 1); // leave the space for further entries
 	storageOffset = imports->getOffset() + imports->getContentSize() + PADDING;
 	offset_t nameOffset = storageOffset;
 	
@@ -667,9 +667,10 @@ ImportEntryWrapper* PeHandler::autoAddLibrary(PEFile *pe, const QString &name, s
     return libWr;
 }
 
-bool PeHandler::autoAddImports(bool addNewSec)
+bool PeHandler::autoAddImports(ImportsAutoadderSettings &settings)
 {
-	const bool shouldMoveTable = (canAddImportsLib(1)) ? false : true;
+	const size_t dllsCount = settings.dlls.size();
+	const bool shouldMoveTable = (canAddImportsLib(dllsCount)) ? false : true;
 	
 	const size_t SEC_PADDING = 10;
 	size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
@@ -680,7 +681,7 @@ bool PeHandler::autoAddImports(bool addNewSec)
 	SectionHdrWrapper *stubHdr = NULL;
 	offset_t newImpOffset = INVALID_ADDR;
 
-	if (addNewSec) {
+	if (settings.addNewSec) {
 		QString name = "new_imp";
 		stubHdr = this->addSection(name, newImpSize, newImpSize);
 		if (!stubHdr) {
@@ -721,19 +722,20 @@ bool PeHandler::autoAddImports(bool addNewSec)
 	}
 	
 	offset_t storageOffset = 0;
-	QString library = "this_is_just_a_placeholder.dll";
-
-	ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, 5, storageOffset);
-	if (libWr == NULL) {
-		throw CustomException("Adding library failed!");
-		return false;
+	for (auto itr = settings.dlls.begin(); itr != settings.dlls.end(); ++itr) {
+		QString library = *itr;
+		ImportEntryWrapper* libWr = autoAddLibrary(m_PE, library, 5, dllsCount, storageOffset);
+		if (libWr == NULL) {
+			throw CustomException("Adding library failed!");
+			return false;
+		}
+		ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+		if (imports == NULL) {
+			throw CustomException("Cannot fetch imports!");
+			return false;
+		}
+		importDirWrapper.wrap();
 	}
-	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
-	if (imports == NULL) {
-		throw CustomException("Cannot fetch imports!");
-		return false;
-	}
-	importDirWrapper.wrap();
 	//---
 	emit modified();
 	return true;
