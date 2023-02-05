@@ -66,6 +66,9 @@ void MainWindow::connectSignals()
 	connect(&sectionsTree, SIGNAL(handlerSelected(PeHandler *)),
 		this, SLOT(onHandlerSelected(PeHandler*)), Qt::UniqueConnection);
 
+	connect(&sectionsTree, SIGNAL(handlerSelected(PeHandler *)),
+		&diffWindow, SLOT(refresh()), Qt::UniqueConnection);
+
 	connect(this, SIGNAL(addSectionRequested(PeHandler*)),
 		&secAddWindow, SLOT(onAddSectionToPe(PeHandler*)) );
 
