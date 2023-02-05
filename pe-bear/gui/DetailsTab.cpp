@@ -301,13 +301,13 @@ void DetailsTab::onAddImportFunc()
 void DetailsTab::onAutoAddImports()
 {
 	ImportsAutoadderSettings settings;
-
+/*
 	settings.addImport("placeholder1.dll", "demo");
 	settings.addImport("placeholder1.dll", "thiis_is_another_func");
 	settings.addImport("placeholder1.dll", "yet_another_placeholder");
 	settings.addImport("placeholder2.dll", "we_are_doing_a_demo");
 	settings.addImport("placeholder3.dll", "hello_world");
-
+*/
 	ImportsAddWindow *impCreator = new ImportsAddWindow(settings, this);
 	impCreator->exec();
 	if (impCreator->result() != QDialog::Accepted){

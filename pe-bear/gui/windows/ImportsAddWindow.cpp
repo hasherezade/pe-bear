@@ -19,7 +19,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	dllNameLabel.setText(tr("DLL:"));
 	dllNameLabel.setBuddy(&dllNameEdit);
 
-	funcNameLabel.setText(tr("Func:"));
+	funcNameLabel.setText(tr("Function:"));
 	funcNameLabel.setBuddy(&funcNameEdit);
 
 	propertyLayout1.addWidget(&dllNameLabel);
