@@ -100,7 +100,7 @@ public:
 			auto funcs = dItr.value();
 			for (auto fItr = funcs.begin(); fItr != funcs.end(); ++fItr) {
 				QString funcName = *fItr;
-				dllAndFunc.append(QPair(dllName, funcName));
+				dllAndFunc.append(QPair<QString,QString>(dllName, funcName));
 			}
 		}
 		endResetModel();
