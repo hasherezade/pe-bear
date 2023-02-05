@@ -1,6 +1,8 @@
 #include "DetailsTab.h"
 #include <QtGlobal>
 
+#include "windows/ImportsAddWindow.h"
+
 #define ACTION_PROP_RAW "raw"
 
 //---------------------------------------------------------------------------
@@ -296,6 +298,35 @@ void DetailsTab::onAddImportFunc()
 	}
 }
 
+void DetailsTab::onAutoAddImports()
+{
+	ImportsAutoadderSettings settings;
+/*
+	settings.addImport("placeholder1.dll", "demo");
+	settings.addImport("placeholder1.dll", "thiis_is_another_func");
+	settings.addImport("placeholder1.dll", "yet_another_placeholder");
+	settings.addImport("placeholder2.dll", "we_are_doing_a_demo");
+	settings.addImport("placeholder3.dll", "hello_world");
+*/
+	ImportsAddWindow *impCreator = new ImportsAddWindow(settings, this);
+	impCreator->exec();
+	if (impCreator->result() != QDialog::Accepted){
+		return;
+	}
+	if (settings.dllFunctions.size() == 0) {
+		//no content to be added
+		return;
+	}
+	try {
+		if (!myPeHndl->autoAddImports(settings)) {
+			QMessageBox::critical(this, "Error", "Auto adding imports failed!");
+		}
+	} catch (CustomException e) {
+		QMessageBox::critical(this, "Error", e.what());
+		return;
+	}
+}
+
 void DetailsTab::onGlobalFontChanged()
 {
 	QMutexLocker locker(&fontMutex);
@@ -323,6 +354,9 @@ void DetailsTab::setScaledIcons()
 
 	QIcon addSubIco = ViewSettings::makeScaledIcon(":/icons/add_subentry.ico", iconDim, iconDim);
 	this->addImportFunc->setIcon(addSubIco);
+
+	QIcon magicAddIco = ViewSettings::makeScaledIcon(":/icons/magic_wand.ico", iconDim, iconDim);
+	this->autoAddImports->setIcon(magicAddIco);
 	
 	sectionsToolBar->setFont(QApplication::font());
 	sectionsToolBar->setMaximumHeight(iconDim * 2);
@@ -368,9 +402,13 @@ void DetailsTab::setupImportsToolbar()
 
 	this->addImportFunc = new QAction(QString("&Add a function to the library"), this);
 	connect(addImportFunc, SIGNAL(triggered()), this, SLOT(onAddImportFunc()) );
+	
+	this->autoAddImports = new QAction(QString("&Auto add imports"), this);
+	connect(autoAddImports, SIGNAL(triggered()), this, SLOT(onAutoAddImports()) );
 
 	toolBar->addAction(addImportLib);
 	toolBar->addAction(addImportFunc);
+	toolBar->addAction(autoAddImports);
 }
 
 void DetailsTab::setDisasmTabText(offset_t raw)

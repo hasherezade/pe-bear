@@ -39,7 +39,7 @@ bool ModifBackup::apply(AbstractByteBuffer* file)
 	BYTE *modPtr = file->getContentAt(this->offset, this->size);
 	
 	if (!modPtr) {
-		std::cerr << "Cannot apply backup at: " << std::hex << this->offset << "  on the given file! Area size mismatch!" << std::endl;
+		std::cerr << "Cannot apply backup at offset: " << std::hex << this->offset << " on the given file! Area size mismatch!" << std::endl;
 		return false;
 	}
 
@@ -198,8 +198,8 @@ bool ModificationHandler::undoLastOperation()
 	if (!op) return false;
 
 	size_t undone = 0;
-	for (std::vector<ModifBackup*>::iterator itr = op->modifs.begin();
-		itr != op->modifs.end();
+	for (std::vector<ModifBackup*>::reverse_iterator itr = op->modifs.rbegin();
+		itr != op->modifs.rend();
 		++itr)
 	{
 		ModifBackup* patch = *itr;
