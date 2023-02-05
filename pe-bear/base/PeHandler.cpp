@@ -753,8 +753,8 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 			return false;
 		}
 		// resize section
-		offset_t secROffset = stubHdr->getContentOffset(Executable::RAW, true);
-		offset_t realSecSize = m_PE->getContentSize() - secROffset;
+		const offset_t secROffset = stubHdr->getContentOffset(Executable::RAW, true);
+		const offset_t realSecSize = m_PE->getContentSize() - secROffset; // the size including the eventual padding
 
 		backupModification(stubHdr->getFieldOffset(SectionHdrWrapper::VSIZE), stubHdr->getFieldSize(SectionHdrWrapper::VSIZE), continueLastOperation);
 		continueLastOperation = true;
@@ -767,10 +767,9 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		stubHdr = m_PE->extendLastSection(newImpSize + SEC_PADDING);
 		if (stubHdr == NULL) {
 			this->unbackupLastModification();
-			throw CustomException("Cannot fetch last section!");
+			throw CustomException("Cannot extend the last section!");
 			return false;
 		}
-		const offset_t SEC_RVA = stubHdr->getContentOffset(Executable::RVA);
 		newImpOffset  = secROffset + realSecSize;
 	}
 	if (shouldMoveTable) {
@@ -782,10 +781,10 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const DWORD oldCharact = stubHdr->getCharacteristics();
 		if (!stubHdr->setCharacteristics(oldCharact | 0xE0000000)) {
 			this->unbackupLastModification();
-			throw CustomException("Cannot modify section characteristics");
+			throw CustomException("Cannot modify the section characteristics");
 			return false;
 		}
-		if (!this->_moveDataDirEntry(pe::DIR_IMPORT, newImpOffset, true)) {
+		if (!this->_moveDataDirEntry(pe::DIR_IMPORT, newImpOffset, continueLastOperation)) {
 			throw CustomException("Cannot move the data dir");
 			return false;
 		}
@@ -818,7 +817,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 				break;
 			}
 			continueLastOperation = true;
-			QString funcName = *fItr;
+			const QString funcName = *fItr;
 			_autoFillFunction(libWr, func, funcName, storageOffset);
 			delete func; func = NULL; // delete the temporary wrapper
 			libWr->wrap();
