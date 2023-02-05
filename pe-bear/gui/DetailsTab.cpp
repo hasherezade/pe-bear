@@ -307,10 +307,14 @@ void DetailsTab::onAutoAddImports()
 	settings.addImport("placeholder1.dll", "yet_another_placeholder");
 	settings.addImport("placeholder2.dll", "we_are_doing_a_demo");
 	settings.addImport("placeholder3.dll", "hello_world");
-	
+
 	ImportsAddWindow *impCreator = new ImportsAddWindow(settings, this);
 	impCreator->exec();
 	if (impCreator->result() != QDialog::Accepted){
+		return;
+	}
+	if (settings.dllFunctions.size() == 0) {
+		//no content to be added
 		return;
 	}
 	try {

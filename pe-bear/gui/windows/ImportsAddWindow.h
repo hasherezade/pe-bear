@@ -128,13 +128,15 @@ public:
 public slots:
 	void onAddClicked();
 	void onRemoveClicked();
+	void onSaveClicked();
 
 protected:
 	QVBoxLayout topLayout;
-	QHBoxLayout propertyLayout1;
-	QHBoxLayout propertyLayout2;
-	QHBoxLayout propertyLayout3;
-	
+	QHBoxLayout propertyLayout0,
+		propertyLayout1, 
+		propertyLayout2,
+		propertyLayout3;
+
 	QHBoxLayout buttonLayout1;
 	QHBoxLayout buttonLayout2;
 	
@@ -146,6 +148,9 @@ protected:
 
 	QPushButton addButton, removeButton,
 		okButton, cancelButton;
+
+	QLabel addSecLabel;
+	QCheckBox addSecCBox;
 
 private:
 	ImpAdderSettingsTableModel *tableModel;

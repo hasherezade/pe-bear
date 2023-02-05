@@ -732,6 +732,8 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 {
 	const QStringList dllsList = settings.dllFunctions.keys();
 	const size_t dllsCount = dllsList.size();
+	if (dllsCount == 0) return false;
+	
 	const size_t kDllRecordsSpace = sizeof(IMAGE_IMPORT_DESCRIPTOR) * (dllsCount + 1); // space for Import descriptor for each needed DLL
 	const bool shouldMoveTable = (canAddImportsLib(dllsCount)) ? false : true;
 	

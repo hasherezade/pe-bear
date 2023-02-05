@@ -7,6 +7,13 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	setWindowFlags(Qt::Dialog);
 	setModal(true);
 
+	addSecLabel.setText(tr("Use new section: "));
+	addSecLabel.setBuddy(&addSecCBox);
+
+	propertyLayout0.addWidget(&addSecLabel);
+	propertyLayout0.addWidget(&addSecCBox);
+	addSecCBox.setChecked(settings.addNewSec);
+
 	dllNameLabel.setText(tr("DLL:"));
 	dllNameLabel.setBuddy(&dllNameEdit);
 
@@ -21,7 +28,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	
 	topLayout.addLayout(&propertyLayout1);
 	topLayout.addLayout(&propertyLayout2);
-	
+
 	addButton.setText(tr("Add"));
 	addButton.setDefault(true);
 	removeButton.setText(tr("Remove"));
@@ -33,7 +40,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	ui_elementsView = new QTableView(this);
 	tableModel = new ImpAdderSettingsTableModel(ui_elementsView, _settings);
 	ui_elementsView->setModel(tableModel);
-	ui_elementsView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	ui_elementsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 	propertyLayout3.addWidget(ui_elementsView);
 	topLayout.addLayout(&propertyLayout3);
@@ -47,6 +54,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	cancelButton.setText(tr("Cancel"));
 	buttonLayout2.addWidget(&okButton);
 	buttonLayout2.addWidget(&cancelButton);
+	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&buttonLayout2);
 
 	setWindowTitle(tr("Add imports"));
@@ -54,7 +62,13 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	connect(&addButton, SIGNAL(clicked()),this, SLOT(onAddClicked() ));
 	connect(&removeButton, SIGNAL(clicked()),this, SLOT(onRemoveClicked()));
 	connect(&cancelButton, SIGNAL(clicked()),this, SLOT(reject()));
-	connect(&okButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(&okButton, SIGNAL(clicked()),this, SLOT(onSaveClicked()));
+}
+
+void ImportsAddWindow::onSaveClicked()
+{
+	settings.addNewSec = addSecCBox.isChecked();
+	accept();
 }
 
 void ImportsAddWindow::onAddClicked()
