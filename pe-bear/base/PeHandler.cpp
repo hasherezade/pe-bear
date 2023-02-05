@@ -749,30 +749,24 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	} else {
 		stubHdr = m_PE->getLastSection();
 		if (stubHdr == NULL) {
-			throw CustomException("Cannot fetch last section!");
+			throw CustomException("Cannot fetch the last section!");
 			return false;
 		}
 		// resize section
 		offset_t secROffset = stubHdr->getContentOffset(Executable::RAW, true);
 		offset_t realSecSize = m_PE->getContentSize() - secROffset;
 
-		SectionHdrWrapper* secHdr = m_PE->getLastSection();
-		if (stubHdr) {
-			// backup the fields
-			backupModification(secHdr->getFieldOffset(SectionHdrWrapper::VSIZE), stubHdr->getFieldSize(SectionHdrWrapper::VSIZE), continueLastOperation);
-			continueLastOperation = true;
-			backupModification(secHdr->getFieldOffset(SectionHdrWrapper::RSIZE), stubHdr->getFieldSize(SectionHdrWrapper::RSIZE), continueLastOperation);
-			OptHdrWrapper* optHdr = dynamic_cast<OptHdrWrapper*>(m_PE->getWrapper(PEFile::WR_OPTIONAL_HDR));
-			if (optHdr) {
-				backupModification(optHdr->getFieldOffset(OptHdrWrapper::IMAGE_SIZE), optHdr->getFieldSize(OptHdrWrapper::IMAGE_SIZE), continueLastOperation);
-			}
-			// do the operation:
-			stubHdr = m_PE->extendLastSection(newImpSize + SEC_PADDING);
-			if (!stubHdr) {
-				this->unbackupLastModification();
-			}
+		backupModification(stubHdr->getFieldOffset(SectionHdrWrapper::VSIZE), stubHdr->getFieldSize(SectionHdrWrapper::VSIZE), continueLastOperation);
+		continueLastOperation = true;
+		backupModification(stubHdr->getFieldOffset(SectionHdrWrapper::RSIZE), stubHdr->getFieldSize(SectionHdrWrapper::RSIZE), continueLastOperation);
+		OptHdrWrapper* optHdr = dynamic_cast<OptHdrWrapper*>(m_PE->getWrapper(PEFile::WR_OPTIONAL_HDR));
+		if (optHdr) {
+			backupModification(optHdr->getFieldOffset(OptHdrWrapper::IMAGE_SIZE), optHdr->getFieldSize(OptHdrWrapper::IMAGE_SIZE), continueLastOperation);
 		}
+		// do the operation:
+		stubHdr = m_PE->extendLastSection(newImpSize + SEC_PADDING);
 		if (stubHdr == NULL) {
+			this->unbackupLastModification();
 			throw CustomException("Cannot fetch last section!");
 			return false;
 		}
