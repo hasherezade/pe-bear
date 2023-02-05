@@ -657,8 +657,8 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	}
 	// search for a sufficient space for name and thunks:
 	offset_t nameOffset = storageOffset;
-	const size_t kRecordSize = libWr->getFieldSize(ImportEntryWrapper::FIRST_THUNK);
-	const size_t kNameRecordPadding = (kRecordSize * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
+	const size_t kThunkSize = m_PE->isBit64() ? sizeof(uint64_t) : sizeof(uint32_t);
+	const size_t kNameRecordPadding = (kThunkSize * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
 	const size_t nameTotalSize = name.length() + 1;
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
@@ -733,7 +733,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	const QStringList dllsList = settings.dllFunctions.keys();
 	const size_t dllsCount = dllsList.size();
 	if (dllsCount == 0) return false;
-	
+
 	const size_t kDllRecordsSpace = sizeof(IMAGE_IMPORT_DESCRIPTOR) * (dllsCount + 1); // space for Import descriptor for each needed DLL
 	const bool shouldMoveTable = (canAddImportsLib(dllsCount)) ? false : true;
 	
