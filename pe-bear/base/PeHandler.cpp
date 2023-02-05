@@ -636,24 +636,29 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 
 ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool continueLastOperation)
 {
-	//add new library wrapper:
 	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+	if (!imports) return NULL;
 	
 	ImportEntryWrapper* lastWr = dynamic_cast<ImportEntryWrapper*> (imports->getLastEntry());
-	if (lastWr == NULL) return NULL;
+	if (!lastWr) return NULL;
 	
-	//backup only the spacer:
+	// if the initial storage offset was not given, try to fill in the space after the Import Table
+	if (storageOffset == 0) {
+		const size_t PADDING = lastWr->getSize() * (expectedDllsCount + 1); // leave the space for further entries
+		storageOffset = imports->getOffset() + imports->getContentSize() + PADDING;
+	}
+	// backup only the spacer:
 	backupModification(lastWr->getOffset() + lastWr->getSize(), lastWr->getSize(), continueLastOperation);
+	// get a new entry to be filled:
 	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
 	if (libWr == NULL) {
 		this->unbackupLastModification();
 		throw CustomException("Failed to add a DLL entry!");
 		return NULL;
 	}
-	const size_t PADDING = libWr->getSize() * (expectedDllsCount + 1); // leave the space for further entries
-	storageOffset = imports->getOffset() + imports->getContentSize() + PADDING;
+	// search for a sufficient space for name and thunks:
 	offset_t nameOffset = storageOffset;
-	const size_t kRecordSize = libWr->getFieldSize(ImportEntryWrapper::FIRST_THUNK) * 2; // TODO: calculate it better
+	const size_t kRecordSize = libWr->getFieldSize(ImportEntryWrapper::FIRST_THUNK);
 	const size_t kNameRecordPadding = (kRecordSize * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
 	const size_t nameTotalSize = name.length() + 1;
 	while (true) {
@@ -670,28 +675,33 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 		nameOffset += kNameRecordPadding; //leave the padding between the previous element and the current record
 		break;
 	}
-	
+	// fill in the name
 	backupModification(nameOffset, nameTotalSize, true);
 	if (m_PE->setStringValue(nameOffset, name) == false) {
 		this->unbackupLastModification();
 		throw CustomException("Failed to fill library name!");
 		return NULL;
-    }
-    storageOffset = nameOffset + nameTotalSize;
+	}
 
-    offset_t firstThunk = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
+	// move the storage offset after the filled name:
+	storageOffset = nameOffset + nameTotalSize;
 
-    libWr->setNumValue(ImportEntryWrapper::FIRST_THUNK, firstThunk);
-    libWr->setNumValue(ImportEntryWrapper::ORIG_FIRST_THUNK, firstThunk);
-    libWr->wrap();
+	// fill in the thunks lists pointers:
+	const offset_t firstThunk = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
+	libWr->setNumValue(ImportEntryWrapper::FIRST_THUNK, firstThunk);
+	libWr->setNumValue(ImportEntryWrapper::ORIG_FIRST_THUNK, firstThunk);
+	libWr->wrap();
 
-    storageOffset += kNameRecordPadding;
-    offset_t nameRva = m_PE->convertAddr(nameOffset, Executable::RAW, Executable::RVA);
+	// leave the space for a needed number of thunks:
+	storageOffset += kNameRecordPadding;
 	
-	backupModification(libWr->getFieldOffset(ImportEntryWrapper::NAME), libWr->getFieldSize(ImportEntryWrapper::NAME), true);
-    libWr->setNumValue(ImportEntryWrapper::NAME, nameRva);
+	// fill in the name RVA:
+	const offset_t nameRva = m_PE->convertAddr(nameOffset, Executable::RAW, Executable::RVA);
 
-    return libWr;
+	backupModification(libWr->getFieldOffset(ImportEntryWrapper::NAME), libWr->getFieldSize(ImportEntryWrapper::NAME), true);
+	libWr->setNumValue(ImportEntryWrapper::NAME, nameRva);
+
+	return libWr;
 }
 
 bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper* fWr, const QString& name, offset_t &storageOffset)
