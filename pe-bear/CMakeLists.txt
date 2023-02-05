@@ -51,6 +51,7 @@ set (pebear_base_hdrs
 	base/PeHandlerFactory.h
 	base/PeHandlersManager.h
 	base/RegKeyManager.h
+	base/ImportsAutoadderSettings.h
 )
 
 set (pebear_gui_base_srcs
@@ -188,6 +189,7 @@ set (pebear_windows_srcs
 	gui/windows/OffsetsBrowseWindow.cpp
 	gui/windows/SignaturesBrowseWindow.cpp
 	gui/windows/SectionAddWindow.cpp
+	gui/windows/ImportsAddWindow.cpp
 	gui/windows/UserConfigWindow.cpp
 	gui/windows/DiffWindow.cpp
 	gui/windows/MainWindow.cpp
@@ -197,6 +199,7 @@ set (pebear_windows_hdrs
 	gui/windows/OffsetsBrowseWindow.h
 	gui/windows/SignaturesBrowseWindow.h
 	gui/windows/SectionAddWindow.h
+	gui/windows/ImportsAddWindow.h
 	gui/windows/UserConfigWindow.h
 	gui/windows/DiffWindow.h
 	gui/windows/MainWindow.h

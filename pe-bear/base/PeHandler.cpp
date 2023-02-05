@@ -653,8 +653,8 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	const size_t PADDING = libWr->getSize() * (expectedDllsCount + 1); // leave the space for further entries
 	storageOffset = imports->getOffset() + imports->getContentSize() + PADDING;
 	offset_t nameOffset = storageOffset;
-	
-	const size_t kNameRecordPadding = (libWr->getFieldSize(ImportEntryWrapper::FIRST_THUNK) * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
+	const size_t kRecordSize = libWr->getFieldSize(ImportEntryWrapper::FIRST_THUNK) * 2; // TODO: calculate it better
+	const size_t kNameRecordPadding = (kRecordSize * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
 	const size_t nameTotalSize = name.length() + 1;
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
@@ -791,7 +791,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const size_t funcCount = settings.dllFunctions[library].size();
 		if (!funcCount) continue;
 		
-		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount + 1, dllsCount, storageOffset);
+		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount, dllsCount, storageOffset);
 		if (libWr == NULL) {
 			throw CustomException("Adding library failed!");
 			return false;
@@ -804,7 +804,9 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const QString library = itr.key();
 		for (auto fItr = settings.dllFunctions[library].begin(); fItr != settings.dllFunctions[library].end(); ++fItr) {
 			ImportedFuncWrapper* func = _addImportFunc(libWr, true);
-			if (!func) break;
+			if (!func) {
+				break;
+			}
 			
 			QString funcName = *fItr;
 			_autoFillFunction(libWr, func, funcName, storageOffset);
@@ -832,7 +834,9 @@ ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool con
 	
 	bool isOk = false;
 	offset_t callVia = lib->getNumValue(ImportEntryWrapper::FIRST_THUNK, &isOk);
-	if (!isOk) return NULL;
+	if (!isOk) {
+		return NULL;
+	}
 
 	{ //scope0
 		// create a temporary wrapper to check if adding a terminating record is possible:

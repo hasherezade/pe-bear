@@ -10,6 +10,7 @@
 #include "Releasable.h"
 #include "Modification.h"
 #include "CommentHandler.h"
+#include "ImportsAutoadderSettings.h"
 
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
@@ -40,22 +41,6 @@ private:
 
 	hash_type hashType;
 	offset_t checksumOff;
-};
-
-//---
-
-struct ImportsAutoadderSettings
-{
-	ImportsAutoadderSettings() : addNewSec(false) {}
-	
-	void addImport(const QString &dll, const QString &func)
-	{
-		dllFunctions[dll].append(func);
-		dllFunctions[dll].removeDuplicates();
-	}
-
-	bool addNewSec;
-	QMap<QString, QStringList> dllFunctions;
 };
 
 //---
