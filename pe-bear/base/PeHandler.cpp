@@ -642,10 +642,9 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	ImportEntryWrapper* lastWr = dynamic_cast<ImportEntryWrapper*> (imports->getLastEntry());
 	if (!lastWr) return NULL;
 	
-	// if the initial storage offset was not given, try to fill in the space after the Import Table
 	if (storageOffset == 0) {
-		const size_t PADDING = lastWr->getSize() * (expectedDllsCount + 1); // leave the space for further entries
-		storageOffset = imports->getOffset() + imports->getContentSize() + PADDING;
+		//throw CustomException("The storage offset was not supplied!");
+		return NULL;
 	}
 	// backup only the spacer:
 	backupModification(lastWr->getOffset() + lastWr->getSize(), lastWr->getSize(), continueLastOperation);
@@ -733,6 +732,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 {
 	const QStringList dllsList = settings.dllFunctions.keys();
 	const size_t dllsCount = dllsList.size();
+	const size_t kDllRecordsSpace = sizeof(IMAGE_IMPORT_DESCRIPTOR) * (dllsCount + 1); // space for Import descriptor for each needed DLL
 	const bool shouldMoveTable = (canAddImportsLib(dllsCount)) ? false : true;
 	
 	const size_t SEC_PADDING = 10;
@@ -743,7 +743,8 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	}
 	
 	//TODO: calculate the needed size basing on settings:
-	size_t newImpSize = pe_util::roundup(impDirSize * 2, 0x1000);;
+	const size_t kNeededSize = impDirSize * 2 + kDllRecordsSpace + SEC_PADDING;
+	size_t newImpSize = pe_util::roundup(kNeededSize, 0x1000);;
 	
 	SectionHdrWrapper *stubHdr = NULL;
 	offset_t newImpOffset = INVALID_ADDR;
@@ -782,6 +783,9 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		}
 		newImpOffset  = secROffset + realSecSize;
 	}
+	
+	offset_t storageOffset = 0;
+	
 	if (shouldMoveTable) {
 		if (newImpOffset == INVALID_ADDR) {
 			return false;
@@ -798,10 +802,17 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 			throw CustomException("Cannot move the data dir");
 			return false;
 		}
+		// the table was moved, use the space just after the table for the storage:
+		ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
+		if (imports) {
+			storageOffset = imports->getOffset() + imports->getContentSize() + kDllRecordsSpace;
+		}
+	} else {
+		// the table was NOT moved, use the newly added space directly for the new records:
+		storageOffset = newImpOffset;
 	}
 
 	QMap<QString, ImportEntryWrapper*> addedWrappers;
-	offset_t storageOffset = 0;
 
 	for (auto itr = dllsList.begin(); itr != dllsList.end(); ++itr) {
 		
