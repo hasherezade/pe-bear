@@ -49,13 +49,11 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	propertyLayout4.addWidget(ui_elementsView);
 	topLayout.addLayout(&propertyLayout3);
 	topLayout.addLayout(&propertyLayout4);
-	propertyLayout4.addStretch();
-	
-	topLayout.addStretch();
+
 	topLayout.setMargin(5);
 	topLayout.setSpacing(5);
 	setLayout(&topLayout);
-	
+
 	okButton.setText(tr("Save"));
 	cancelButton.setText(tr("Cancel"));
 	buttonLayout2.addWidget(&okButton);
