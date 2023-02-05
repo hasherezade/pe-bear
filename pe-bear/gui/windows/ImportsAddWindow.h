@@ -135,7 +135,9 @@ protected:
 	QHBoxLayout propertyLayout0,
 		propertyLayout1, 
 		propertyLayout2,
-		propertyLayout3;
+		propertyLayout3,
+		propertyLayout4,
+		propertyLayout5;
 
 	QHBoxLayout buttonLayout1;
 	QHBoxLayout buttonLayout2;

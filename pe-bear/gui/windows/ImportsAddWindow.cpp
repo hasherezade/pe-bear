@@ -7,12 +7,14 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	setWindowFlags(Qt::Dialog);
 	setModal(true);
 
-	addSecLabel.setText(tr("Use new section: "));
+	addSecLabel.setText(tr("Use a new section:"));
 	addSecLabel.setBuddy(&addSecCBox);
 
-	propertyLayout0.addWidget(&addSecLabel);
-	propertyLayout0.addWidget(&addSecCBox);
+	propertyLayout5.addWidget(&addSecLabel);
+	propertyLayout5.addWidget(&addSecCBox);
 	addSecCBox.setChecked(settings.addNewSec);
+
+	propertyLayout0.addWidget(new QLabel("Insert / remove a record:", this));
 
 	dllNameLabel.setText(tr("DLL:"));
 	dllNameLabel.setBuddy(&dllNameEdit);
@@ -26,6 +28,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	propertyLayout1.addWidget(&funcNameLabel);
 	propertyLayout2.addWidget(&funcNameEdit);
 	
+	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&propertyLayout1);
 	topLayout.addLayout(&propertyLayout2);
 
@@ -42,8 +45,11 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	ui_elementsView->setModel(tableModel);
 	ui_elementsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-	propertyLayout3.addWidget(ui_elementsView);
+	propertyLayout3.addWidget(new QLabel("List of imports to be added:", this));
+	propertyLayout4.addWidget(ui_elementsView);
 	topLayout.addLayout(&propertyLayout3);
+	topLayout.addLayout(&propertyLayout4);
+	propertyLayout4.addStretch();
 	
 	topLayout.addStretch();
 	topLayout.setMargin(5);
@@ -54,7 +60,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	cancelButton.setText(tr("Cancel"));
 	buttonLayout2.addWidget(&okButton);
 	buttonLayout2.addWidget(&cancelButton);
-	topLayout.addLayout(&propertyLayout0);
+	topLayout.addLayout(&propertyLayout5);
 	topLayout.addLayout(&buttonLayout2);
 
 	setWindowTitle(tr("Add imports"));
