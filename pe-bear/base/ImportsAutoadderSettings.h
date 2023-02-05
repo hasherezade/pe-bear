@@ -31,7 +31,40 @@ struct ImportsAutoadderSettings
 		}
 		return true;
 	}
-
+	
+	size_t calcDllNamesSpace() const
+	{
+		size_t areaSize = 0;
+		for (auto itr = dllFunctions.begin(); itr != dllFunctions.end(); ++itr) {
+			const QString dllName = itr.key();
+			areaSize += dllName.length() + 1;
+		}
+		return areaSize;
+	}
+	
+	size_t calcFuncNamesSpace() const
+	{
+		size_t areaSize = 0;
+		for (auto dItr = dllFunctions.begin(); dItr != dllFunctions.end(); ++dItr) {
+			const QStringList funcs = dItr.value();
+			for (auto fItr = funcs.begin(); fItr != funcs.end(); ++fItr) {
+				const QString func = *fItr;
+				areaSize += func.length() + 1;
+			}
+		}
+		return areaSize;
+	}
+	
+	size_t calcThunksCount() const
+	{
+		size_t thunksNeeded = 0;
+		for (auto dItr = dllFunctions.begin(); dItr != dllFunctions.end(); ++dItr) {
+			const QStringList funcs = dItr.value();
+			thunksNeeded = funcs.size() + 1; // records for all the functions, plus the terminator
+		}
+		return thunksNeeded;
+	}
+	
 	bool addNewSec;
 	QMap<QString, QStringList> dllFunctions;
 };

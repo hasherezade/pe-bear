@@ -234,10 +234,15 @@ protected slots:
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool continueLastOperation = false); //throws CustomException
-	bool _autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper* func, const QString& name, offset_t &storageOffset); //throws CustomException
+	bool _autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper* func, const QString& name, const WORD ordinal, offset_t &storageOffset); //throws CustomException
 	
 	ImportedFuncWrapper* _addImportFunc(ImportEntryWrapper *lib, bool continueLastOperation = false);
 	bool _moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw, bool continueLastOperation = false);
+	
+	size_t _getThunkSize() const
+	{
+		return m_PE->isBit64() ? sizeof(uint64_t) : sizeof(uint32_t);
+	}
 	
 	~PeHandler() {
 		deleteThreads();
