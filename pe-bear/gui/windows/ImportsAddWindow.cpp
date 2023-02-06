@@ -44,6 +44,8 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	tableModel = new ImpAdderSettingsTableModel(ui_elementsView, _settings);
 	ui_elementsView->setModel(tableModel);
 	ui_elementsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui_elementsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	ui_elementsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
 	propertyLayout3.addWidget(new QLabel("List of imports to be added:", this));
 	propertyLayout4.addWidget(ui_elementsView);
@@ -67,6 +69,25 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	connect(&removeButton, SIGNAL(clicked()),this, SLOT(onRemoveClicked()));
 	connect(&cancelButton, SIGNAL(clicked()),this, SLOT(reject()));
 	connect(&okButton, SIGNAL(clicked()),this, SLOT(onSaveClicked()));
+	
+	connect(ui_elementsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), 
+		this, SLOT(onTableSelectionChanged(const QItemSelection &)));
+}
+
+void ImportsAddWindow::onTableSelectionChanged(const QItemSelection &selected)
+{
+	QModelIndexList indexes = selected.indexes();
+	if (indexes.size() < 1) return;
+	
+	const QModelIndex &index = indexes.at(0);
+	if (!index.isValid() || !tableModel) return;
+	
+	int elNum = index.data(Qt::UserRole).toInt();
+	if (elNum == (-1)) return;
+	
+	QPair<QString,QString> dllAndFunc = tableModel->getPairAt(elNum);
+	this->dllNameEdit.setText(dllAndFunc.first);
+	this->funcNameEdit.setText(dllAndFunc.second);
 }
 
 void ImportsAddWindow::onSaveClicked()

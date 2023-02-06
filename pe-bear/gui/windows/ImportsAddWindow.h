@@ -60,8 +60,17 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
 	{
-		int elNum = index.row();
-		if (elNum > countElements()) return QVariant();
+		const int elNum = index.row();
+		
+		if (role == Qt::UserRole) {
+			if (!index.isValid() || elNum > countElements()) {
+				return (-1);
+			}
+			return elNum;
+		}
+		if (!index.isValid() || elNum > countElements()) {
+			return QVariant();
+		}
 
 		int attribute = index.column();
 		if (attribute >= COUNT_COL) return QVariant();
@@ -72,12 +81,10 @@ public:
 				return valPair.first;
 			}
 			if (attribute == COL_FUNC) {
-				return  valPair.second;
+				return valPair.second;
 			}
 		}
-		if (role == Qt::UserRole) {
-			return elNum;
-		}
+
 		return QVariant();
 	}
 	
@@ -111,6 +118,11 @@ public:
 		return dllAndFunc.size();
 	}
 	
+	QPair<QString,QString> getPairAt(int elNum)
+	{
+		return dllAndFunc.at(elNum);
+	}
+
 protected:
 	QList<QPair<QString,QString>> dllAndFunc;
 	ImportsAutoadderSettings& m_Settings;
@@ -129,6 +141,7 @@ public slots:
 	void onAddClicked();
 	void onRemoveClicked();
 	void onSaveClicked();
+	void onTableSelectionChanged(const QItemSelection &selected);
 
 protected:
 	QVBoxLayout topLayout;
