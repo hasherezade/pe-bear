@@ -33,7 +33,6 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	topLayout.addLayout(&propertyLayout2);
 
 	addButton.setText(tr("Add"));
-	addButton.setDefault(true);
 	removeButton.setText(tr("Remove"));
 
 	buttonLayout1.addWidget(&addButton);
@@ -57,7 +56,9 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	setLayout(&topLayout);
 
 	okButton.setText(tr("Save"));
+	okButton.setDefault(true);
 	cancelButton.setText(tr("Cancel"));
+
 	buttonLayout2.addWidget(&okButton);
 	buttonLayout2.addWidget(&cancelButton);
 	topLayout.addLayout(&propertyLayout5);
@@ -66,9 +67,14 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	setWindowTitle(tr("Add imports"));
 
 	connect(&addButton, SIGNAL(clicked()),this, SLOT(onAddClicked() ));
+	addButton.setShortcut(QKeySequence(Qt::Key_Insert));
+	
 	connect(&removeButton, SIGNAL(clicked()),this, SLOT(onRemoveClicked()));
+	removeButton.setShortcut(QKeySequence(Qt::Key_Delete));
+	
 	connect(&cancelButton, SIGNAL(clicked()),this, SLOT(reject()));
 	connect(&okButton, SIGNAL(clicked()),this, SLOT(onSaveClicked()));
+	okButton.setShortcut(QKeySequence(Qt::Key_Enter));
 	
 	connect(ui_elementsView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), 
 		this, SLOT(onTableSelectionChanged(const QItemSelection &)));
