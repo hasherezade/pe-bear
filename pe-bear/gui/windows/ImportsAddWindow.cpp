@@ -41,7 +41,12 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 
 	ui_elementsView = new QTableView(this);
 	tableModel = new ImpAdderSettingsTableModel(ui_elementsView, _settings);
-	ui_elementsView->setModel(tableModel);
+	
+	QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+	proxyModel->setSourceModel( tableModel );
+	ui_elementsView->setModel( proxyModel ); 
+	ui_elementsView->setSortingEnabled(true);
+	
 	ui_elementsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui_elementsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui_elementsView->setSelectionMode(QAbstractItemView::SingleSelection);
