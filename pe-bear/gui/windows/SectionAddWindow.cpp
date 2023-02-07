@@ -115,17 +115,14 @@ void SectionAddWindow::onOkClicked()
 	uint32_t vVal = this->secVsizeEdit.value();
 	QString name = this->secNameEdit.text();
 	if (!currPeHndl) return;
-	
-	uint64_t loadedSize = 0;
 
 	DWORD accessRights = 0;
 	if (rightsCBox[READ].checkState() == Qt::Checked) accessRights |= SCN_MEM_READ;
 	if (rightsCBox[WRITE].checkState() == Qt::Checked) accessRights |= SCN_MEM_WRITE;
 	if (rightsCBox[EXEC].checkState() == Qt::Checked) accessRights |= SCN_MEM_EXECUTE;
 
-	SectionHdrWrapper* sec = NULL;
 	try {
-		sec = currPeHndl->addSection(name, rVal, vVal);
+		SectionHdrWrapper* sec = currPeHndl->addSection(name, rVal, vVal);
 		if (!sec) throw CustomException("Cannot add a new section");
 
 		sec->setNumValue(SectionHdrWrapper::CHARACT, accessRights);
@@ -138,7 +135,7 @@ void SectionAddWindow::onOkClicked()
 				this->fileCBox.setText(EMPTY_FILE_TXT);
 				return;
 			}
-			loadedSize = currPeHndl->loadSectionContent(sec, file, true);
+			currPeHndl->loadSectionContent(sec, file, true);
 			file.close();
 			sec = NULL;// after reloading PEFile, pointer is no longer valid
 		}

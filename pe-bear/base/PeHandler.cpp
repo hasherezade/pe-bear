@@ -517,11 +517,13 @@ offset_t PeHandler::loadSectionContent(SectionHdrWrapper* sec, QFile &fIn, bool 
 
 	offset_t modifOffset = sec->getRawPtr();
 	bufsize_t modifSize = sec->getContentSize(Executable::RAW, true);
-	backupModification(modifOffset, modifSize, continueLastOperation);
-
+	if (modifOffset == INVALID_ADDR|| modifSize == 0) {
+		return 0;
+	}
 	AbstractByteBuffer *buf = m_PE->getFileBuffer();
 	if (!buf) return 0;
-
+	
+	backupModification(modifOffset, modifSize, continueLastOperation);
 	offset_t loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
 
 	setDisplayed(false, modifOffset, modifSize);
