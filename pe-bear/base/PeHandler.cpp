@@ -770,6 +770,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 			throw CustomException("Cannot add a new section");
 			return false;
 		}
+		continueLastOperation = true;
 		newImpOffset = stubHdr->getRawPtr();
 	} else {
 		stubHdr = m_PE->getLastSection();
