@@ -558,7 +558,9 @@ bool PeHandler::_moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw, bool
 		isOk = false;
 	}
 	if (!isOk) {
-		unbackupLastModification();
+		if (!continueLastOperation) {
+			unbackupLastModification(); // operation was not performed, so remove the backup
+		}
 		return false;
 	}
 	dataDirWrappers[dirNum]->wrap();
@@ -653,19 +655,19 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// get a new entry to be filled:
 	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
 	if (libWr == NULL) {
-		this->unbackupLastModification();
+		this->unModify();
 		throw CustomException("Failed to add a DLL entry!");
 		return NULL;
 	}
 	// search for a sufficient space for name and thunks:
 	offset_t nameOffset = storageOffset;
 	const size_t kThunkSize = _getThunkSize();
-	const size_t kNameRecordPadding = (kThunkSize * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
-	const size_t nameTotalSize = name.length() + 1;
+	const size_t kNameRecordPadding = kThunkSize * (importedFuncsCount + 1); // leave space for X thunks + terminator
+	const size_t nameTotalSize = name.length() + 1; // name + string '\0' terminator
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
 		if (!ptr) {
-			this->unbackupLastModification();
+			this->unModify();
 			throw CustomException("Failed to get a free space to fill the entry!");
 			return NULL;
 		}
@@ -673,13 +675,12 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 			nameOffset++; //move the pointer...
 			continue;
 		}
-		nameOffset += kNameRecordPadding; //leave the padding between the previous element and the current record
 		break;
 	}
 	// fill in the name
 	backupModification(nameOffset, nameTotalSize, true);
 	if (m_PE->setStringValue(nameOffset, name) == false) {
-		this->unbackupLastModification();
+		this->unModify();
 		throw CustomException("Failed to fill library name!");
 		return NULL;
 	}
@@ -724,7 +725,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 		const size_t nameTotalLen = name.length() + 1;
 		backupModification(storageOffset, nameTotalLen, true);
 		if (m_PE->setStringValue(storageOffset, name) == false) {
-			this->unbackupLastModification();
+			this->unModify();
 			throw CustomException("Failed to fill the function name");
 			return false;
 		}
@@ -792,7 +793,6 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		// do the operation:
 		stubHdr = m_PE->extendLastSection(newImpSize);
 		if (stubHdr == NULL) {
-			this->unbackupLastModification();
 			throw CustomException("Cannot extend the last section!");
 			return false;
 		}
@@ -809,11 +809,12 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		continueLastOperation = true;
 		const DWORD oldCharact = stubHdr->getCharacteristics();
 		if (!stubHdr->setCharacteristics(oldCharact | 0xE0000000)) {
-			this->unbackupLastModification();
+			this->unModify();
 			throw CustomException("Cannot modify the section characteristics");
 			return false;
 		}
 		if (!this->_moveDataDirEntry(pe::DIR_IMPORT, newImpOffset, continueLastOperation)) {
+			this->unModify();
 			throw CustomException("Cannot move the data dir");
 			return false;
 		}
@@ -912,7 +913,8 @@ ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool con
 	
 	if (!isSet) {
 		delete nextFunc; nextFunc = NULL;
-		this->unbackupLastModification();
+		this->unModify();
+		throw CustomException("Failed to add imported function!");
 		return NULL;
 	}
 	return nextFunc;
@@ -921,7 +923,12 @@ ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool con
 bool PeHandler::addImportFunc(size_t libNum)
 {
 	ImportEntryWrapper *lib = dynamic_cast<ImportEntryWrapper*>(importDirWrapper.getEntryAt(libNum));
-	ImportedFuncWrapper* func = _addImportFunc(lib);
+	ImportedFuncWrapper* func = NULL;
+	try {
+		func = _addImportFunc(lib);
+	} catch (CustomException &e) {
+		func = NULL;
+	}
 	if (!func) {
 		return false;
 	}
