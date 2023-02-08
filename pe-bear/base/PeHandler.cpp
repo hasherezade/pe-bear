@@ -744,22 +744,22 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	const size_t kDllRecordsSpace = sizeof(IMAGE_IMPORT_DESCRIPTOR) * (dllsCount + 1); // space for Import descriptor for each needed DLL
 	const bool shouldMoveTable = (canAddImportsLib(dllsCount)) ? false : true;
 	
-	size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
+	const size_t impDirSize = this->getDirSize(pe::DIR_IMPORT);
 	if (!impDirSize) {
 		throw CustomException("Import Directory does not exist");
 		return false;
 	}
-	
-	const size_t SEC_PADDING = 10;
-	//TODO: improve the calculations
-	const size_t stringsSize = settings.calcDllNamesSpace() + settings.calcFuncNamesSpace();
+	const size_t newImpDirSize = (shouldMoveTable) ? (impDirSize + kDllRecordsSpace) : 0;
 	const size_t thunksCount = settings.calcThunksCount();
-	const size_t thunksAreaSize = thunksCount * this->_getThunkSize() + thunksCount;
-	const size_t importRecords = thunksCount * sizeof(IMAGE_IMPORT_BY_NAME);
-	const size_t newImpDirSize = (shouldMoveTable) ? (impDirSize + kDllRecordsSpace) : kDllRecordsSpace;
-	size_t kNeededSize = newImpDirSize + stringsSize + thunksAreaSize + importRecords;
+	
+	//TODO: improve the calculations
+	const size_t dllRecordsSize = settings.calcDllNamesSpace() + (thunksCount * this->_getThunkSize());
+	const size_t funcRecordsSize = settings.calcFuncNamesSpace() + (sizeof(WORD) * thunksCount);
+
+	const size_t SEC_PADDING = 10;
+	size_t kNeededSize = newImpDirSize + dllRecordsSize + funcRecordsSize;
 	if (!settings.addNewSec) kNeededSize += SEC_PADDING;
-	size_t newImpSize = pe_util::roundup(kNeededSize * 2, 0x200);
+	size_t newImpSize = kNeededSize;//pe_util::roundup(kNeededSize, 0x200);
 	
 	SectionHdrWrapper *stubHdr = NULL;
 	offset_t newImpOffset = INVALID_ADDR;
