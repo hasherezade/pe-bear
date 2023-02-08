@@ -660,8 +660,8 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// search for a sufficient space for name and thunks:
 	offset_t nameOffset = storageOffset;
 	const size_t kThunkSize = _getThunkSize();
-	const size_t kNameRecordPadding = (kThunkSize * (importedFuncsCount + 1)) + 1; // leave space for X thunks + terminator + string '\0' terminator
-	const size_t nameTotalSize = name.length() + 1;
+	const size_t kNameRecordPadding = kThunkSize * (importedFuncsCount + 1); // leave space for X thunks + terminator
+	const size_t nameTotalSize = name.length() + 1; // name + string '\0' terminator
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
 		if (!ptr) {
@@ -673,7 +673,6 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 			nameOffset++; //move the pointer...
 			continue;
 		}
-		nameOffset += kNameRecordPadding; //leave the padding between the previous element and the current record
 		break;
 	}
 	// fill in the name
