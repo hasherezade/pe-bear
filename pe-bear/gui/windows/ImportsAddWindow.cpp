@@ -14,6 +14,13 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	propertyLayout5.addWidget(&addSecCBox);
 	addSecCBox.setChecked(settings.addNewSec);
 
+	separateOFTLabel.setText(tr("Separate Original First Thunk:"));
+	separateOFTLabel.setBuddy(&separateOFTBox);
+
+	propertyLayout6.addWidget(&separateOFTLabel);
+	propertyLayout6.addWidget(&separateOFTBox);
+	separateOFTBox.setChecked(settings.separateOFT);
+
 	propertyLayout0.addWidget(new QLabel("Insert / remove a record:", this));
 
 	dllNameLabel.setText(tr("DLL:"));
@@ -66,6 +73,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 
 	buttonLayout2.addWidget(&okButton);
 	buttonLayout2.addWidget(&cancelButton);
+	topLayout.addLayout(&propertyLayout6);
 	topLayout.addLayout(&propertyLayout5);
 	topLayout.addLayout(&buttonLayout2);
 
@@ -104,6 +112,7 @@ void ImportsAddWindow::onTableSelectionChanged(const QItemSelection &selected)
 void ImportsAddWindow::onSaveClicked()
 {
 	settings.addNewSec = addSecCBox.isChecked();
+	settings.separateOFT = separateOFTBox.isChecked();
 	accept();
 }
 

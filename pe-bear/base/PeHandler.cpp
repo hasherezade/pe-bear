@@ -638,7 +638,7 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 	return true;
 }
 
-ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool continueLastOperation)
+ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation)
 {
 	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
 	if (!imports) return NULL;
@@ -662,7 +662,9 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// search for a sufficient space for name and thunks:
 	offset_t nameOffset = storageOffset;
 	const size_t kThunkSize = _getThunkSize();
-	const size_t kNameRecordPadding = kThunkSize * (importedFuncsCount + 1); // leave space for X thunks + terminator
+	const size_t kThunkSeries = separateOFT ? 2 : 1;
+	const size_t kThunkSeriesSize = kThunkSize * (importedFuncsCount + 1); // leave space for X thunks + terminator
+	const size_t kNameRecordPadding = kThunkSeriesSize * kThunkSeries; 
 	const size_t nameTotalSize = name.length() + 1; // name + string '\0' terminator
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
@@ -689,9 +691,13 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	storageOffset = nameOffset + nameTotalSize;
 
 	// fill in the thunks lists pointers:
+	offset_t origFirstThunk = 0;
 	const offset_t firstThunk = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
+	if (separateOFT) {
+		origFirstThunk = m_PE->convertAddr((storageOffset + kThunkSeriesSize), Executable::RAW, Executable::RVA);
+	}
 	libWr->setNumValue(ImportEntryWrapper::FIRST_THUNK, firstThunk);
-	libWr->setNumValue(ImportEntryWrapper::ORIG_FIRST_THUNK, firstThunk);
+	libWr->setNumValue(ImportEntryWrapper::ORIG_FIRST_THUNK, origFirstThunk);
 	libWr->wrap();
 
 	// leave the space for a needed number of thunks:
@@ -752,14 +758,14 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	const size_t newImpDirSize = (shouldMoveTable) ? (impDirSize + kDllRecordsSpace) : 0;
 	const size_t thunksCount = settings.calcThunksCount();
 	
-	//TODO: improve the calculations
-	const size_t dllRecordsSize = settings.calcDllNamesSpace() + (thunksCount * this->_getThunkSize());
+	const size_t thunksSeries = settings.separateOFT ? 2 : 1;
+	const size_t dllRecordsSize = settings.calcDllNamesSpace() + (thunksCount * this->_getThunkSize() * thunksSeries);
 	const size_t funcRecordsSize = settings.calcFuncNamesSpace() + (sizeof(WORD) * thunksCount);
 
 	const size_t SEC_PADDING = 10;
 	size_t kNeededSize = newImpDirSize + dllRecordsSize + funcRecordsSize;
 	if (!settings.addNewSec) kNeededSize += SEC_PADDING;
-	size_t newImpSize = kNeededSize;//pe_util::roundup(kNeededSize, 0x200);
+	size_t newImpSize = kNeededSize;
 	
 	SectionHdrWrapper *stubHdr = NULL;
 	offset_t newImpOffset = INVALID_ADDR;
@@ -836,7 +842,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const size_t funcCount = settings.dllFunctions[library].size();
 		if (!funcCount) continue;
 		
-		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount, dllsCount, storageOffset, continueLastOperation);
+		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount, dllsCount, storageOffset, settings.separateOFT ,continueLastOperation);
 		if (libWr == NULL) {
 			throw CustomException("Adding library failed!");
 			return false;

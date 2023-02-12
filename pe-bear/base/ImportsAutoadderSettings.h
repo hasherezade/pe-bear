@@ -5,7 +5,7 @@
 
 struct ImportsAutoadderSettings
 {
-	ImportsAutoadderSettings() : addNewSec(false) {}
+	ImportsAutoadderSettings() : addNewSec(false), separateOFT(false) {}
 	
 	bool addImport(const QString &dll, const QString &func)
 	{
@@ -66,5 +66,6 @@ struct ImportsAutoadderSettings
 	}
 	
 	bool addNewSec;
+	bool separateOFT; //< separate Original First Thunk from First Thunk
 	QMap<QString, QStringList> dllFunctions;
 };

@@ -233,7 +233,7 @@ protected slots:
 	void onCalcThreadFinished();
 
 protected:
-	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool continueLastOperation = false); //throws CustomException
+	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException
 	bool _autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper* func, const QString& name, const WORD ordinal, offset_t &storageOffset); //throws CustomException
 	
 	ImportedFuncWrapper* _addImportFunc(ImportEntryWrapper *lib, bool continueLastOperation = false);
