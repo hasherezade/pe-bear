@@ -397,13 +397,13 @@ void DetailsTab::setupImportsToolbar()
 
 	QToolBar *toolBar = &dirSplitters[pe::DIR_IMPORT]->toolBar;
 
-	this->addImportLib = new QAction(QString("&Add a library"), this);
+	this->addImportLib = new QAction(QString("Add a &library"), this);
 	connect(addImportLib, SIGNAL(triggered()), this, SLOT(onAddImportLib()) );
 
-	this->addImportFunc = new QAction(QString("&Add a function to the library"), this);
+	this->addImportFunc = new QAction(QString("Add a &function to the library"), this);
 	connect(addImportFunc, SIGNAL(triggered()), this, SLOT(onAddImportFunc()) );
 	
-	this->autoAddImports = new QAction(QString("&Auto add imports"), this);
+	this->autoAddImports = new QAction(QString("Add imports via &wizard"), this);
 	connect(autoAddImports, SIGNAL(triggered()), this, SLOT(onAutoAddImports()) );
 
 	toolBar->addAction(addImportLib);
