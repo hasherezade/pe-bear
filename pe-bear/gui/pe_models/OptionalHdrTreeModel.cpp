@@ -227,9 +227,11 @@ QVariant OptHdrDllCharactTreeItem::data(int column) const
 offset_t OptHdrDllCharactTreeItem::getContentOffset() const
 {
 	offset_t offset = this->m_PE->peOptHdrOffset();
-
+	if (offset == INVALID_ADDR) return 0;
+	
 	Executable::exe_bits mode = this->m_PE->getBitMode();
 	if (mode != Executable::BITS_32 && mode != Executable::BITS_64) return 0;
+	
 	static IMAGE_OPTIONAL_HEADER32 h32;
 	static IMAGE_OPTIONAL_HEADER64 h64;
 	return offset + (mode == Executable::BITS_32 ? ((uint64_t)&h32.DllCharacteristics - (uint64_t) &h32) : ((uint64_t) &h64.DllCharacteristics - (uint64_t) &h64));
