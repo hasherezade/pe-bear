@@ -153,6 +153,8 @@ protected:
 		propertyLayout5,
 		propertyLayout6;
 
+	QRegExpValidator *funcNameValidator;
+
 	QHBoxLayout buttonLayout1;
 	QHBoxLayout buttonLayout2;
 	

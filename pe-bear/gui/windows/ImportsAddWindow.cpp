@@ -2,7 +2,8 @@
 
 ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget *parent)
 	: QDialog(parent, Qt::Dialog), settings(_settings),
-	tableModel(NULL)
+	funcNameValidator(NULL),
+	tableModel(NULL), ui_elementsView(NULL)
 {
 	setWindowFlags(Qt::Dialog);
 	setModal(true);
@@ -34,7 +35,10 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 
 	propertyLayout1.addWidget(&funcNameLabel);
 	propertyLayout2.addWidget(&funcNameEdit);
-	funcNameEdit.setToolTip("A function name, or ordinal prefixed by '#' i.e. #123");
+
+	funcNameValidator = new QRegExpValidator(QRegExp("[0-9A-za-z._#@?-]{1,}"));
+	funcNameEdit.setValidator(funcNameValidator);
+	funcNameEdit.setToolTip("A function name, or ordinal prefixed by '#', i.e. #123");
 	
 	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&propertyLayout1);

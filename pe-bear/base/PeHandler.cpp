@@ -720,6 +720,10 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 
 	backupModification(fWr->getOffset(), fWr->getSize(), true);
 	if (name.length()) {
+		if (!pe_util::validateFuncName(name.toStdString().c_str(), name.length())) {
+			this->unModify();
+			throw CustomException("Invalid function name supplied!");
+		}
 		const offset_t thunkRVA = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
 		if (thunkRVA == INVALID_ADDR) {
 			return false;
