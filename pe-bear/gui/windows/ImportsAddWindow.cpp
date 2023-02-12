@@ -36,7 +36,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	propertyLayout1.addWidget(&funcNameLabel);
 	propertyLayout2.addWidget(&funcNameEdit);
 
-	funcNameValidator = new QRegExpValidator(QRegExp("[0-9A-za-z._#@?-]{1,}"));
+	funcNameValidator = new QRegExpValidator(QRegExp("[0-9A-Za-z._#@?-]{1,}"));
 	funcNameEdit.setValidator(funcNameValidator);
 	funcNameEdit.setToolTip("A function name, or ordinal prefixed by '#', i.e. #123");
 	
