@@ -153,10 +153,10 @@ bool ExportedFuncTreeModel::setData(const QModelIndex &index, const QVariant &va
 			if (!textPtr) return false;
 
 			offset = entry->getOffset(textPtr);
-			fieldSize = text.size() + 2;
+			fieldSize = text.length() + 1;
 
 			this->myPeHndl->backupModification(offset, fieldSize);
-			isModified = m_PE->setTextValue(textPtr, text.toStdString(), fieldSize);
+			isModified = m_PE->setTextValue(textPtr, text.toStdString(), text.length());
 			break;
 		}
 		default:
