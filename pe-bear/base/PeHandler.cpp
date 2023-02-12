@@ -819,7 +819,8 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		backupModification(stubHdr->getFieldOffset(SectionHdrWrapper::CHARACT), stubHdr->getFieldSize(SectionHdrWrapper::CHARACT), continueLastOperation);
 		continueLastOperation = true;
 		const DWORD oldCharact = stubHdr->getCharacteristics();
-		if (!stubHdr->setCharacteristics(oldCharact | 0xE0000000)) {
+		const DWORD requiredCharact = SCN_MEM_READ | SCN_MEM_WRITE;
+		if (!stubHdr->setCharacteristics(oldCharact | requiredCharact)) {
 			this->unModify();
 			throw CustomException("Cannot modify the section characteristics");
 			return false;
