@@ -34,6 +34,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 
 	propertyLayout1.addWidget(&funcNameLabel);
 	propertyLayout2.addWidget(&funcNameEdit);
+	funcNameEdit.setToolTip("A function name, or ordinal prefixed by '#' i.e. #123");
 	
 	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&propertyLayout1);

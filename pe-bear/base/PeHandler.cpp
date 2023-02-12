@@ -717,12 +717,13 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 	if (m_PE == NULL || fWr == NULL) {
 		return false;
 	}
-	const offset_t thunkRVA = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
-	if (thunkRVA == INVALID_ADDR) {
-		return false;
-	}
+
 	backupModification(fWr->getOffset(), fWr->getSize(), true);
 	if (name.length()) {
+		const offset_t thunkRVA = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
+		if (thunkRVA == INVALID_ADDR) {
+			return false;
+		}
 		fWr->setNumValue(ImportedFuncWrapper::THUNK, thunkRVA);
 		fWr->setNumValue(ImportedFuncWrapper::ORIG_THUNK, thunkRVA);
 		fWr->setNumValue(ImportedFuncWrapper::HINT, ordinal);
@@ -738,7 +739,11 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 		storageOffset += nameTotalLen;
 		return true;
 	}
-	return false;
+	// import by ordinal:
+	const uint64_t ord_flag = m_PE->isBit32() ? ORDINAL_FLAG32 : ORDINAL_FLAG64;
+	fWr->setNumValue(ImportedFuncWrapper::THUNK, ordinal ^ ord_flag);
+	fWr->setNumValue(ImportedFuncWrapper::ORIG_THUNK, ordinal ^ ord_flag);
+	return true;
 }
 
 bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
@@ -842,7 +847,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const size_t funcCount = settings.dllFunctions[library].size();
 		if (!funcCount) continue;
 		
-		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount, dllsCount, storageOffset, settings.separateOFT ,continueLastOperation);
+		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount, dllsCount, storageOffset, settings.separateOFT, continueLastOperation);
 		if (libWr == NULL) {
 			throw CustomException("Adding library failed!");
 			return false;
@@ -861,7 +866,14 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 			}
 			continueLastOperation = true;
 			const QString funcName = *fItr;
-			_autoFillFunction(libWr, func, funcName, 0, storageOffset);
+
+			if (funcName.startsWith("#")) {
+				QString ordStr = funcName.mid(1); 
+				const int ordinal = ordStr.toInt();
+				_autoFillFunction(libWr, func, "", ordinal, storageOffset);
+			} else {
+				_autoFillFunction(libWr, func, funcName, 0, storageOffset);
+			}
 			delete func; func = NULL; // delete the temporary wrapper
 			libWr->wrap();
 		}

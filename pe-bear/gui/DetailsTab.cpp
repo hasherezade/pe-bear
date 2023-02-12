@@ -321,7 +321,7 @@ void DetailsTab::onAutoAddImports()
 		if (!myPeHndl->autoAddImports(settings)) {
 			QMessageBox::critical(this, "Error", "Auto adding imports failed!");
 		}
-	} catch (CustomException e) {
+	} catch (CustomException &e) {
 		QMessageBox::critical(this, "Error", e.what());
 		return;
 	}
