@@ -313,7 +313,7 @@ QVariant PEFileTreeItem::font(int column) const
 	return f;
 }
 
-BYTE* PEFileTreeItem::getContent()
+BYTE* PEFileTreeItem::getContent() const
 {
 	if (!this->myPeHndl) return NULL;
 	PEFile *m_PE = this->myPeHndl->getPe();
@@ -440,22 +440,18 @@ QVariant PEFileSectionsTreeItem::decoration(int column) const
 offset_t PEFileSectionsTreeItem::getContentOffset() const
 {
 	if (!m_PE) return 0;
-	SectionHdrWrapper *sec = getMySection();
-
-	if (sec == NULL) {
-		if (m_PE->getSectionsCount() == 0)
-			return 0;
-
-		SectionHdrWrapper *firstSec = m_PE->getSecHdr(0); //TODO: get first Section by Raw Address!
-		if (!firstSec)
-			return 0;
-
-		return firstSec->getContentOffset(Executable::RAW, true);
+	BYTE *content = getContent();
+	if (!content) {
+		return 0;
 	}
-	return sec->getContentOffset(Executable::RAW, true);
+	const offset_t offset = m_PE->getOffset(content);
+	if (offset == INVALID_ADDR) {
+		return 0;
+	}
+	return offset;
 }
 
-BYTE* PEFileSectionsTreeItem::getContent()
+BYTE* PEFileSectionsTreeItem::getContent() const
 {
 	if (!m_PE) return NULL;
 	BYTE *content = m_PE->getContent();
@@ -529,7 +525,7 @@ QVariant PEFileEntryPointItem::data(int column) const
 	return "EP = " + QString::number(offset, 16).toUpper();
 }
 
-BYTE* PEFileEntryPointItem::getContent()
+BYTE* PEFileEntryPointItem::getContent() const
 {
 	if (!this->myPeHndl) return NULL;
 	PEFile *m_PE = this->myPeHndl->getPe();
@@ -544,12 +540,7 @@ offset_t PEFileEntryPointItem::getContentOffset() const
 	PEFile *m_PE = this->myPeHndl->getPe();
 	if (!m_PE) return INVALID_ADDR;
 
-	offset_t offset = m_PE->getEntryPoint();
-	try{
-		offset = m_PE->rvaToRaw(offset);
-	} catch (CustomException(e)) {
-		offset = INVALID_ADDR;
-	}
+	const offset_t offset = m_PE->getEntryPoint(Executable::RAW);
 	return offset;
 }
 
@@ -564,7 +555,7 @@ bufsize_t PEFileEntryPointItem::getContentSize() const
 	if (offset == INVALID_ADDR) return 0;
 	if (offset >= totalSize) return 0;
 
-	bufsize_t dif = bufsize_t(totalSize - offset);
+	const bufsize_t dif = bufsize_t(totalSize - offset);
 	return dif;
 }
 //-----------------------------------------
@@ -656,7 +647,7 @@ bufsize_t PEFileNTHdrTreeItem::getContentSize() const
 	return contentSize;
 }
 
-BYTE* PEFileNTHdrTreeItem::getContent()
+BYTE* PEFileNTHdrTreeItem::getContent() const
 {
 	if (!this->myPeHndl) return NULL;
 	PEFile *m_PE = this->myPeHndl->getPe();

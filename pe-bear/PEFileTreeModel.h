@@ -60,7 +60,7 @@ public:
 	virtual QVariant decoration(int column) const;
 	virtual QVariant font(int column) const;
 
-	virtual BYTE* getContent();
+	virtual BYTE* getContent() const;
 	ViewLevel getViewLevel() { return level; }
 
 /* PEGuiItem interface */
@@ -116,7 +116,7 @@ public:
 	virtual QVariant background(int column) const;
 	virtual QVariant decoration(int column) const; // DecorationRole
 
-	virtual BYTE* getContent();
+	virtual BYTE* getContent() const;
 
 public slots:
 	void onSectionNumChanged();
@@ -137,7 +137,7 @@ public:
 	PEFileNTHdrTreeItem(PeHandler *peHndl, level_t level = DESC, enum PEFileNTHdrFieldId subrole = PEFILE_NTHDR_NONE, PEFileTreeItem *parent = NULL);
 
 	virtual QVariant data(int column) const;
-	virtual BYTE* getContent();
+	virtual BYTE* getContent() const;
 
 /* PEGuiItem interface */
 	virtual offset_t getContentOffset() const;
@@ -157,7 +157,7 @@ public:
 	virtual QVariant decoration(int column) const;
 	virtual QVariant data(int column) const;
 
-	virtual BYTE* getContent();
+	virtual BYTE* getContent() const;
 
 /* PEGuiItem interface */
 	virtual offset_t getContentOffset() const;
