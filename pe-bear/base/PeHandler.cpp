@@ -457,8 +457,13 @@ bool PeHandler::isInModifiedArea(offset_t offset)
 	return this->modifHndl.isInLastModifiedArea(offset);
 }
 
-bool PeHandler::resize(bufsize_t newSize)
+bool PeHandler::resize(bufsize_t newSize, bool continueLastOperation)
 {
+	try {
+		this->backupResize(newSize, continueLastOperation);
+	} catch (CustomException &e) {
+		std::cerr << "Resize backup fail: " << e.what() << std::endl;
+	}
 	if (m_PE->resize(newSize)) {
 		updatePeOnResized();
 		emit modified();
@@ -500,12 +505,12 @@ SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_
 		this->modifHndl.backupResize(newSize, true);
 		
 		newSec = m_PE->addNewSection(name, rSize, vSize);
-	} catch (CustomException e) {
+	} catch (CustomException &e) {
 		this->modifHndl.unStoreLast();
-		throw (e);
+		throw (e); // rethrow the exception to exit from the function
 	}
 
-	if (!newSec) {
+	if (!newSec) { // in case if adding section has failed, but not because of an exception thrown
 		this->modifHndl.unStoreLast();
 		throw CustomException("Cannot add new section!");
 	}

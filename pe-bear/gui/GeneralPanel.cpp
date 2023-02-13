@@ -121,7 +121,7 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 			newSize = data.toInt();
 	}
 
-	static QString alert = "Do your really want to resize file?\nThis operation cannot be undone...";
+	static QString alert = "Do your really want to resize file?";
 	static QPixmap enlarge(":/icons/enlarge.ico");
 	static QPixmap shrink(":/icons/shrink.ico");
 

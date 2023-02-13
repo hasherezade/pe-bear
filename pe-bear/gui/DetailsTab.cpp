@@ -268,11 +268,6 @@ void DetailsTab::onFitSections()
 		if (iOk) continueLastOperation = true;
 	}
 	if (fileToResize) {
-		try {
-			this->myPeHndl->backupResize(lastRaw, continueLastOperation);
-		} catch (CustomException &e) {
-			std::cerr << "Resize backup fail: " << e.what() << std::endl;
-		}
 		fOk = this->myPeHndl->resize(lastRaw);
 	}
 

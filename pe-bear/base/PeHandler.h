@@ -113,7 +113,7 @@ public:
 	bool isInModifiedArea(offset_t offset);
 
 	/* resize */
-	bool resize(bufsize_t newSize);
+	bool resize(bufsize_t newSize, bool continueLastOperation = false);
 	bool resizeImage(bufsize_t newSize);
 
 	SectionHdrWrapper* addSection(QString name,  bufsize_t rSize, bufsize_t vSize); //throws exception
