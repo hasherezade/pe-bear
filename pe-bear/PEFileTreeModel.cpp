@@ -450,9 +450,9 @@ offset_t PEFileSectionsTreeItem::getContentOffset() const
 		if (!firstSec)
 			return 0;
 
-		return firstSec->getRawPtr();
+		return firstSec->getContentOffset(Executable::RAW, true);
 	}
-	return sec->getRawPtr();
+	return sec->getContentOffset(Executable::RAW, true);
 }
 
 BYTE* PEFileSectionsTreeItem::getContent()
@@ -467,7 +467,7 @@ BYTE* PEFileSectionsTreeItem::getContent()
 		sec = m_PE->getSecHdr(0); //TODO: get first Section by Raw Address!
 	}
 	if (!sec) return NULL;
-	return m_PE->getContentAt(sec->getRawPtr(), 1);;
+	return m_PE->getContentAt(sec->getContentOffset(Executable::RAW, true), 1);
 }
 
 bufsize_t PEFileSectionsTreeItem::getContentSize() const
