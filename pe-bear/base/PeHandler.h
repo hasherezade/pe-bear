@@ -140,6 +140,7 @@ public:
 	bool isDataDirModified(offset_t modOffset, bufsize_t modSize);
 	bool isSectionsHeadersModified(offset_t modOffset, bufsize_t modSize);
 	void backupModification(offset_t  modOffset, bufsize_t modSize, bool continueLastOp = false);
+	void backupResize(bufsize_t newSize, bool continueLastOperation = false);
 	void unbackupLastModification();
 	bool setBlockModified(offset_t  modOffset, bufsize_t modSize);
 	void unModify();

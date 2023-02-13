@@ -474,7 +474,6 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 	offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
 	bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
 	this->modifHndl.backupModification(modOffset, modSize, false);
-
 	m_PE->setImageSize(newSize);
 	return true;
 }
@@ -496,6 +495,10 @@ SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_
 	//---
 	SectionHdrWrapper* newSec = NULL;
 	try {
+		const bufsize_t roundedRawEnd = buf_util::roundupToUnit(m_PE->getMappedSize(Executable::RAW), m_PE->getAlignment(Executable::RAW));
+		const bufsize_t newSize = roundedRawEnd + rSize;
+		this->modifHndl.backupResize(newSize, true);
+		
 		newSec = m_PE->addNewSection(name, rSize, vSize);
 	} catch (CustomException e) {
 		this->modifHndl.unStoreLast();
@@ -806,6 +809,7 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 			backupModification(optHdr->getFieldOffset(OptHdrWrapper::IMAGE_SIZE), optHdr->getFieldSize(OptHdrWrapper::IMAGE_SIZE), continueLastOperation);
 		}
 		// do the operation:
+		this->modifHndl.backupResize(this->m_PE->getContentSize() + newImpSize, continueLastOperation);
 		stubHdr = m_PE->extendLastSection(newImpSize);
 		if (stubHdr == NULL) {
 			throw CustomException("Cannot extend the last section!");
@@ -1027,6 +1031,11 @@ bool PeHandler::substBlock(offset_t offset, uint64_t size, BYTE* buf)
 void PeHandler::backupModification(offset_t modifOffset, bufsize_t modifSize, bool continueLastOperation)
 {
 	modifHndl.backupModification(modifOffset, modifSize, continueLastOperation);
+}
+
+void PeHandler::backupResize(bufsize_t newSize, bool continueLastOperation)
+{
+	modifHndl.backupResize(newSize, continueLastOperation);
 }
 
 void PeHandler::unbackupLastModification()

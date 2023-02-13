@@ -160,7 +160,6 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 
 	int res = msgBox.exec();
 	if (res != QMessageBox::AcceptRole) return false;
-
 	bool isOk = myPeHndl->resize(newSize);
 	if (!isOk) {
 		QMessageBox msgBox;

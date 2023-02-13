@@ -8,22 +8,43 @@
 class ModifBackup
 {
 public:
+
+	ModifBackup()
+		: buffer(NULL), offset(INVALID_ADDR), size(0) {}
+
 	ModifBackup(AbstractByteBuffer *fileBuffer, offset_t modOffset, bufsize_t modSize);
 	~ModifBackup();
 
 	bufsize_t getSize() { return size; }
 	offset_t getOffset() { return offset; }
 
-	bool apply(AbstractByteBuffer* file);
+	virtual bool apply(AbstractByteBuffer* file);
 	bool isOffsetAffected(offset_t offset);
 
 protected:
+	void _storePatchContent(AbstractByteBuffer* fileBuf, offset_t modOffset, bufsize_t modSize);
+	bool _applyPatchContent(AbstractByteBuffer* fileBuf);
+	
 	BYTE* buffer;
 	bufsize_t size;
 	offset_t offset;
 
 friend class ModificationHandler;
 };
+
+//---
+
+class ResizeBackup : public ModifBackup
+{
+public:
+	ResizeBackup(AbstractByteBuffer *fileBuffer, bufsize_t newSize);
+	virtual bool apply(AbstractByteBuffer* file);
+
+protected:
+	bufsize_t fullSize; // saved size of the original fileBuffer before the resize
+};
+
+//---
 
 class OperationBackup
 {
@@ -60,6 +81,8 @@ protected:
 friend class ModificationHandler;
 };
 
+//---
+
 class ModificationHandler : public QObject
 {
 	Q_OBJECT
@@ -68,7 +91,7 @@ public:
 	~ModificationHandler();
 
 	bool backupModification(offset_t modifOffset, bufsize_t modifSize, bool continueLastOperation);
-
+	bool backupResize(bufsize_t newSize, bool continueLastOperation);
 	/* unstore last operation - delete object */
 	bool unStoreLast();
 
@@ -97,15 +120,17 @@ public:
 	}
 
 protected:
+	bool _backupModification(ModifBackup *newModif, bool continueLastOperation);
 	
 	/* Creates operation with single modification. Throws a CustomException of error. */
-	void store(offset_t modOffset, bufsize_t modSize);
+	bool store(ModifBackup* modif);
 
 	/* stores already prepared operation */
-	void  storeOperation(OperationBackup* backup)
+	bool storeOperation(OperationBackup* backup)
 	{
-		if (!backup) return;
+		if (!backup) return false;
 		this->modifs.push(backup);
+		return true;
 	}
 
 	OperationBackup* getLastOperation();

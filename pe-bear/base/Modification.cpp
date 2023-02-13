@@ -1,30 +1,16 @@
 #include "Modification.h"
 
 #include <algorithm>
-	
-ModifBackup::ModifBackup(AbstractByteBuffer* file, offset_t modOffset, bufsize_t modSize)
+
+ModifBackup::ModifBackup(AbstractByteBuffer* fileBuf, offset_t modOffset, bufsize_t modSize)
 	: buffer(NULL), offset(INVALID_ADDR), size(0)
 {
-	if (!file) throw CustomException("Uninitialized file");
+	if (!fileBuf) throw CustomException("Uninitialized file");
 	
-	BYTE *content = file->getContent();
+	BYTE *content = fileBuf->getContent();
 	if (!content) throw CustomException("File buffer is NULL!");
 
-	//fetch the file fragment at the offset where the modification will happen:
-	BYTE *modPtr = file->getContentAt(modOffset, modSize);
-	if (!modPtr) {
-		throw CustomException("Could not fetch the content at the offset!");
-	}
-
-	//allocate a buffer to store the patch:
-	this->buffer = (BYTE*) calloc(modSize, sizeof(BYTE));
-	if (!buffer) throw CustomException("Cannot allocate modification buffer!");
-	
-	this->offset = modOffset;
-	this->size = modSize;
-
-	//store the backup in the patch buffer:
-	::memcpy(buffer, modPtr, modSize);
+	_storePatchContent(fileBuf, modOffset, modSize);
 }
 
 ModifBackup::~ModifBackup()
@@ -32,12 +18,38 @@ ModifBackup::~ModifBackup()
 	if (buffer) free(buffer);
 }
 
-bool ModifBackup::apply(AbstractByteBuffer* file)
+void ModifBackup::_storePatchContent(AbstractByteBuffer* fileBuf, offset_t modOffset, bufsize_t modSize)
 {
-	if (!file) return false;
-
-	BYTE *modPtr = file->getContentAt(this->offset, this->size);
+	if (modOffset == INVALID_ADDR || modSize == 0) return;
 	
+	//fetch the file fragment at the offset where the modification will happen:
+	BYTE *modPtr = fileBuf->getContentAt(modOffset, modSize);
+	if (!modPtr) {
+		throw CustomException("Could not fetch the content of size: 0x" + QString::number(modSize, 16) + " at the offset: 0x" + QString::number(modOffset, 16) );
+		return;
+	}
+
+	//allocate a buffer to store the patch:
+	this->buffer = (BYTE*) calloc(modSize, sizeof(BYTE));
+	if (!buffer) {
+		throw CustomException("Cannot allocate modification buffer!");
+		return;
+	}
+	
+	//store the backup in the patch buffer:
+	::memcpy(buffer, modPtr, modSize);
+	
+	this->offset = modOffset;
+	this->size = modSize;
+}
+
+
+bool ModifBackup::_applyPatchContent(AbstractByteBuffer* fileBuf)
+{
+	if (!fileBuf || !this->buffer) {
+		return false;
+	}
+	BYTE *modPtr = fileBuf->getContentAt(this->offset, this->size);
 	if (!modPtr) {
 		std::cerr << "Cannot apply backup at offset: " << std::hex << this->offset << " on the given file! Area size mismatch!" << std::endl;
 		return false;
@@ -47,13 +59,51 @@ bool ModifBackup::apply(AbstractByteBuffer* file)
 	return true;
 }
 
+bool ModifBackup::apply(AbstractByteBuffer* fileBuf)
+{
+	return _applyPatchContent(fileBuf);
+}
+
 bool ModifBackup::isOffsetAffected(offset_t curr_offset)
 {
-	const offset_t modS = getOffset();
-	const offset_t modE = modS + getSize();
-
-	return (curr_offset >= modS && curr_offset < modE);
+	if (this->offset == INVALID_ADDR) {
+		return false;
+	}
+	const offset_t modE = this->offset + this->size;
+	return (curr_offset >= this->offset && curr_offset < modE);
 }
+
+//---
+
+ResizeBackup::ResizeBackup(AbstractByteBuffer *fileBuf, bufsize_t newSize)
+	: ModifBackup(), fullSize(0)
+{
+	if (!fileBuf) throw CustomException("Uninitialized file");
+	
+	this->fullSize = fileBuf->getContentSize();
+	if (fullSize == newSize) return;
+	
+	if (fullSize > newSize) {
+		// shrinking operation
+		const size_t modSize = fullSize - newSize;
+		_storePatchContent(fileBuf, newSize, modSize);
+	}
+}
+
+bool ResizeBackup::apply(AbstractByteBuffer* fileBuf)
+{
+	if (!fileBuf) return false;
+	
+	size_t currSize = fileBuf->getContentSize();
+	if (fileBuf->resize(this->fullSize)) {
+		if (currSize < this->fullSize) {
+			_applyPatchContent(fileBuf);
+		}
+		return true;
+	}
+	return false;
+}
+
 //-------
 
 void OperationBackup::deleteChildren()
@@ -151,13 +201,35 @@ bool ModificationHandler::backupModification(offset_t modifOffset, bufsize_t mod
 {
 	if (modifOffset == INVALID_ADDR || !modifSize) return false;
 
+	ModifBackup *newModif = new ModifBackup(this->file, modifOffset, modifSize);
+	if (_backupModification(newModif, continueLastOperation)) {
+		return true;
+	}
+	delete newModif; // storage of the modification failed, so delete it
+	return false;
+}
+
+bool ModificationHandler::backupResize(bufsize_t newSize, bool continueLastOperation)
+{
+	ResizeBackup *newModif = new ResizeBackup(this->file, newSize);
+	if (_backupModification(newModif, continueLastOperation)) {
+		return true;
+	}
+	delete newModif; // storage of the modification failed, so delete it
+	return false;
+}
+
+bool ModificationHandler::_backupModification(ModifBackup *newModif, bool continueLastOperation)
+{
+	if (!newModif) return false;
+	
 	bool isOk = true;
 	try {
 		OperationBackup *last = this->getLastOperation();
 		if (!continueLastOperation || !last) {
-			store(modifOffset, modifSize);
+			isOk = store(newModif);
 		} else {
-			isOk = last->appendBackup(new ModifBackup(this->file, modifOffset, modifSize));
+			isOk = last->appendBackup(newModif);
 		}
 
 	} catch (CustomException &e) {
@@ -167,17 +239,19 @@ bool ModificationHandler::backupModification(offset_t modifOffset, bufsize_t mod
 	return isOk;
 }
 
-void ModificationHandler::store(offset_t modOffset, bufsize_t modSize)
+bool ModificationHandler::store(ModifBackup* modif)
 {
+	bool isOk = true;
 	try {
-		ModifBackup * modif = new ModifBackup(file, modOffset, modSize);
-		OperationBackup * backup = new OperationBackup(modif);
-		storeOperation(backup);
+		OperationBackup* backup = new OperationBackup(modif);
+		isOk = storeOperation(backup);
 	}
 	catch (CustomException &e)
 	{
 		std::cerr << "Backup error: " << e.what() << std::endl;
+		isOk = false;
 	}
+	return isOk;
 }
 
 bool ModificationHandler::unStoreLast()

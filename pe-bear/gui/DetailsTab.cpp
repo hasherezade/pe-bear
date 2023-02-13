@@ -234,8 +234,8 @@ void DetailsTab::onAddSection()
 
 void DetailsTab::onFitSections()
 {
-	offset_t fileSize = m_PE->getRawSize();
-	offset_t lastRaw = this->m_PE->getLastMapped(Executable::RAW);
+	const offset_t fileSize = m_PE->getRawSize();
+	const offset_t lastRaw = this->m_PE->getLastMapped(Executable::RAW);
 
 	offset_t imageSize = m_PE->getImageSize();
 	offset_t lastRva = this->m_PE->getLastMapped(Executable::RVA);
@@ -262,8 +262,19 @@ void DetailsTab::onFitSections()
 	bool fOk = !fileToResize;
 	bool iOk = !imageToResize;
 
-	if (imageToResize) iOk = this->myPeHndl->resizeImage(lastRva);
-	if (fileToResize) fOk = this->myPeHndl->resize(lastRaw);
+	bool continueLastOperation = false;
+	if (imageToResize) {
+		iOk = this->myPeHndl->resizeImage(lastRva);
+		if (iOk) continueLastOperation = true;
+	}
+	if (fileToResize) {
+		try {
+			this->myPeHndl->backupResize(lastRaw, continueLastOperation);
+		} catch (CustomException &e) {
+			std::cerr << "Resize backup fail: " << e.what() << std::endl;
+		}
+		fOk = this->myPeHndl->resize(lastRaw);
+	}
 
 	if (fOk && iOk) {
 		QMessageBox::information(NULL, "Done!", "Resizing succeeded!");
