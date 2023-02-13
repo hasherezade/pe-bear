@@ -145,7 +145,7 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 		msgBox.exec();
 		return false;
 	}
-	if (newSize == currentSize)  return false;
+	if (newSize == currentSize) return false;
 
 	if (newSize < currentSize) {
 		dif = currentSize - newSize;

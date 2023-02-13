@@ -81,6 +81,13 @@ QVariant SecTreeItem::background(int column) const
 	warningCol.setAlpha(200);
 	changeCol.setAlpha(50);
 
+	if (fieldIndx == SEC_RPTR) {
+		const offset_t hdrOffset = sec->getContentOffset(Executable::RAW, false);
+		const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
+		if (hdrOffset != mappedOffset) {
+			return changeCol;
+		}
+	}
 	if (fieldIndx == SEC_VSIZE || fieldIndx == SEC_VPTR) {
 		bufsize_t mappedVSize = sec->getContentSize(Executable::RVA, true);
 		bufsize_t secPtr = sec->getContentOffset(Executable::RVA, false);
@@ -190,6 +197,14 @@ QVariant SecTreeItem::toolTip(int column) const
 				bufsize_t rounded = sec->getContentSize(Executable::RVA, true);
 				if (sec->getContentSize(Executable::RVA, false) != rounded) return "mapped:\n" + QString::number(rounded, 16);
 				break;
+			}
+			case SEC_RPTR:
+			{
+				const offset_t hdrOffset = sec->getContentOffset(Executable::RAW, false);
+				const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
+				if (hdrOffset != mappedOffset) {
+					return "mapped offset:\n" + QString::number(mappedOffset, 16).toUpper();;
+				}
 			}
 		}
 	}
