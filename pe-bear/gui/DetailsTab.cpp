@@ -255,7 +255,7 @@ void DetailsTab::onFitSections()
 		if (whatToResize.length() > 0) whatToResize +=" and ";
 		whatToResize += "Image";
 	}
-	QString confirmation = "Do you want to resize " + whatToResize  +" to fit?\nFile resizing cannot be undone!\n";
+	QString confirmation = "Do you want to resize " + whatToResize  +" to fit?\n";
 	QMessageBox::StandardButton reply = QMessageBox::question(NULL, "Do you really want to resize?", confirmation + '\n' + info,  QMessageBox::Yes|QMessageBox::No);                     
 	if (reply != QMessageBox::Yes) return;  
 
