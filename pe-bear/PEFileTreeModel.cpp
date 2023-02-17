@@ -170,7 +170,7 @@ bufsize_t PEFileTreeItem::getContentSize() const
 		case PEFILE_DOS_STUB :
 		{
 			const offset_t ntHdrsOffset = m_PE->peNtHdrOffset();
-			if (ntHdrsOffset < offset) {
+			if (ntHdrsOffset == INVALID_ADDR || ntHdrsOffset < offset) {
 				return 0;
 			}
 			return ntHdrsOffset - offset;
@@ -251,13 +251,16 @@ QVariant PEFileTreeItem::toolTip(int column) const
 	if (!this->myPeHndl) return QVariant();
 	PEFile *m_PE = this->myPeHndl->getPe();
 	if (!m_PE) return QVariant();
-
+	QStringList peInfo;
 	int fieldIndx = column;
 	if (this->level == DESC) {
 		if (role == PEFILE_MAIN) {
-			QString truncated = m_PE->isTruncated() ? "\n(truncated)" : "";
-			QString resized = m_PE->isResized() ? "\n(resized)" : "";
-			return myPeHndl->getFullName() + truncated + resized;
+			if (m_PE->isTruncated()) peInfo << "(truncated)";
+			if (m_PE->isResized()) peInfo << "(resized)";
+			
+			myPeHndl->isPeAtypical(&peInfo);
+			
+			return myPeHndl->getFullName() + "\n" + peInfo.join("\n");
 		}
 		if (role == PEFILE_OVERLAY) {
 			return "Overlay size: 0x" + QString::number(this->getOverlaySize(), 16);
@@ -279,14 +282,14 @@ QVariant PEFileTreeItem::decoration(int column) const
 		}
 		
 		if (m_PE->getBitMode() == Executable::BITS_64) {
-			if (myPeHndl->isPeValid()) {
+			if (!myPeHndl->isPeAtypical()) {
 				return ViewSettings::getScaledPixmap(":/icons/app64.ico");
 			}
 			else {
 				return ViewSettings::getScaledPixmap(":/icons/app64_w.ico");
 			}
 		} else {
-			if (myPeHndl->isPeValid()) {
+			if (!myPeHndl->isPeAtypical()) {
 				return ViewSettings::getScaledPixmap(":/icons/app32.ico");
 			}
 			else {

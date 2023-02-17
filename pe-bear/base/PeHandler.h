@@ -52,7 +52,7 @@ public:
 	PeHandler(PEFile *_pe, FileBuffer *_fileBuffer);
 	PEFile* getPe() { return m_PE; }
 
-	bool isPeValid() 
+	bool isPeValid() const
 	{
 		if (!m_PE) return false;
 		if (m_PE->getSectionsCount() == 0) {
@@ -64,6 +64,32 @@ public:
 		}
 		// TODO: verify the internals of the PE file
 		return true;
+	}
+	
+	bool isPeAtypical(QStringList *warnings = NULL) const
+	{
+		bool isAtypical = false;
+		if (!isPeValid()) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The executable may not run: the ImageSize size doesn't fit sections";
+		}
+		const size_t mappedSecCount = m_PE->getSectionsCount(true);
+		// check for unaligned sections:
+		if (mappedSecCount != m_PE->getSectionsCount(false)) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "Not all sections are mapped";
+		}
+		for (size_t i = 0; i < mappedSecCount; i++) {
+			SectionHdrWrapper *sec = m_PE->getSecHdr(i);
+			const offset_t hdrOffset = sec->getContentOffset(Executable::RAW, false);
+			const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
+			if (hdrOffset != mappedOffset) {
+				isAtypical = true;
+				if (warnings) (*warnings) << "Contains sections misaligned to FileAlignment";
+				break;
+			}
+		}
+		return isAtypical;
 	}
 	
 	bool updateFileModifTime()
