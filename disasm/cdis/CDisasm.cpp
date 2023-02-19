@@ -177,17 +177,21 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 	return va;
 }
 
-minidis::mnem_type CDisasm::fetchMnemType(const x86_insn cMnem) const
+minidis::mnem_type CDisasm::fetchMnemType(const cs_insn &insn) const
 {
 	using namespace minidis;
-	if (cMnem == X86_INS_INVALID) {
+
+	const unsigned int cMnem = insn.id;
+	if (cMnem == x86_insn::X86_INS_INVALID) {
 		return MT_INVALID;
 	}
-	if (cMnem >= X86_INS_JAE && cMnem <= X86_INS_JS) {
-		if (cMnem == X86_INS_JMP || cMnem == X86_INS_LJMP) return MT_JUMP;
+	if (cMnem == x86_insn::X86_INS_JMP || cMnem == x86_insn::X86_INS_LJMP) {
+		return MT_JUMP;
+	}
+	if (cMnem >= x86_insn::X86_INS_JAE && cMnem <= x86_insn::X86_INS_JS) {
 		return MT_COND_JUMP;
 	}
-	if (cMnem >= X86_INS_MOV && cMnem <= X86_INS_MOVZX) {
+	if (cMnem >= x86_insn::X86_INS_MOV && cMnem <= x86_insn::X86_INS_MOVZX) {
 		return MT_MOV;
 	}
 
@@ -245,14 +249,14 @@ bool CDisasm::isPushRet(int index, /*out*/ int* ret_index) const
 	const cs_insn m_insn = m_table.at(index);
 	const cs_detail *detail = &m_details.at(index);
 
-	const minidis::mnem_type mnem = fetchMnemType(static_cast<x86_insn>(m_insn.id));
+	const minidis::mnem_type mnem = fetchMnemType(m_insn);
 	if (mnem == minidis::MT_PUSH) {
 		int y2 = index + 1;
 		if (y2 >= m_table.size()) {
 			return false;
 		}
 		const cs_insn m_insn2 = m_table.at(y2);
-		const minidis::mnem_type mnem2 = fetchMnemType(static_cast<x86_insn>(m_insn2.id));
+		const minidis::mnem_type mnem2 = fetchMnemType(m_insn2);
 		if (mnem2 == minidis::MT_RET) {
 			if (ret_index != NULL) {
 				(*ret_index) = y2;
@@ -336,7 +340,7 @@ QString CDisasm::translateBranching(const int y) const
 		return "";
 	}
 	const cs_insn m_insn = m_table.at(y);
-	const minidis::mnem_type mType = this->fetchMnemType(static_cast<x86_insn>(m_insn.id));
+	const minidis::mnem_type mType = this->fetchMnemType(m_insn);
 
 	if (!this->isBranching(mType) || !m_insn.mnemonic) {
 		return "";

@@ -103,7 +103,7 @@ public:
 			return MT_NONE;
 		}
 		const cs_insn &m_insn =  m_table.at(index);
-		return fetchMnemType(static_cast<x86_insn>(m_insn.id));
+		return fetchMnemType(m_insn);
 	}
 	
 	virtual bool isAddrOperand(int index) const;
@@ -114,7 +114,7 @@ public:
 protected:
 	size_t _chunksCount() const { return this->m_table.size(); }
 	bool isLongOp(const cs_insn &m_insn) const { return (m_insn.id == X86_INS_LCALL || m_insn.id == X86_INS_LJMP); }
-	minidis::mnem_type fetchMnemType(const x86_insn cMnem) const;
+	minidis::mnem_type fetchMnemType(const cs_insn &insn) const;
 	
 	size_t disasmNext();
 	bool init_capstone(Executable::exe_bits bitMode);
