@@ -130,7 +130,6 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 {
 	isOk = false;
 	if (index >= m_table.size()) {
-		printf("Out of bounds\n");
 		return INVALID_ADDR;
 	}
 	const cs_insn m_insn = m_table.at(index);
