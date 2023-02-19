@@ -1,12 +1,12 @@
 #include "PeDisasm.h"
 #include <QtCore>
-#define PREVIEW_SIZE 0x200
+
 
 using namespace pe_bear;
 
-PeDisasm::PeDisasm(PEFile *pe)
+PeDisasm::PeDisasm(PEFile *pe, size_t _previewSize)
 	: __disasm_super(),
-	m_PE(pe), previewSize(PREVIEW_SIZE), 
+	m_PE(pe), previewSize(_previewSize), 
 	firstOffset(0), isInit(false), isBitModeAuto(true)
 {
 	if (pe == NULL) throw CustomException("PE not initialized!");

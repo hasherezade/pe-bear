@@ -292,10 +292,14 @@ void SectionMenu::createActions()
 	this->loadSelSecAction = new QAction("Substitute the content", this);
 	connect(this->loadSelSecAction, SIGNAL(triggered()), this, SLOT(loadSelectedSection()) );
 
+	this->dumpDisasmAction = new QAction("&Export section disasembly as...", this);
+	connect(dumpDisasmAction, SIGNAL(triggered()), this, SLOT(exportSectionDisasm()) );
+
 	addAction(this->dumpSelSecAction);
 	addAction(this->loadSelSecAction);
 	addAction(this->clearSelSecAction);
-	//addAction(this->searchSigAction);
+	addSeparator();
+	addAction(this->dumpDisasmAction);
 }
 
 void SectionMenu::sectionSelected(PeHandler *pe, SectionHdrWrapper *sec)
@@ -332,6 +336,43 @@ void SectionMenu::dumpSelectedSection()
 		return;
 	}
 	QMessageBox::warning(this, "Error", "Dumping section failed!");
+}
+
+void SectionMenu::exportSectionDisasm()
+{
+	if (!peHndl) return;
+	PEFile *pe = peHndl->getPe();
+	if (!pe) return;
+	if (!selectedSection) return;
+
+	QString outDir = mainSettings.dirDump;
+	if (outDir == "") outDir = peHndl->getDirPath();
+
+	QString defaultPath = outDir + QDir::separator() + peHndl->getShortName() + "[" + selectedSection->mappedName + "].txt";
+	QString path = QFileDialog::getSaveFileName(this, "Save disasembly as...", defaultPath);
+	if (path.size() == 0) return;
+
+	const offset_t startOff = selectedSection->getContentOffset(Executable::RAW, true);
+	const size_t previewSize = selectedSection->getContentSize(Executable::RAW, true);
+	pe_bear::PeDisasm myDisasm(pe, previewSize);
+	myDisasm.init(startOff, pe->getBitMode());
+	myDisasm.fillTable();
+
+	QFile fOut(path);
+	if (fOut.open(QFile::WriteOnly | QFile::Text) == false) {
+		QMessageBox::warning(this, "Error", "Dumping section failed!");
+		return;
+	}
+	QTextStream disasmStream(&fOut);
+	for (int index = 0; index < myDisasm.chunksCount(); ++index ) {
+		QString str = myDisasm.mnemStr(index);
+		QString offset = QString::number(myDisasm.getRvaAt(index), 16);
+		disasmStream << offset << " : " <<  str << "\n";
+	}
+	fOut.close();
+
+	QMessageBox::information(this, "Done!", "Dumped section disasembly: "+ selectedSection->mappedName +"\ninto: " + path);
+	return;
 }
 
 void SectionMenu::clearSelectedSection()

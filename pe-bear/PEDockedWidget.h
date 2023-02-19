@@ -111,12 +111,18 @@ public slots:
 	void dumpSelectedSection();
 	void clearSelectedSection();
 	void loadSelectedSection();
+	void exportSectionDisasm();
 
 protected:
 	void createActions();
 
 	MainSettings &mainSettings;
 	PeHandler *peHndl;
-	SectionHdrWrapper* selectedSection;
-	QAction *dumpSecAction, *dumpSelSecAction, *clearSelSecAction, *loadSelSecAction, *searchSigAction;
+	SectionHdrWrapper *selectedSection;
+	QAction *dumpSecAction, 
+		*dumpSelSecAction, 
+		*clearSelSecAction, 
+		*loadSelSecAction, 
+		*searchSigAction, 
+		*dumpDisasmAction;
 };

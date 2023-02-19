@@ -10,13 +10,15 @@ typedef pe_bear::UDisasm __disasm_super;
 typedef pe_bear::CDisasm __disasm_super; 
 #endif
 
+#define DISASM_PREVIEW_SIZE 0x200
+
 namespace pe_bear {
 
 class PeDisasm : public __disasm_super
 {
 	
 public:
-	PeDisasm(PEFile *pe);
+	PeDisasm(PEFile *pe, size_t previewSize = DISASM_PREVIEW_SIZE);
 	bool init(const offset_t offset, Executable::exe_bits bitMode = Executable::UNKNOWN);
 	bool fillTable();
 
