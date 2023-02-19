@@ -46,5 +46,6 @@
         <file>icons/dump.ico</file>
         <file>icons/information.ico</file>
         <file>icons/magic_wand.ico</file>
+        <file>icons/disasm.ico</file>
     </qresource>
 </RCC>

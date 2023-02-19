@@ -292,7 +292,8 @@ void SectionMenu::createActions()
 	this->loadSelSecAction = new QAction("Substitute the content", this);
 	connect(this->loadSelSecAction, SIGNAL(triggered()), this, SLOT(loadSelectedSection()) );
 
-	this->dumpDisasmAction = new QAction("&Export section disasembly as...", this);
+	QIcon disasmIco(":/icons/disasm.ico");
+	this->dumpDisasmAction = new QAction(disasmIco, "&Export section disasembly as...", this);
 	connect(dumpDisasmAction, SIGNAL(triggered()), this, SLOT(exportSectionDisasm()) );
 
 	addAction(this->dumpSelSecAction);
