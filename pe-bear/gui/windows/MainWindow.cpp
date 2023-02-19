@@ -241,10 +241,6 @@ void MainWindow::setupWidgets()
 
 void MainWindow::createTreeActions()
 {
-	QIcon packerIco(":/icons/Locked.ico");
-	searchSigAction = new ExeDependentAction(packerIco, "Search for signatures", this);
-	connect(searchSigAction, SIGNAL(triggered(PeHandler*)), this, SLOT(sigSearch(PeHandler*)) );
-
 	dumpAllSecAction =  new ExeDependentAction(QIcon(":/icons/dump.ico"), "Dump all sections to...", this);
 	connect(this->dumpAllSecAction, SIGNAL(triggered(PeHandler*)), this, SLOT(dumpAllSections(PeHandler*)));
 
@@ -270,8 +266,7 @@ void MainWindow::createTreeActions()
 	sectionMenu.setTitle("Edit the section\n");
 	sectionsTreeMenu.addMenu(&sectionMenu);
 	sectionsTreeMenu.addSeparator();
-	
-	sectionsTreeMenu.addAction(this->searchSigAction);
+
 	sectionsTreeMenu.addAction(this->addSecAction);
 	sectionsTreeMenu.addAction(this->dumpAllSecAction);
 	sectionsTreeMenu.addAction(this->saveAction);
@@ -433,20 +428,10 @@ void MainWindow::onHandlerSelected(PeHandler* peHndl)
 	
 	this->m_PeHndl = peHndl;
 	this->unloadAction->setEnabled(isPe);
+	
+	const offset_t offset = (peHndl) ? peHndl->getDisplayedOffset() : INVALID_ADDR;
+	SectionHdrWrapper* sec = (peHndl) ? pePtr->getSecHdrAtOffset(offset, Executable::RAW) : NULL;
 
-	SectionHdrWrapper* sec = NULL;
-	const bool selected = (peHndl != NULL);
-	if (selected) {
-		offset_t offset = peHndl->getDisplayedOffset();
-		sec = pePtr->getSecHdrAtOffset(offset, Executable::RAW);
-		if (sec) {
-			searchSigAction->setEnabled(true);
-			searchSigAction->setText("Search for signatures in: ["+ sec->mappedName +"] from: " + QString::number(offset, 16).toUpper());
-		} else {
-			searchSigAction->setText("Search for signatures");
-			searchSigAction->setEnabled(false);
-		}
-	}
 	this->sectionMenu.sectionSelected(peHndl, sec);
 
 	if (!isPe) {

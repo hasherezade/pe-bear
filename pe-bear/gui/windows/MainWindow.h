@@ -207,7 +207,6 @@ private:
 	ExeDependentAction *dumpAllSecAction,
 		*addSecAction,
 		*saveAction,
-		*searchSigAction,
 		*unloadAction,
 		*reloadAction;
 
