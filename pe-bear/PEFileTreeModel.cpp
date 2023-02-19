@@ -257,10 +257,13 @@ QVariant PEFileTreeItem::toolTip(int column) const
 		if (role == PEFILE_MAIN) {
 			if (m_PE->isTruncated()) peInfo << "(truncated)";
 			if (m_PE->isResized()) peInfo << "(resized)";
-			
 			myPeHndl->isPeAtypical(&peInfo);
 			
-			return myPeHndl->getFullName() + "\n" + peInfo.join("\n");
+			QString fileTooltip = myPeHndl->getFullName();
+			if (peInfo.size()) {
+				fileTooltip += "\n" + peInfo.join("\n");
+			}
+			return fileTooltip;
 		}
 		if (role == PEFILE_OVERLAY) {
 			return "Overlay size: 0x" + QString::number(this->getOverlaySize(), 16);
