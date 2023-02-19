@@ -75,7 +75,11 @@ SignaturesBrowseWindow::SignaturesBrowseWindow(sig_ma::SigFinder* vSign, QWidget
 	this->vSign = vSign;
 	//---
 	SignaturesBrowseModel *sigModel = new SignaturesBrowseModel(vSign, this);
-	signsTree.setModel(sigModel);
+	QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+	proxyModel->setSourceModel( sigModel );
+	signsTree.setModel( proxyModel ); 
+	signsTree.setSortingEnabled(true);
+
 	signsTree.setItemsExpandable(false);
 	signsTree.setRootIsDecorated(false);
 	setCentralWidget(&signsTree);
