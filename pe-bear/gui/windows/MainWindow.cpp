@@ -461,8 +461,16 @@ void MainWindow::onHandlerSelected(PeHandler* peHndl)
 void MainWindow::onExeHandlerAdded(PeHandler* hndl)
 {
 	if (hndl == NULL) return;
-	this->statusBar.showMessage("Loaded: "+ hndl->getFullName());
+
+	const QString loadInfo = "Loaded: "+ hndl->getFullName();
+	this->statusBar.showMessage(loadInfo);
 	this->loadTagsForPe(hndl);
+	
+	// show warnings:
+	QStringList peInfo;
+	if (hndl->isPeAtypical(&peInfo)) {
+		QMessageBox::warning(this, "Warning", hndl->getFullName() + ":\n" + peInfo.join("\n"));
+	}
 }
 
 int MainWindow::openMultiplePEs(QStringList fNames)
