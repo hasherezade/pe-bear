@@ -30,9 +30,7 @@ public:
 	SigFinder(void) {}
 	~SigFinder(void){}
 
-	PckrSign* getFirstMatch(uint8_t *buf, long buf_size, long start_offset = 0, match_direction md = FIXED);
-
-	matched getMatching(uint8_t *buf, long buf_size, long start_offset, match_direction md = FIXED);
+	matched getMatching(const uint8_t *buf, long buf_size, long start_offset, match_direction md = FIXED);
 
 	size_t loadSignatures(const std::string &fname);
 

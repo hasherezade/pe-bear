@@ -211,21 +211,24 @@ bool PeHandler::isPacked()
 PckrSign* PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT, match_direction md)
 {
 	if (!signFinder || !m_PE) return NULL;
+
 	BYTE* content = m_PE->getContent();
 	if (!content) return NULL;
-	size_t contentSize = m_PE->getRawSize();
+
+	const size_t contentSize = m_PE->getRawSize();
 
 	offset_t startingRaw = m_PE->toRaw(startAddr, aT);
 	if (startingRaw == INVALID_ADDR) return NULL;
 
 	sig_ma::matched matchedSet = signFinder->getMatching(content, contentSize, startingRaw, md);
-	int foundCount = matchedSet.signs.size();
+	size_t foundCount = matchedSet.signs.size();
 	if (foundCount == 0) return NULL;
 
-	PckrSign* packer = *(matchedSet.signs.begin());
-	if (!packer) foundCount = 0;
-
-	if (foundCount > 0) {
+	PckrSign* packer = NULL;
+	for (auto sItr = matchedSet.signs.begin(); sItr != matchedSet.signs.end(); ++sItr) {
+		packer = *sItr;
+		if (!packer) continue;
+		
 		FoundPacker pckr(startingRaw + matchedSet.match_offset, packer);
 		std::vector<FoundPacker>::iterator itr = std::find(this->packerAtOffset.begin(), this->packerAtOffset.end(), pckr);
 
