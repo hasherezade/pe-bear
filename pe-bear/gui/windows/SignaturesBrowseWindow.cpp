@@ -74,13 +74,19 @@ SignaturesBrowseWindow::SignaturesBrowseWindow(sig_ma::SigFinder* vSign, QWidget
 	this->vSign = vSign;
 	//---
 	this->sigModel = new SignaturesBrowseModel(vSign, this);
-	QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+	this->proxyModel = new SigSortFilterProxyModel(this);
+
 	proxyModel->setSourceModel( sigModel );
 	signsTree.setModel( proxyModel ); 
 	signsTree.setSortingEnabled(true);
 
 	signsTree.setItemsExpandable(false);
 	signsTree.setRootIsDecorated(false);
+
+	filterLabel.setText("Search in columns:");
+	topLayout.addWidget(&filterLabel);
+	topLayout.addWidget(&filterEdit);
+
 	topLayout.addWidget(&signsTree);
 	topLayout.addWidget(&sigInfo);
 	
@@ -92,7 +98,17 @@ SignaturesBrowseWindow::SignaturesBrowseWindow(sig_ma::SigFinder* vSign, QWidget
 	connect(this->sigModel, SIGNAL(modelUpdated()), this, SLOT(onSigListUpdated()));
 	connect(this, SIGNAL(signaturesUpdated()), sigModel, SLOT(onNeedReset()));
 
+	connect(&filterEdit, SIGNAL(textChanged(QString)), this, SLOT(onFilterChanged(QString)) );
+	
 	this->onSigListUpdated();
+}
+
+void SignaturesBrowseWindow::onFilterChanged(QString str)
+{
+	if (!proxyModel) return;
+	
+	QRegExp regExp(str.toLower(), Qt::CaseSensitive, QRegExp::FixedString);
+	proxyModel->setFilterRegExp(regExp);
 }
 
 void SignaturesBrowseWindow::createMenu()

@@ -56,8 +56,34 @@ public:
 		this->endResetModel();
 		//<
 	}
+	
 protected:
 	sig_ma::SigFinder *signs;
+};
+
+//----------------------------------------------------
+
+class SigSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+	SigSortFilterProxyModel(QObject *parent)
+		: QSortFilterProxyModel(parent)
+	{
+	}
+	
+	bool filterAcceptsRow(int sourceRow,const QModelIndex &sourceParent) const
+	{
+		QAbstractItemModel *source = sourceModel();
+		if (!source) return false;
+		
+		for(int i = 0; i < source->columnCount(); i++)
+		{
+			QModelIndex index = source->index(sourceRow, i, sourceParent);
+			if (source->data(index).toString().toLower().trimmed().contains(filterRegExp()))
+				return true;
+		}
+		return false;  
+	}
 };
 
 //----------------------------------------------------
@@ -75,6 +101,9 @@ public slots:
 
 public:
 	SignaturesBrowseWindow(sig_ma::SigFinder *vSign, QWidget *parent);
+	
+private slots:
+	void onFilterChanged(QString);
 
 private:
 	void createMenu();
@@ -82,8 +111,12 @@ private:
 	QTreeView signsTree;
 	sig_ma::SigFinder* vSign;
 	SignaturesBrowseModel *sigModel;
+	SigSortFilterProxyModel *proxyModel;
 	
 	QVBoxLayout topLayout;
+
+	QLabel filterLabel;
+	QLineEdit filterEdit;
 	QLabel sigInfo;
 };
 
