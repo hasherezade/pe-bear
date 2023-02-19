@@ -121,12 +121,17 @@ matched SigTree::getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs)
 		for (lvlI = level.begin(); lvlI != level.end(); ++lvlI) {
 			std::vector<SigNode*>::iterator curr = lvlI;
 
-			//TODO: allow for alternate sig search paths: with wildcards AND with exact matches
+			// allow for alternate sig search paths: with wildcards AND with exact matches
 			SigNode *nextC = (*curr)->getChild(b);
-			if (!nextC) {
-				nextC = (*curr)->getWildc();
+			if (nextC) {
+				PckrSign *sig = this->nodeToSign[nextC];
+				if (sig) {
+					matchedSet.signs.insert(sig);
+				}
+				level2.push_back(nextC);
 			}
-
+			
+			nextC = (*curr)->getWildc();
 			if (nextC) {
 				PckrSign *sig = this->nodeToSign[nextC];
 				if (sig) {
