@@ -13,9 +13,10 @@ size_t SigFinder::loadSignatures(const std::string &fname)
 	std::ifstream input;
 	input.open(fname);
 	if (!input.is_open()) {
+		//std::cout << "File not found: " << fname << std::endl;
 		return 0;
 	}
-	size_t num = tree.loadFromFile(input);
+	const size_t num = tree.loadFromFile(input);
 	input.close();
 	return num;
 }

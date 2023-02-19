@@ -27,6 +27,14 @@ protected slots:
 	virtual void onNeedReset() { reset(); emit modelUpdated(); }
 
 public:
+	enum COLS {
+		COL_ID = 0,
+		COL_NAME,
+		COL_SIZE,
+		COL_PREVIEW,
+		MAX_COL
+	};
+	
 	SignaturesBrowseModel(sig_ma::SigFinder *signs, QObject *parent = 0);
 	
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -41,15 +49,6 @@ public:
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const { return createIndex(row, column); } //no index item pointer
 	QModelIndex parent(const QModelIndex &index) const { return QModelIndex(); } // no parent
 
-	enum COLS {
-		COL_ID = 0,
-		COL_NAME,
-		COL_SIZE,
-		COL_PREVIEW,
-		MAX_COL
-	};
-
-protected:
 	void reset()
 	{
 		//>
@@ -57,7 +56,7 @@ protected:
 		this->endResetModel();
 		//<
 	}
-
+protected:
 	sig_ma::SigFinder *signs;
 };
 
@@ -72,6 +71,7 @@ signals:
 
 public slots:
 	void openSignatures();
+	void onSigListUpdated();
 
 public:
 	SignaturesBrowseWindow(sig_ma::SigFinder *vSign, QWidget *parent);
@@ -81,5 +81,9 @@ private:
 
 	QTreeView signsTree;
 	sig_ma::SigFinder* vSign;
+	SignaturesBrowseModel *sigModel;
+	
+	QVBoxLayout topLayout;
+	QLabel sigInfo;
 };
 

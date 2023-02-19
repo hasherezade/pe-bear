@@ -52,10 +52,18 @@ MainWindow::MainWindow(QWidget *parent)
 	createMenus();
 	connectSignals();
 
-	vSign.loadSignatures(SIG_FILE);
 	guiSettings.readPersistent();
 	selectCurrentStyle();
 	startTimer();
+
+	// try to load from alternative files:
+	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
+	vSign.loadSignatures(sigFile1.toStdString());
+
+	const QString sigFile2 = QDir::currentPath() + QDir::separator() + SIG_FILE;
+	vSign.loadSignatures(sigFile2.toStdString());
+
+	signWindow.onSigListUpdated();
 }
 
 void MainWindow::connectSignals()
