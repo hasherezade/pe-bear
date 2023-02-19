@@ -354,6 +354,7 @@ void SectionMenu::exportSectionDisasm()
 
 	const offset_t startOff = selectedSection->getContentOffset(Executable::RAW, true);
 	const size_t previewSize = selectedSection->getContentSize(Executable::RAW, true);
+	
 	pe_bear::PeDisasm myDisasm(pe, previewSize);
 	myDisasm.init(startOff, pe->getBitMode());
 	myDisasm.fillTable();
@@ -366,8 +367,38 @@ void SectionMenu::exportSectionDisasm()
 	QTextStream disasmStream(&fOut);
 	for (int index = 0; index < myDisasm.chunksCount(); ++index ) {
 		QString str = myDisasm.mnemStr(index);
-		QString offset = QString::number(myDisasm.getRvaAt(index), 16);
-		disasmStream << offset << " : " <<  str << "\n";
+		if (myDisasm.isBranching(index)) {
+			str = myDisasm.translateBranching(index);
+		}
+		
+		//resolve target functions:
+		bool isOk = false;
+		const offset_t tRva =  myDisasm.getTargetRVA(index, isOk);
+		QString funcName = "";
+		QString refStr = "";
+		if (isOk) {
+			funcName = peHndl->importDirWrapper.thunkToFuncName(tRva, false);
+			if (funcName.length() == 0 ) {
+				funcName = peHndl->delayImpDirWrapper.thunkToFuncName(tRva, false);
+			}
+			refStr = myDisasm.getStringAt(tRva);
+		}
+		
+		offset_t VA = pe->rvaToVa(myDisasm.getRvaAt(index));
+		QString vaStr = QString::number(VA, 16);
+		
+		// stream to the file:
+		disasmStream << vaStr << " : " <<  str;
+		if (funcName.length()) {
+			disasmStream << " : " <<  funcName;
+		}
+		else if (refStr.length()) {
+			disasmStream << " : " <<  refStr;
+		}
+		disasmStream << "\n";
+		if (myDisasm.isBranching(index)) {
+			disasmStream << "\n"; // add a separator line
+		}
 	}
 	fOut.close();
 
