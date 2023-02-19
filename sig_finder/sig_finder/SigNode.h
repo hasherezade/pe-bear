@@ -44,8 +44,8 @@ public:
 	SigNode(uint8_t val, sig_type type = IMM);
 	~SigNode();
 
-	SigNode* getWildc();
-	SigNode* getChild(uint8_t val);
+	SigNode* getWildc() const;
+	SigNode* getChild(uint8_t val) const;
 
 	SigNode* putChild(uint8_t val);
 	SigNode* putWildcard(uint8_t val);

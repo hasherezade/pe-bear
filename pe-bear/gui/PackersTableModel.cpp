@@ -5,6 +5,7 @@ using namespace sig_ma;
 enum COLS {
 	COL_OFFSET = 0,
 	COL_NAME,
+	COL_SIG,
 	COL_SECTION,
 	MAX_COL
 };
@@ -22,6 +23,7 @@ QVariant PackersTableModel::headerData(int section, Qt::Orientation orientation,
 		switch (section) {
 			case COL_OFFSET: return "Offset";
 			case COL_NAME: return "Name";
+			case COL_SIG: return "Signature";
 			case COL_SECTION:  return "Section";
 		}
 	}
@@ -69,6 +71,7 @@ QVariant PackersTableModel::data(const QModelIndex &index, int role) const
 	SectionHdrWrapper *sec = m_PE->getSecHdrAtOffset(offset, Executable::RAW);
 	switch (column) {
 		case COL_OFFSET: return QString::number(offset, 16);
+		case COL_SIG: return QString::fromStdString(sign->getContent());
 		case COL_NAME: return QString::fromStdString(sign->getName());
 		case COL_SECTION: {
 			if (sec) return sec->mappedName;

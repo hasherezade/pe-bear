@@ -100,7 +100,7 @@ void SigTree::insertPckrSign(PckrSign* sign)
 }
 
 
-matched SigTree::getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs)
+matched SigTree::getMatching(const uint8_t *buf, const size_t buf_len, bool skipNOPs)
 {
 	matched matchedSet;
 	matchedSet.match_offset = 0;
@@ -112,17 +112,17 @@ matched SigTree::getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs)
 
 	long checked = 0;
 	long skipped = 0;
-	for (int indx = 0; indx < buf_len; indx++) {
-		uint8_t b = buf[indx];
+	for (size_t indx = 0; indx < buf_len; indx++) {
+		const uint8_t bufChar = buf[indx];
 
 		std::vector<SigNode*> level2;
-		std::vector<SigNode*>::iterator lvlI;
-		
-		for (lvlI = level.begin(); lvlI != level.end(); ++lvlI) {
-			std::vector<SigNode*>::iterator curr = lvlI;
 
+		for (std::vector<SigNode*>::const_iterator lvlI = level.begin(); lvlI != level.end(); ++lvlI) {
+			const SigNode* currNode = (*lvlI);
+			if (!currNode) continue;
+			
 			// allow for alternate sig search paths: with wildcards AND with exact matches
-			SigNode *nextC = (*curr)->getChild(b);
+			SigNode *nextC = currNode->getChild(bufChar);
 			if (nextC) {
 				PckrSign *sig = this->nodeToSign[nextC];
 				if (sig) {
@@ -131,7 +131,7 @@ matched SigTree::getMatching(uint8_t *buf, size_t buf_len, bool skipNOPs)
 				level2.push_back(nextC);
 			}
 			
-			nextC = (*curr)->getWildc();
+			nextC = currNode->getWildc();
 			if (nextC) {
 				PckrSign *sig = this->nodeToSign[nextC];
 				if (sig) {

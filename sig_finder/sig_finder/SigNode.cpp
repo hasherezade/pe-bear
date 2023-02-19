@@ -35,7 +35,7 @@ SigNode::~SigNode()
 	}
 }
 
-SigNode* SigNode::getWildc()
+SigNode* SigNode::getWildc() const
 {
 	/* TODO: value masking */
 	SigNode srchd(WILD_ONE, WILDC);
@@ -44,7 +44,7 @@ SigNode* SigNode::getWildc()
 	return (*found);
 }
 
-SigNode* SigNode::getChild(uint8_t val)
+SigNode* SigNode::getChild(uint8_t val) const
 {
 	SigNode srchd(val, IMM);
 	std::set<SigNode*, sig_compare>::iterator found = childs.find(&srchd);
