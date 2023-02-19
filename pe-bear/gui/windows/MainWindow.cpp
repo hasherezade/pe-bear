@@ -940,6 +940,7 @@ void MainWindow::openSignatures()
 
 	if (filename.length() > 0) {
 		int i = vSign.loadSignatures(filename);
+		signWindow.onSigListUpdated();
 		QMessageBox msgBox;
 		msgBox.setText("Added new signatures: " + QString::number(i));
 		msgBox.exec();
