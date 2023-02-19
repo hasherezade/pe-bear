@@ -293,7 +293,7 @@ void SectionMenu::createActions()
 	connect(this->loadSelSecAction, SIGNAL(triggered()), this, SLOT(loadSelectedSection()) );
 
 	QIcon disasmIco(":/icons/disasm.ico");
-	this->dumpDisasmAction = new QAction(disasmIco, "&Export section disasembly as...", this);
+	this->dumpDisasmAction = new QAction(disasmIco, "&Export section disassembly as...", this);
 	connect(dumpDisasmAction, SIGNAL(triggered()), this, SLOT(exportSectionDisasm()) );
 
 	addAction(this->dumpSelSecAction);
