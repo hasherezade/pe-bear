@@ -243,7 +243,7 @@ void MainWindow::createTreeActions()
 {
 	dumpAllSecAction =  new ExeDependentAction(QIcon(":/icons/dump.ico"), "Dump all sections to...", this);
 	connect(this->dumpAllSecAction, SIGNAL(triggered(PeHandler*)), this, SLOT(dumpAllSections(PeHandler*)));
-
+	
 	QIcon addIco(":/icons/add_entry.ico");
 	addSecAction =  new ExeDependentAction(addIco, "Add a new section", this);
 	connect(this->addSecAction, SIGNAL(triggered(PeHandler*)), this, SLOT(addSection(PeHandler*)));
@@ -293,6 +293,9 @@ void MainWindow::createActions()
 	unloadAllAction = new QAction(QIcon(":/icons/DeleteAll.ico"), "&Unload All", this);
 	connect(this->unloadAllAction, SIGNAL(triggered()), this, SLOT(unloadAllPEs()));
 
+	dumpAllPEsSecAction = new QAction(QIcon(":/icons/dump.ico"), "Dump all sections from PEs to...", this);
+	connect(this->dumpAllPEsSecAction, SIGNAL(triggered()), this, SLOT(dumpSectionsFromAllPEs()));
+	
 	setRegKeyAction = new QAction("Add to Explorer", this);
 	this->setRegKeyAction->setCheckable(true);
 	this->setRegKeyAction->setChecked(isRegKey());
@@ -373,6 +376,7 @@ void MainWindow::createMenus()
 	}
 	connect(styleMenu, SIGNAL(triggered(QAction*)), this, SLOT(setSelectedStyle(QAction*)));
 
+	// Signatures menu
 	this->signaturesMenu = this->settingsMenu->addMenu("Si&gnatures");
 
 	menuBar()->addAction(this->openDiffWindowAction);
@@ -395,6 +399,11 @@ void MainWindow::createMenus()
 	//---
 	this->signaturesMenu->addAction(this->viewSignAction);
 	this->signaturesMenu->addAction(this->openSignAction);
+	
+	// Process all loaded PEs:
+	this->fileMenu->addSeparator();
+	this->fromLoadedPEsMenu = this->fileMenu->addMenu("From loaded PEs...");
+	this->fromLoadedPEsMenu->addAction(this->dumpAllPEsSecAction);
 }
 
 void MainWindow::startTimer()
@@ -592,6 +601,35 @@ void MainWindow::unloadAllPEs()
 		closePE(oldHndl);
 	}
 	m_PEHandlers.clear();
+}
+
+void MainWindow::dumpSectionsFromAllPEs()
+{
+	std::map<PEFile*, PeHandler*> &handlers = m_PEHandlers.getHandlersMap();
+	const size_t count = handlers.size();
+	if (count == 0) return;
+ 
+ 	QString dirPath = chooseDumpOutDir(NULL);
+	if (!dirPath.length()) return;
+	
+	size_t dumped = 0;
+	std::map<PEFile*, PeHandler*>::iterator iter;
+	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
+		PeHandler *hndl = iter->second;
+		if (!hndl) continue;
+		PEFile *pe = hndl->getPe();
+		if (!pe) continue;
+		if (dumpAllPeSections(pe, dirPath, hndl->getShortName())) {
+			dumped++;
+		}
+	}
+	if (dumped != count) {
+		QMessageBox::warning(this, "Error", "Dumping sections from some of the PEs failed!");
+	}
+	if (dumped > 0) {
+		QMessageBox::information(this, "Done!", "Dumped sections from: " + QString::number(dumped)
+			+ " PEs into:\n" + dirPath);
+	}
 }
 
 void MainWindow::_reload(PeHandler* hndl, const bool isDeleted)
@@ -956,14 +994,14 @@ void MainWindow::savePE(PeHandler* selectedPeHndl)
 QString MainWindow::chooseDumpOutDir(PeHandler *selectedPeHndl)
 {
 	const QString EMPTY_STR = "";
-	if (!selectedPeHndl) return EMPTY_STR;
+	//if (!selectedPeHndl) return EMPTY_STR;
 	//---
 	QFileDialog dialog;
 	dialog.setFileMode(QFileDialog::Directory);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 
 	QString dirPathStr = this->mainSettings.dirDump;
-	QString currentPeDir = selectedPeHndl->getDirPath();
+	QString currentPeDir = selectedPeHndl ? selectedPeHndl->getDirPath() : QDir::currentPath();
 
 	if (dirPathStr == "") dirPathStr = currentPeDir;
 	dialog.setDirectory(dirPathStr);
@@ -980,15 +1018,10 @@ QString MainWindow::chooseDumpOutDir(PeHandler *selectedPeHndl)
 	return dirPathStr;
 }
 
-void MainWindow::dumpAllSections(PeHandler* selectedPeHndl)
+size_t MainWindow::dumpAllPeSections(PEFile *pe, const QString &dirPath, const QString &peName)
 {
-	if (!selectedPeHndl) return;
-	PEFile *pe = selectedPeHndl->getPe();
-	if (!pe) return;
-
-	QString dirPath = chooseDumpOutDir(selectedPeHndl);
-	if (dirPath.length() == 0) return;
-
+	if (!pe || dirPath.length() == 0) return 0;
+	
 	size_t dumped = 0;
 	size_t count = pe->getSectionsCount();
 	for (size_t i = 0; i < count; ++i) {
@@ -996,12 +1029,25 @@ void MainWindow::dumpAllSections(PeHandler* selectedPeHndl)
 		if (!sec) continue;
 
 		QString secName = sec->mappedName;
-		QString fileName = dirPath + QDir::separator() + selectedPeHndl->getShortName() + "[" + secName + "]";
+		QString fileName = dirPath + QDir::separator() + peName + "[" + secName + "]";
 		if (pe->dumpSection(sec, fileName)) dumped++;
 	}
+	return dumped;
+}
+
+void MainWindow::dumpAllSections(PeHandler* selectedPeHndl)
+{
+	if (!selectedPeHndl) return;
+
+	PEFile *pe = selectedPeHndl->getPe();
+	QString dirPath = chooseDumpOutDir(selectedPeHndl);
+	
+	if (!pe || dirPath.length() == 0) return;
+	
+	const size_t dumped = dumpAllPeSections(pe, dirPath, selectedPeHndl->getShortName());
 	if (dumped > 0) {
 		QMessageBox::information(this, "Done!", "Dumped: " + QString::number(dumped)
-			+ " out of " + QString::number(count) + " sections into:\n" + dirPath);
+			+ " sections into:\n" + dirPath);
 	}
 	else {
 		QMessageBox::warning(this, "Error", "Dumping sections failed!");

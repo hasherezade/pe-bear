@@ -47,6 +47,7 @@ public slots:
 	void onSigSearchResult(int foundCount, int reqType);
 	void runNewInstance();
 	void unloadAllPEs();
+	void dumpSectionsFromAllPEs();
 	void open();
 	void closePE(PeHandler*);
 	void reload(PeHandler*);
@@ -135,7 +136,7 @@ protected:
 	bool checkFileChanges(const QString &path);
 
 private:
-
+	size_t dumpAllPeSections(PEFile *pe, const QString &dirPath, const QString &peName);
 	ExeFactory::exe_type recognizeFileType(QString name, const bool showAlert);
 	bool readPersistent();
 	bool writePersistent();
@@ -185,7 +186,8 @@ private:
 	QMenu *fileMenu, 
 		*settingsMenu,
 		*viewMenu,
-		*signaturesMenu;
+		*signaturesMenu,
+		*fromLoadedPEsMenu;
 
 	QActionGroup *stylesGroup;
 
@@ -202,7 +204,8 @@ private:
 		*globalFontAction,
 		*defaultFontsAction,
 		*zoomInAction, *zoomOutAction, *zoomDefault,
-		*darkStyle, *defaultStyle;
+		*darkStyle, *defaultStyle,
+		*dumpAllPEsSecAction;
 
 	ExeDependentAction *dumpAllSecAction,
 		*addSecAction,
