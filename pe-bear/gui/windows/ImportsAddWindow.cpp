@@ -58,8 +58,9 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	proxyModel->setSourceModel( tableModel );
 	ui_elementsView->setModel( proxyModel ); 
 	ui_elementsView->setSortingEnabled(true);
-	
+#if QT_VERSION >= 0x050000
 	ui_elementsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#endif
 	ui_elementsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui_elementsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
