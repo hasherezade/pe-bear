@@ -48,7 +48,6 @@ protected:
 		IS_BOUND,
 		ADDED_COLS_NUM
 	};
-friend class ImportsTreeView;
 };
 
 //----------------------------------------------------------------------
