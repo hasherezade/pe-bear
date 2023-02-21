@@ -70,41 +70,38 @@ bool BoundImpTreeModel::setData(const QModelIndex &index, const QVariant &value,
 {
 	if (!index.isValid()) return false;
 
-	size_t fId = index.row();
-	uint32_t sID = this->columnToFID(index.column());
-
-	if (!wrapper()) return false;
-	DelayImpEntryWrapper* entry =  dynamic_cast<DelayImpEntryWrapper*>(wrapperAt(index));
-	//ExeElementWrapper *entry = wrapperAt(index);
+	BoundEntryWrapper* entry =  dynamic_cast<BoundEntryWrapper*>(wrapperAt(index));
 	if (!entry) return false;
 
+	uint32_t fieldID = this->columnToFID(index.column());
+    
 	QString text = value.toString();
 
 	bool isModified = false;
-	uint32_t offset = 0;
-	uint32_t fieldSize = 0;
+	offset_t offset = 0;
+	bufsize_t fieldSize = 0;
 
 	if (index.column() == NAME) {
 		char* textPtr = entry->getLibraryName();
 		if (!textPtr) return false;
 
 		offset = entry->getOffset(textPtr);
-		fieldSize = text.size() + 2;
+		fieldSize = text.size() + 1;
 
 		this->myPeHndl->backupModification(offset, fieldSize);
-		isModified = m_PE->setTextValue(textPtr, text.toStdString(), fieldSize);
+		isModified = m_PE->setTextValue(textPtr, text.toStdString(), text.size());
 
 	} else {
-		
+
 		bool isOk = false;
 		ULONGLONG number = text.toLongLong(&isOk, 16);
 		if (!isOk) return false;
 
-		offset = entry->getFieldOffset(sID);
-		fieldSize = entry->getFieldSize(sID);
+		offset = entry->getFieldOffset(fieldID);
+		fieldSize = entry->getFieldSize(fieldID);
 
 		this->myPeHndl->backupModification(offset, fieldSize);
-		isModified = entry->setNumValue(sID, index.column(), number);
+		isModified = entry->setNumValue(fieldID, index.column(), number);
 	}
 
 	if (isModified) {
