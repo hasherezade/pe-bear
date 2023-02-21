@@ -19,7 +19,25 @@ using namespace std;
 using namespace sig_ma;
 //-----------------------------------------------------------
 
+class UniqueNameHelper
+{
+public:
+	QString getUniqueFromName(const QString &name)
+	{
+		QString myName = name;
+		long nameId = 1;
+		while (uniqueNames.find(myName) != uniqueNames.end()) {
+			myName = name + "_" + QString::number(nameId++, 10);
+		}
+		uniqueNames.insert(myName);
+		return myName;
+	}
+	
+protected:
+	std::set<QString> uniqueNames;
+};
 
+//-----------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) 
 	: QMainWindow(parent), 
 	m_PeHndl(NULL), m_Timer(this),
@@ -405,7 +423,7 @@ void MainWindow::createMenus()
 	
 	// Process all loaded PEs:
 	this->fileMenu->addSeparator();
-	this->fromLoadedPEsMenu = this->fileMenu->addMenu("From loaded PEs...");
+	this->fromLoadedPEsMenu = this->fileMenu->addMenu("From all loaded...");
 	this->fromLoadedPEsMenu->addAction(this->dumpAllPEsSecAction);
 	this->fromLoadedPEsMenu->addAction(this->exportAllPEsDisasmAction);
 }
@@ -616,6 +634,7 @@ void MainWindow::dumpSectionsFromAllPEs()
  	QString dirPath = chooseDumpOutDir(NULL);
 	if (!dirPath.length()) return;
 	
+	UniqueNameHelper uniquePeHelper;
 	size_t dumped = 0;
 	std::map<PEFile*, PeHandler*>::iterator iter;
 	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
@@ -623,7 +642,9 @@ void MainWindow::dumpSectionsFromAllPEs()
 		if (!hndl) continue;
 		PEFile *pe = hndl->getPe();
 		if (!pe) continue;
-		if (dumpAllPeSections(pe, dirPath, hndl->getShortName())) {
+		
+		const QString peName = uniquePeHelper.getUniqueFromName(hndl->getShortName()); //protect against duplicated names
+		if (dumpAllPeSections(pe, dirPath, peName)) {
 			dumped++;
 		}
 	}
@@ -646,6 +667,8 @@ void MainWindow::exportDisasmFromAllPEs()
 	if (!dirPath.length()) return;
 	
 	size_t dumped = 0;
+	UniqueNameHelper uniquePeHelper;
+	
 	std::map<PEFile*, PeHandler*>::iterator iter;
 	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
 		PeHandler *hndl = iter->second;
@@ -657,10 +680,10 @@ void MainWindow::exportDisasmFromAllPEs()
 		DWORD ep = pe->getEntryPoint(Executable::RAW);
 		SectionHdrWrapper* sec = pe->getSecHdrAtOffset(ep, Executable::RAW, true);
 		if (!sec) continue;
-
-		const QString peName = hndl->getShortName();
+		
+		const QString peName = uniquePeHelper.getUniqueFromName(hndl->getShortName()); //protect against duplicated names
 		const QString secName = sec->mappedName;
-		const QString fileName = dirPath + QDir::separator() + hndl->getShortName() + "[" + secName + "].txt";
+		const QString fileName = dirPath + QDir::separator() + peName + "[" + secName + "].txt";
 
 		const offset_t startOff = sec->getContentOffset(Executable::RAW, true);
 		const size_t previewSize = sec->getContentSize(Executable::RAW, true);
