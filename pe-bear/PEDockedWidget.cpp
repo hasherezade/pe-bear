@@ -341,10 +341,7 @@ void SectionMenu::dumpSelectedSection()
 
 void SectionMenu::exportSectionDisasm()
 {
-	if (!peHndl) return;
-	PEFile *pe = peHndl->getPe();
-	if (!pe) return;
-	if (!selectedSection) return;
+	if (!peHndl || !selectedSection) return;
 
 	QString outDir = mainSettings.dirDump;
 	if (outDir == "") outDir = peHndl->getDirPath();
@@ -356,53 +353,10 @@ void SectionMenu::exportSectionDisasm()
 	const offset_t startOff = selectedSection->getContentOffset(Executable::RAW, true);
 	const size_t previewSize = selectedSection->getContentSize(Executable::RAW, true);
 	
-	pe_bear::PeDisasm myDisasm(pe, previewSize);
-	myDisasm.init(startOff, pe->getBitMode());
-	myDisasm.fillTable();
-
-	QFile fOut(path);
-	if (fOut.open(QFile::WriteOnly | QFile::Text) == false) {
+	if (!peHndl->exportDisasm(path, startOff, previewSize)) {
 		QMessageBox::warning(this, "Error", "Dumping section failed!");
 		return;
 	}
-	QTextStream disasmStream(&fOut);
-	for (int index = 0; index < myDisasm.chunksCount(); ++index ) {
-		QString str = myDisasm.mnemStr(index);
-		if (myDisasm.isBranching(index)) {
-			str = myDisasm.translateBranching(index);
-		}
-		
-		//resolve target functions:
-		bool isOk = false;
-		const offset_t tRva =  myDisasm.getTargetRVA(index, isOk);
-		QString funcName = "";
-		QString refStr = "";
-		if (isOk) {
-			funcName = peHndl->importDirWrapper.thunkToFuncName(tRva, false);
-			if (funcName.length() == 0 ) {
-				funcName = peHndl->delayImpDirWrapper.thunkToFuncName(tRva, false);
-			}
-			refStr = myDisasm.getStringAt(tRva);
-		}
-		
-		offset_t VA = pe->rvaToVa(myDisasm.getRvaAt(index));
-		QString vaStr = QString::number(VA, 16);
-		
-		// stream to the file:
-		disasmStream << vaStr << " : " <<  str;
-		if (funcName.length()) {
-			disasmStream << " : " <<  funcName;
-		}
-		else if (refStr.length()) {
-			disasmStream << " : " <<  refStr;
-		}
-		disasmStream << "\n";
-		if (myDisasm.isBranching(index)) {
-			disasmStream << "\n"; // add a separator line
-		}
-	}
-	fOut.close();
-
 	QMessageBox::information(this, "Done!", "Dumped section disasembly: "+ selectedSection->mappedName +"\ninto: " + path);
 	return;
 }

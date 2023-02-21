@@ -3,6 +3,7 @@
 
 #include "../base/PeHandlersManager.h"
 #include <bearparser/bearparser.h>
+#include "../disasm/PeDisasm.h"
 
 using namespace sig_ma;
 using namespace pe;
@@ -1192,5 +1193,63 @@ bool PeHandler::markedBranching(offset_t cRva, offset_t tRva)
 	markedOrigin = tRva;
 
 	emit marked();
+	return true;
+}
+
+bool PeHandler::exportDisasm(const QString &path, const offset_t startOff, const size_t previewSize)
+{
+	PEFile *pe = this->getPe();
+	if (!pe) return false;
+	
+	if (!pe->getContentAt(startOff, previewSize)) {
+		return false;
+	}
+	
+	QFile fOut(path);
+	if (fOut.open(QFile::WriteOnly | QFile::Text) == false) {
+		return false;
+	}
+	
+	pe_bear::PeDisasm myDisasm(pe, previewSize);
+	myDisasm.init(startOff, pe->getBitMode());
+	myDisasm.fillTable();
+
+	QTextStream disasmStream(&fOut);
+	for (int index = 0; index < myDisasm.chunksCount(); ++index ) {
+		QString str = myDisasm.mnemStr(index);
+		if (myDisasm.isBranching(index)) {
+			str = myDisasm.translateBranching(index);
+		}
+
+		//resolve target functions:
+		bool isOk = false;
+		const offset_t tRva =  myDisasm.getTargetRVA(index, isOk);
+		QString funcName = "";
+		QString refStr = "";
+		if (isOk) {
+			funcName = importDirWrapper.thunkToFuncName(tRva, false);
+			if (funcName.length() == 0 ) {
+				funcName = delayImpDirWrapper.thunkToFuncName(tRva, false);
+			}
+			refStr = myDisasm.getStringAt(tRva);
+		}
+		
+		offset_t VA = pe->rvaToVa(myDisasm.getRvaAt(index));
+		QString vaStr = QString::number(VA, 16);
+		
+		// stream to the file:
+		disasmStream << vaStr << " : " <<  str;
+		if (funcName.length()) {
+			disasmStream << " : " <<  funcName;
+		}
+		else if (refStr.length()) {
+			disasmStream << " : " <<  refStr;
+		}
+		disasmStream << "\n";
+		if (myDisasm.isBranching(index)) {
+			disasmStream << "\n"; // add a separator line
+		}
+	}
+	fOut.close();
 	return true;
 }

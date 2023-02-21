@@ -188,6 +188,8 @@ public:
 	bool setDisplayedEP();
 	void undoDisplayOffset();
 
+	bool exportDisasm(const QString &path, const offset_t startOff, const size_t previewSize);
+
 	/* File name wrappers */
 	QString getFullName() { return this->m_fileBuffer->getFileName(); }
 
@@ -204,6 +206,7 @@ public:
 		QFileInfo fileInfo(path);
 		return fileInfo.absoluteDir().absolutePath();
 	}
+	
 //--------
 	/* wrappers for PE structures */
 	DosHdrWrapper dosHdrWrapper;
