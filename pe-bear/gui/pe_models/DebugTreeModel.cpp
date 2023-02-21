@@ -5,68 +5,111 @@
 
 #define NOT_FILLED  "-"
 
+int DebugTreeModel::columnCount(const QModelIndex &parent) const
+{
+	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
+	if (!dbgWrap) return 0;
+	ExeNodeWrapper* entry = dbgWrap->getEntryAt(0);
+	if (!entry) return 0;
+	uint32_t cntr = entry->getFieldsCount() + ADDED_COLS_NUM;
+	return cntr;
+}
+
 QVariant DebugTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role != Qt::DisplayRole) return QVariant();
-
 	switch (section) {
 		case OFFSET: return "Offset";
 		case NAME: return "Name";
-		case VALUE : return "Value";
-		case VALUE2: return "Meaning";
 	}
-	return QVariant();
+	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
+	if (!dbgWrap) return QVariant();
+
+	int32_t fID = this->columnToFID(section);
+	return dbgWrap->getFieldName(0, fID);
+}
+
+ExeElementWrapper* DebugTreeModel::wrapperAt(QModelIndex index) const
+{
+	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
+	if (!dbgWrap) return NULL;
+	return dbgWrap->getEntryAt(index.row());
 }
 
 QVariant DebugTreeModel::data(const QModelIndex &index, int role) const
 {
-	DebugDirWrapper* wrap = dynamic_cast<DebugDirWrapper*>(wrapper());
-	if (!wrap) return QVariant();
+	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
+	if (!dbgWrap) return QVariant();
 
 	int column = index.column();
 	if (role == Qt::ForegroundRole) return this->addrColor(index);
-	if (role == Qt::FontRole) {
-		if (this->containsOffset(index) || this->containsValue(index)) return offsetFont;
-	}
+
+	if (column != NAME && role == Qt::FontRole) return offsetFont;
 	if (role == Qt::ToolTipRole) return toolTip(index);
 
+	DebugDirEntryWrapper* entry =  dynamic_cast<DebugDirEntryWrapper*>(wrapperAt(index));
+	if (!entry) return QVariant();
+
+	//if (role == Qt::BackgroundColorRole && !entry->isValid()) return errColor;
 	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
-	int fId = getFID(index);
+
 	switch (column) {
 		case OFFSET: return QString::number(getFieldOffset(index), 16);
-		case NAME: return wrap->getFieldName(fId);
-		case VALUE2: 
-		{
-			bool isOk = false;
-			int val = wrap->getNumValue(fId, &isOk);
-			if (fId == DebugDirWrapper::TIMESTAMP) {
-				if (!isOk) return "";
-				return getDateString(val);
-			}
-			if (fId == DebugDirWrapper::TYPE) {
-				if (!isOk) return "";
-				return wrap->translateType(val);
-			}
-			return "";
-		}
+		case NAME: return entry->getName();
 	}
-	return dataValue(index);
+	bool isOk = false;
+	uint64_t val = entry->getNumValue(getFID(index), &isOk);
+	if (!isOk) return "UNK"; /* other type? */
+
+	return QString::number(val, 16);
 }
 
-QString DebugTreeModel::makeDockerTitle(uint32_t upId)
+bool DebugTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-	ExeNodeWrapper* node = dynamic_cast<ExeNodeWrapper*>(wrapper());
-	if (node == NULL) {
-		return "";
+	if (!index.isValid()) return false;
+
+	size_t fId = index.row();
+	uint32_t sID = this->columnToFID(index.column());
+
+	if (!wrapper()) return false;
+	
+	DebugDirEntryWrapper* entry =  dynamic_cast<DebugDirEntryWrapper*>(wrapperAt(index));
+	if (!entry) return false;
+
+	QString text = value.toString();
+
+	bool isModified = false;
+	offset_t offset = 0;
+	bufsize_t fieldSize = 0;
+
+	bool isOk = false;
+	ULONGLONG number = text.toLongLong(&isOk, 16);
+	if (!isOk) return false;
+
+	offset = entry->getFieldOffset(sID);
+	fieldSize = entry->getFieldSize(sID);
+
+	this->myPeHndl->backupModification(offset, fieldSize);
+	isModified = entry->setNumValue(sID, index.column(), number);
+
+	if (isModified) {
+		this->myPeHndl->setBlockModified(offset, fieldSize);
+		return true;
 	}
-	ExeNodeWrapper *childEntry = node->getEntryAt(0);
-	if (childEntry == NULL) {
-		return "";
-	}
-	return childEntry->getName();
+	this->myPeHndl->unbackupLastModification();
+	return false;
 }
 
-//-----------------------------------------------------------------------------------
+Qt::ItemFlags DebugTreeModel::flags(const QModelIndex &index) const
+{ 
+	if (!index.isValid())
+		return Qt::NoItemFlags;
+	int column = index.column();
+	if (column == NAME || column >= ADDED_COLS_NUM) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+//----------------------------------------------------------------------------
 
 int DebugRDSIEntryTreeModel::rowCount(const QModelIndex &parent) const
 {
@@ -78,8 +121,10 @@ ExeElementWrapper* DebugRDSIEntryTreeModel::wrapper() const
 {
 	if (!myPeHndl) return NULL;
 	
-	ExeNodeWrapper* subWr = myPeHndl->debugDirWrapper.getEntryAt(0);
-	return subWr;
+	ExeNodeWrapper* parentW = myPeHndl->debugDirWrapper.getEntryAt(this->parentId);
+	if (!parentW) return NULL;
+	
+	return parentW->getEntryAt(0);
 }
 
 ExeElementWrapper* DebugRDSIEntryTreeModel::wrapperAt(QModelIndex index) const
@@ -89,8 +134,7 @@ ExeElementWrapper* DebugRDSIEntryTreeModel::wrapperAt(QModelIndex index) const
 
 QVariant DebugRDSIEntryTreeModel::data(const QModelIndex &index, int role) const
 {
-	ExeElementWrapper *w = wrapperAt(index);
-	DebugDirCVEntryWrapper* wrap = dynamic_cast<DebugDirCVEntryWrapper*>(w);
+	DebugDirCVEntryWrapper* wrap = dynamic_cast<DebugDirCVEntryWrapper*>(wrapperAt(index));
 	if (!wrap) return QVariant();
 	
 	if (role == Qt::ForegroundRole) return this->addrColor(index);
@@ -123,12 +167,12 @@ QVariant DebugRDSIEntryTreeModel::data(const QModelIndex &index, int role) const
 			}
 			else if (fId == DebugDirCVEntryWrapper::F_CVDBG_PDB) {
 				//TODO: make some decent parsing here
-				char *str_ptr = (char*)w->getFieldPtr(fId);
+				char *str_ptr = (char*)wrap->getFieldPtr(fId);
 				if (!str_ptr) return QVariant();
 				return QString(str_ptr);
 			}
 			bool isOk = false;
-			uint64_t val = w->getNumValue(fId, &isOk);
+			uint64_t val = wrap->getNumValue(fId, &isOk);
 			if (isOk) {
 				return QString::number(val, 16);
 			}
