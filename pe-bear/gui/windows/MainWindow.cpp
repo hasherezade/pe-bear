@@ -455,15 +455,9 @@ void MainWindow::onExeHandlerAdded(PeHandler* hndl)
 {
 	if (hndl == NULL) return;
 
-	const QString loadInfo = "Loaded: "+ hndl->getFullName();
+	const QString loadInfo = "Loaded: " + hndl->getFullName();
 	this->statusBar.showMessage(loadInfo);
 	this->loadTagsForPe(hndl);
-	
-	// show warnings:
-	QStringList peInfo;
-	if (hndl->isPeAtypical(&peInfo)) {
-		QMessageBox::warning(this, "Warning", hndl->getFullName() + ":\n" + peInfo.join("\n"));
-	}
 }
 
 int MainWindow::openMultiplePEs(QStringList fNames)
@@ -913,6 +907,12 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 	if (hndl->getPe()->isTruncated()) {
 		QString alert = "The file: \n " + fName + "\n is too big and was loaded truncated!";
 		QMessageBox::StandardButton res = QMessageBox::warning(this, "Too big file!", alert, QMessageBox::Ok);
+	}
+	// show warnings:
+	QStringList peInfo;
+	if (hndl->isPeAtypical(&peInfo)) {
+		this->statusBar.showMessage("WARNING: " + hndl->getFullName() + ": " + peInfo.join(";"));
+		if (showAlert) QMessageBox::warning(this, "Warning", hndl->getFullName() + ":\n" + peInfo.join("\n"));
 	}
 	return hndl; 
 }
