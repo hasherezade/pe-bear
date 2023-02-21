@@ -314,7 +314,7 @@ void MainWindow::createActions()
 	dumpAllPEsSecAction = new QAction(QIcon(":/icons/dump.ico"), "Dump all sections to...", this);
 	connect(this->dumpAllPEsSecAction, SIGNAL(triggered()), this, SLOT(dumpSectionsFromAllPEs()));
 	
-	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), "Export disasembly to...", this);
+	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), "Export disassembly to...", this);
 	connect(this->exportAllPEsDisasmAction, SIGNAL(triggered()), this, SLOT(exportDisasmFromAllPEs()));
 	
 	setRegKeyAction = new QAction("Add to Explorer", this);
