@@ -20,7 +20,7 @@ QVariant DebugTreeModel::headerData(int section, Qt::Orientation orientation, in
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
 		case OFFSET: return "Offset";
-		case NAME: return "Name";
+		case NAME: return "TypeName";
 	}
 	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
 	if (!dbgWrap) return QVariant();
@@ -105,7 +105,7 @@ Qt::ItemFlags DebugTreeModel::flags(const QModelIndex &index) const
 	if (!index.isValid())
 		return Qt::NoItemFlags;
 	int column = index.column();
-	if (column == NAME || column >= ADDED_COLS_NUM) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	if (column >= ADDED_COLS_NUM) return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
