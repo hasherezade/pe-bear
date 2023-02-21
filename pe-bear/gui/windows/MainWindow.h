@@ -48,6 +48,7 @@ public slots:
 	void runNewInstance();
 	void unloadAllPEs();
 	void dumpSectionsFromAllPEs();
+	void exportDisasmFromAllPEs();
 	void open();
 	void closePE(PeHandler*);
 	void reload(PeHandler*);
@@ -205,7 +206,8 @@ private:
 		*defaultFontsAction,
 		*zoomInAction, *zoomOutAction, *zoomDefault,
 		*darkStyle, *defaultStyle,
-		*dumpAllPEsSecAction;
+		*dumpAllPEsSecAction,
+		*exportAllPEsDisasmAction;
 
 	ExeDependentAction *dumpAllSecAction,
 		*addSecAction,

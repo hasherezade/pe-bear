@@ -293,8 +293,11 @@ void MainWindow::createActions()
 	unloadAllAction = new QAction(QIcon(":/icons/DeleteAll.ico"), "&Unload All", this);
 	connect(this->unloadAllAction, SIGNAL(triggered()), this, SLOT(unloadAllPEs()));
 
-	dumpAllPEsSecAction = new QAction(QIcon(":/icons/dump.ico"), "Dump all sections from PEs to...", this);
+	dumpAllPEsSecAction = new QAction(QIcon(":/icons/dump.ico"), "Dump all sections to...", this);
 	connect(this->dumpAllPEsSecAction, SIGNAL(triggered()), this, SLOT(dumpSectionsFromAllPEs()));
+	
+	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), "Export disasembly to...", this);
+	connect(this->exportAllPEsDisasmAction, SIGNAL(triggered()), this, SLOT(exportDisasmFromAllPEs()));
 	
 	setRegKeyAction = new QAction("Add to Explorer", this);
 	this->setRegKeyAction->setCheckable(true);
@@ -404,6 +407,7 @@ void MainWindow::createMenus()
 	this->fileMenu->addSeparator();
 	this->fromLoadedPEsMenu = this->fileMenu->addMenu("From loaded PEs...");
 	this->fromLoadedPEsMenu->addAction(this->dumpAllPEsSecAction);
+	this->fromLoadedPEsMenu->addAction(this->exportAllPEsDisasmAction);
 }
 
 void MainWindow::startTimer()
@@ -628,6 +632,47 @@ void MainWindow::dumpSectionsFromAllPEs()
 	}
 	if (dumped > 0) {
 		QMessageBox::information(this, "Done!", "Dumped sections from: " + QString::number(dumped)
+			+ " PEs into:\n" + dirPath);
+	}
+}
+
+void MainWindow::exportDisasmFromAllPEs()
+{
+	std::map<PEFile*, PeHandler*> &handlers = m_PEHandlers.getHandlersMap();
+	const size_t count = handlers.size();
+	if (count == 0) return;
+ 
+ 	QString dirPath = chooseDumpOutDir(NULL);
+	if (!dirPath.length()) return;
+	
+	size_t dumped = 0;
+	std::map<PEFile*, PeHandler*>::iterator iter;
+	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
+		PeHandler *hndl = iter->second;
+		if (!hndl) continue;
+		
+		PEFile *pe = hndl->getPe();
+		if (!pe) continue;
+		
+		DWORD ep = pe->getEntryPoint(Executable::RAW);
+		SectionHdrWrapper* sec = pe->getSecHdrAtOffset(ep, Executable::RAW, true);
+		if (!sec) continue;
+
+		const QString peName = hndl->getShortName();
+		const QString secName = sec->mappedName;
+		const QString fileName = dirPath + QDir::separator() + hndl->getShortName() + "[" + secName + "].txt";
+
+		const offset_t startOff = sec->getContentOffset(Executable::RAW, true);
+		const size_t previewSize = sec->getContentSize(Executable::RAW, true);
+		if (hndl->exportDisasm(fileName, startOff, previewSize)) {
+			dumped++;
+		}
+	}
+	if (dumped != count) {
+		QMessageBox::warning(this, "Error", "Exporting disasm from some of the PEs failed!");
+	}
+	if (dumped > 0) {
+		QMessageBox::information(this, "Done!", "Exported disasm from: " + QString::number(dumped)
 			+ " PEs into:\n" + dirPath);
 	}
 }
@@ -994,7 +1039,6 @@ void MainWindow::savePE(PeHandler* selectedPeHndl)
 QString MainWindow::chooseDumpOutDir(PeHandler *selectedPeHndl)
 {
 	const QString EMPTY_STR = "";
-	//if (!selectedPeHndl) return EMPTY_STR;
 	//---
 	QFileDialog dialog;
 	dialog.setFileMode(QFileDialog::Directory);
@@ -1007,7 +1051,9 @@ QString MainWindow::chooseDumpOutDir(PeHandler *selectedPeHndl)
 	dialog.setDirectory(dirPathStr);
 	int ret = dialog.exec();
 
-	if((QDialog::DialogCode) ret != QDialog::Accepted) return EMPTY_STR;
+	if ((QDialog::DialogCode) ret != QDialog::Accepted) {
+		return EMPTY_STR;
+	}
 	//---
 	QDir dir = dialog.directory();
 	QString fName = dir.absolutePath();
