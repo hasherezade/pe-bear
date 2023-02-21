@@ -1,4 +1,5 @@
 #include "BoundImpTreeModel.h"
+#include "../../DateDisplay.h"
 
 //-----------------------------------------------------------------------------
 
@@ -48,6 +49,21 @@ QVariant BoundImpTreeModel::data(const QModelIndex &index, int role) const
 		case NAME: return wrap->getName();
 	}
 	return dataValue(index);
+}
+
+QVariant BoundImpTreeModel::toolTip(const QModelIndex &index) const
+{
+    BoundEntryWrapper* entry =  dynamic_cast<BoundEntryWrapper*>(wrapperAt(index));
+	if (!entry) return QVariant();
+	
+	const int fieldID = getFID(index);
+	if (fieldID == BoundEntryWrapper::TIMESTAMP) {
+		bool isOk = false;
+		int val = entry->getNumValue(fieldID, &isOk);
+		if (!isOk) return QVariant();
+		return getDateString(val);
+	}
+	return QVariant();   
 }
 
 bool BoundImpTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
