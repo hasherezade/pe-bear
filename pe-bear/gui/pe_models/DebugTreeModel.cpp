@@ -38,17 +38,14 @@ ExeElementWrapper* DebugTreeModel::wrapperAt(QModelIndex index) const
 
 QVariant DebugTreeModel::data(const QModelIndex &index, int role) const
 {
-	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
-	if (!dbgWrap) return QVariant();
+	DebugDirEntryWrapper* entry =  dynamic_cast<DebugDirEntryWrapper*>(wrapperAt(index));
+	if (!entry) return QVariant();
 
 	int column = index.column();
 	if (role == Qt::ForegroundRole) return this->addrColor(index);
 
 	if (column != NAME && role == Qt::FontRole) return offsetFont;
 	if (role == Qt::ToolTipRole) return toolTip(index);
-
-	DebugDirEntryWrapper* entry =  dynamic_cast<DebugDirEntryWrapper*>(wrapperAt(index));
-	if (!entry) return QVariant();
 
 	//if (role == Qt::BackgroundColorRole && !entry->isValid()) return errColor;
 	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
@@ -62,6 +59,25 @@ QVariant DebugTreeModel::data(const QModelIndex &index, int role) const
 	if (!isOk) return "UNK"; /* other type? */
 
 	return QString::number(val, 16);
+}
+
+QVariant DebugTreeModel::toolTip(const QModelIndex &index) const
+{
+	DebugDirEntryWrapper* entry =  dynamic_cast<DebugDirEntryWrapper*>(wrapperAt(index));
+	if (!entry) return QVariant();
+	
+	const int fieldID = getFID(index);
+	QString translated = entry->translateFieldContent(fieldID);
+	if (translated.length()) {
+		return translated;
+	}
+	if (fieldID == DebugDirEntryWrapper::TIMESTAMP) {
+		bool isOk = false;
+		int val = entry->getNumValue(fieldID, &isOk);
+		if (!isOk) return QVariant();
+		return getDateString(val);
+	}
+	return QVariant();
 }
 
 bool DebugTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
