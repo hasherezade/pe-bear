@@ -55,9 +55,7 @@ public:
 	bool isPeValid() const
 	{
 		if (!m_PE) return false;
-		if (m_PE->getSectionsCount() == 0) {
-			return false;
-		}
+
 		offset_t lastRva = this->m_PE->getLastMapped(Executable::RVA);
 		if (lastRva != m_PE->getImageSize()) {
 			return false;
@@ -72,6 +70,10 @@ public:
 		if (!isPeValid()) {
 			isAtypical = true;
 			if (warnings) (*warnings) << "The executable may not run: the ImageSize size doesn't fit sections";
+		}
+		if (m_PE->getSectionsCount() == 0) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The PE has no sections";
 		}
 		const size_t mappedSecCount = m_PE->getSectionsCount(true);
 		// check for unaligned sections:
