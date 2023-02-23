@@ -1,56 +1,97 @@
-os:
-  - Visual Studio 2019
+version: '{branch}.{build}'
+skip_tags: true
 
-platform: x64
+image:
+- Visual Studio 2019
+- macos
+
+matrix:
+  exclude:
+    - platform: x86
+      image: macOS
+
+platform:
   - x64
+  - x86
+  
+configuration: Release
 
 branches:
   only:
-    - main
-   
-install:
-  - git submodule update --init --recursive
-  - set PATH=C:\Program Files\CMake\bin;%PATH%
+    - master
 
 build:
   verbosity: detailed
 
-configuration:
-  - Release
-  
 environment:
-  artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(CONFIGURATION)
-  matrix:
-    - env_arch: "x64"
-      QT5: C:\Qt\5.15.2\msvc2019_64
-    - env_arch: "x86"
-      QT5: C:\Qt\5.15.2\msvc2019
+  artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(PLATFORM)
+  buildConfig: $(CONFIGURATION)
+  buildPlatform: $(PLATFORM)
 
-before_build:
-  - set PATH=%PATH%;%QT5%\bin;%QT5%\lib\cmake
-  - set Qt5Core_DIR=%QT5%
-  - mkdir build
-  - cd build
-  - if [%env_arch%]==[x64] (
-    cmake .. -A x64 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
-  - if [%env_arch%]==[x86] (
-    cmake .. -A Win32 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
+for:
+  -
+    matrix:
+      only:
+        - image: macOS
+
     
-build_script:
-  - cmake --build . --config %CONFIGURATION%
-  
-after_build:
-  - mkdir %artifactName%
-  - cp -r pe-bear/%CONFIGURATION%/* %artifactName%
-  - cp %QT5%\bin\Qt5Core.dll %artifactName%
-  - cp %QT5%\bin\Qt5Gui.dll %artifactName%
-  - cp %QT5%\bin\Qt5Widgets.dll %artifactName%
-  - mkdir %artifactName%\platforms
-  - mkdir %artifactName%\styles
-  - mkdir %artifactName%\imageformats
-  - cp %QT5%\plugins\platforms\qwindows.dll %artifactName%\platforms
-  - cp %QT5%\plugins\styles\qwindowsvistastyle.dll %artifactName%\styles
-  - cp %QT5%\plugins\imageformats\qico.dll %artifactName%\imageformats
-  
-artifacts:
-- path: build\%artifactName%
+    install:
+     - git submodule update --init --recursive
+     - export PATH="$HOME/Qt/5.15.2/clang_64/bin:$PATH"
+     - export LDFLAGS="-L/usr/local/opt/qt/lib"
+     - export CPPFLAGS="-I/usr/local/opt/qt/include"
+     - export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
+
+    before_build:
+      - cmake --version
+      - qmake -v
+
+    build_script:
+      - ./macos_wrap.sh macdeployqt
+
+    after_build:
+       - ls
+
+    artifacts:
+       - path: PE-bear.app.zip
+       
+  -
+    matrix:
+      only:
+        - image: Visual Studio 2019
+    
+    install:
+     - git submodule update --init --recursive
+     - if [%buildPlatform%]==[x64] (
+       set QT5=C:\Qt\5.15.2\msvc2019_64)
+     - if [%buildPlatform%]==[x86] (
+       set QT5=C:\Qt\5.15.2\msvc2019)
+     - set PATH=%PATH%;%QT5%\bin;%QT5%\lib\cmake
+     - set Qt5Core_DIR=%QT5%
+     
+    before_build:
+     - mkdir build
+     - cd build
+     
+    build_script:
+      - if [%buildPlatform%]==[x64] (
+        cmake .. -A x64 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
+      - if [%buildPlatform%]==[x86] (
+        cmake .. -A Win32 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
+      - cmake --build . --config %buildConfig%
+
+    after_build:
+     - mkdir %artifactName%
+     - cp -r pe-bear/%buildConfig%/* %artifactName%
+     - cp "%QT5%\bin\Qt5Core.dll" %artifactName%
+     - cp "%QT5%\bin\Qt5Gui.dll" %artifactName%
+     - cp "%QT5%\bin\Qt5Widgets.dll" %artifactName%
+     - mkdir %artifactName%\platforms
+     - mkdir %artifactName%\styles
+     - mkdir %artifactName%\imageformats
+     - cp "%QT5%\plugins\platforms\qwindows.dll" %artifactName%\platforms
+     - cp "%QT5%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles
+     - cp "%QT5%\plugins\imageformats\qico.dll" %artifactName%\imageformats
+
+    artifacts:
+     - path: build\%artifactName%
