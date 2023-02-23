@@ -18,7 +18,7 @@ configuration: Release
 
 branches:
   only:
-    - master
+    - main
 
 build:
   verbosity: detailed
