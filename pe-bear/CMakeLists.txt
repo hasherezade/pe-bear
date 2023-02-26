@@ -5,6 +5,7 @@ project (PE-bear)
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
 set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
 set(COMMIT_HASH "" CACHE STRING "Commit Hash")
+set(SCHEME_NAME "net.hasherezade.pe-bear")
 
 message(STATUS "sigfind_dir='${SIGFIND_DIR}'")
 message(STATUS "sigfind_lib='${SIGFIND_LIB}'")
@@ -14,6 +15,8 @@ message(STATUS "parser_lib='${PARSER_LIB}'")
 
 message(STATUS "disasm_dir='${DISASM_DIR}'")
 message(STATUS "disasm_lib='${DISASM_DIR}'")
+
+include(GNUInstallDirs)
 
 if(USE_QT4)
 	find_package (Qt4 REQUIRED)
@@ -283,16 +286,31 @@ else()
 	target_link_libraries (${PROJECT_NAME} Qt5::Core Qt5::Widgets )
 endif()
 
-IF(MACOSX)
-	install(TARGETS ${PROJECT_NAME}
-		BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-		RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-		COMPONENT ${PROJECT_NAME}
-	)
-ELSE()
-	install(TARGETS ${PROJECT_NAME}
-		RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-		COMPONENT ${PROJECT_NAME}
-	)
-ENDIF()
+install(TARGETS ${PROJECT_NAME}
+	BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	COMPONENT ${PROJECT_NAME}
+)
 
+install(FILES "${CMAKE_SOURCE_DIR}/logo/main_ico.png"
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/pixmaps"
+	RENAME "${SCHEME_NAME}.png"
+)
+
+configure_file("${CMAKE_SOURCE_DIR}/xdg/launcher.desktop.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.desktop"
+	@ONLY
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.desktop"
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
+	RENAME "${SCHEME_NAME}.desktop"
+)
+
+configure_file("${CMAKE_SOURCE_DIR}/xdg/appdata.metainfo.xml.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.metainfo.xml"
+	@ONLY
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.metainfo.xml"
+	DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
+	RENAME "${SCHEME_NAME}.metainfo.xml"
+)

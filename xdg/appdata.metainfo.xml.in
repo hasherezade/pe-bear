@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+    <id>@SCHEME_NAME@</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-2.0-or-later</project_license>
+    <name>@PROJECT_NAME@</name>
+    <summary>Portable Executable reversing tool with a friendly GUI</summary>
+    <description>
+        <p>PE-bear is a multiplatform reversing tool for PE (Portable Executable) files. Its objective is to deliver fast and flexible "first view" for malware analysts, stable and capable to handle malformed PE files.</p>
+    </description>
+    <screenshots>
+        <screenshot type="default">
+            <caption>PE-bear Linux sections</caption>
+            <image>https://hshrzd.files.wordpress.com/2013/06/pe-bear_linux-sections.png</image>
+        </screenshot>
+    </screenshots>
+    <url type="homepage">https://hshrzd.wordpress.com/pe-bear/</url>
+    <url type="bugtracker">https://github.com/hasherezade/pe-bear/issues</url>
+    <update_contact>https://github.com/hasherezade</update_contact>
+    <launchable type="desktop-id">@SCHEME_NAME@.desktop</launchable>
+    <developer_name>hasherezade</developer_name>
+    <content_rating type="oars-1.0" />
+</component>
