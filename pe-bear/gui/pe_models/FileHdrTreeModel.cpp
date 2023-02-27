@@ -114,7 +114,7 @@ bufsize_t FileHdrTreeItem::getContentSize() const
 
 //-------------------
 FileHdrCharactTreeItem::FileHdrCharactTreeItem(PeHandler* peHndl, level_t level, DWORD characteristics, FileHdrTreeItem *parent)
-	: FileHdrTreeItem(peHndl, level, role = FileHdrWrapper::CHARACT, parent)
+	: FileHdrTreeItem(peHndl, level, FileHdrWrapper::CHARACT, parent)
 {
 	if (!myPeHndl) return;
 
