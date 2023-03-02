@@ -259,18 +259,33 @@ int OptionalHdrTreeItem::columnCount() const { 	return MAX_COL; }
 QVariant OptionalHdrTreeItem::background(int column) const
 {
 	if (!m_PE) return QVariant();
-	if (role == OptHdrWrapper::EP && column == COL_VALUE) {
-		if (!m_PE->getContentAt(m_PE->getEntryPoint(Executable::RAW), 1)) {
-			return errColor;
+	
+	QColor changeCol = Qt::cyan;
+	changeCol.setAlpha(50);
+
+	if (column == COL_VALUE) {
+		if (role == OptHdrWrapper::IMAGE_SIZE) {
+			bool isOk;
+			uint64_t rawImgSize = myPeHndl->optHdrWrapper.getNumValue(OptHdrWrapper::IMAGE_SIZE, &isOk);
+			if (isOk && (m_PE->getImageSize() != rawImgSize)) {
+				return changeCol;
+			}
+		}
+		if (role == OptHdrWrapper::EP) {
+			if (!m_PE->getContentAt(m_PE->getEntryPoint(Executable::RAW), 1)) {
+				return errColor;
+			}
+		}
+		
+		if (role == OptHdrWrapper::CHECKSUM) {
+			bool isOk;
+			uint64_t checksum = myPeHndl->optHdrWrapper.getNumValue(OptHdrWrapper::CHECKSUM, &isOk);
+			if (isOk) {
+				if (this->myPeHndl->getCurrentChecksum() != QString::number(checksum, 16)) return errColor;
+			}
 		}
 	}
-	if (role == OptHdrWrapper::CHECKSUM && column == COL_VALUE) {
-		bool isOk;
-		uint64_t checksum = myPeHndl->optHdrWrapper.getNumValue(OptHdrWrapper::CHECKSUM, &isOk);
-		if (isOk) {
-			if (this->myPeHndl->getCurrentChecksum() != QString::number(checksum, 16)) return errColor;
-		}
-	}
+
 	if (level == DETAILS && (column >= COL_VALUE && column <= COL_VALUE2)) {
 		QColor flagsColorT = addrColors.flagsColor();
 		flagsColorT.setAlpha(addrColors.flagsAlpha());
