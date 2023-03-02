@@ -484,6 +484,9 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 	bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
 	this->modifHndl.backupModification(modOffset, modSize, false);
 	m_PE->setImageSize(newSize);
+
+	updatePeOnResized();
+	emit modified();
 	return true;
 }
 
