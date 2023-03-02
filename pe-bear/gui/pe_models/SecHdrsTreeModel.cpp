@@ -203,7 +203,8 @@ QVariant SecTreeItem::toolTip(int column) const
 				const offset_t hdrOffset = sec->getContentOffset(Executable::RAW, false);
 				const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
 				if (hdrOffset != mappedOffset) {
-					return "mapped offset:\n" + QString::number(mappedOffset, 16).toUpper();;
+					const QString offsetStr = (mappedOffset != INVALID_ADDR) ? QString::number(mappedOffset, 16).toUpper() : "<invalid>";
+					return "mapped offset:\n" + offsetStr;
 				}
 			}
 		}
