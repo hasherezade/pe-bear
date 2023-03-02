@@ -103,7 +103,7 @@ public:
 			if (isOk) {
 				if ((flags & pe::COMIMAGE_FLAGS_ILONLY) == 0) {
 					isAtypical = true;
-					if (warnings) (*warnings) << "This is a mixed mode .NET file: may contain native code.";
+					if (warnings) (*warnings) << "This .NET file may contain native code.";
 				}
 			}
 		}
