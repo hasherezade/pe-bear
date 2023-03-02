@@ -121,7 +121,7 @@ void PeHandler::associateWrappers()
 	dataDirWrappers[DIR_COM_DESCRIPTOR] = &clrDirWrapper;
 }
 
-bool PeHandler::hasDirectory(dir_entry dirNum)
+bool PeHandler::hasDirectory(dir_entry dirNum) const
 {
 	if (dirNum >= DIR_ENTRIES_COUNT) return false;
 

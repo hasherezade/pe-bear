@@ -64,7 +64,7 @@ public:
 		return true;
 	}
 	
-	bool isPeAtypical(QStringList *warnings = NULL) const
+	bool isPeAtypical(QStringList *warnings = NULL)
 	{
 		bool isAtypical = false;
 		if (!isPeValid()) {
@@ -94,6 +94,17 @@ public:
 				isAtypical = true;
 				if (warnings) (*warnings) << "Contains sections misaligned to FileAlignment";
 				break;
+			}
+		}
+		
+		if (hasDirectory(pe::DIR_COM_DESCRIPTOR)) {
+			bool isOk;
+			uint64_t flags = this->clrDirWrapper.getNumValue(ClrDirWrapper::FLAGS, &isOk);
+			if (isOk) {
+				if ((flags & pe::COMIMAGE_FLAGS_ILONLY) == 0) {
+					isAtypical = true;
+					if (warnings) (*warnings) << "This is a mixed mode .NET file: may contain native code.";
+				}
 			}
 		}
 		return isAtypical;
@@ -126,7 +137,7 @@ public:
 		return true;
 	}
 
-	bool hasDirectory(pe::dir_entry dirNum);
+	bool hasDirectory(pe::dir_entry dirNum) const;
 
 	QString getCurrentSHA256() { return getCurrentHash(CalcThread::SHA256); }
 	QString getCurrentMd5() { return getCurrentHash(CalcThread::MD5); }
