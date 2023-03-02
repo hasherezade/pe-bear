@@ -85,7 +85,12 @@ public:
 			SectionHdrWrapper *sec = m_PE->getSecHdr(i);
 			const offset_t hdrOffset = sec->getContentOffset(Executable::RAW, false);
 			const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
-			if (hdrOffset != mappedOffset) {
+			if (mappedOffset == INVALID_ADDR) {
+				isAtypical = true;
+				if (warnings) (*warnings) << "The PE may be truncated. Some sections are outside the file scope.";
+				break;
+			}
+			else if (hdrOffset != mappedOffset) {
 				isAtypical = true;
 				if (warnings) (*warnings) << "Contains sections misaligned to FileAlignment";
 				break;
