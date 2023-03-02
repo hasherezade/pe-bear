@@ -267,8 +267,6 @@ void DetailsTab::onFitSections()
 	}
 	if (fileToResize) {
 		fOk = this->myPeHndl->resize(lastRaw);
-	} else {
-		if (iOk) this->myPeHndl->modified();
 	}
 
 	if (fOk && iOk) {
