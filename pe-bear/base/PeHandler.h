@@ -75,6 +75,22 @@ public:
 			isAtypical = true;
 			if (warnings) (*warnings) << "The PE has no sections";
 		}
+		bool isOk = false;
+		const uint64_t machineID = fileHdrWrapper.getNumValue(FileHdrWrapper::MACHINE, &isOk);
+		if (isOk && machineID == 0) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The executable won't run: Machine ID not set";
+		}
+		const uint64_t subsys = this->optHdrWrapper.getNumValue(OptHdrWrapper::SUBSYS, &isOk);
+		if (isOk && subsys == 0) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The executable won't run: Subsystem not set";
+		}
+		const uint64_t optHdrMagic = this->optHdrWrapper.getNumValue(OptHdrWrapper::MAGIC, &isOk);
+		if (isOk && optHdrMagic == 0) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The executable won't run: OptHdr Magic not set";
+		}
 		const size_t mappedSecCount = m_PE->getSectionsCount(true);
 		// check for unaligned sections:
 		if (mappedSecCount != m_PE->getSectionsCount(false)) {
@@ -98,7 +114,6 @@ public:
 		}
 		
 		if (hasDirectory(pe::DIR_COM_DESCRIPTOR)) {
-			bool isOk;
 			uint64_t flags = this->clrDirWrapper.getNumValue(ClrDirWrapper::FLAGS, &isOk);
 			if (isOk) {
 				if ((flags & pe::COMIMAGE_FLAGS_ILONLY) == 0) {
