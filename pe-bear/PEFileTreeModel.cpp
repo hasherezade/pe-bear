@@ -754,7 +754,7 @@ QVariant PEFileTreeModel::data(const QModelIndex &index, int role) const
 	PEFileTreeItem *item = static_cast<PEFileTreeItem*>(index.internalPointer());
 	if (item == NULL) return QVariant();
 	switch (role) {
-		case Qt::BackgroundColorRole : return item->background(index.column());
+		case Qt::BackgroundRole : return item->background(index.column());
 		case Qt::SizeHintRole :
 		{
 			return QVariant(); //get default

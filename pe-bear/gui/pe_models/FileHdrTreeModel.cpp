@@ -206,7 +206,7 @@ QVariant FileHdrTreeModel::data(const QModelIndex &index, int role) const
 	FileHdrTreeItem *item = static_cast<FileHdrTreeItem*>(index.internalPointer());
 	if (item == NULL) return QVariant();
 
-	if (role == Qt::BackgroundColorRole)
+	if (role == Qt::BackgroundRole)
 		return item->background(index.column());
 
 	if (role == Qt::SizeHintRole) {

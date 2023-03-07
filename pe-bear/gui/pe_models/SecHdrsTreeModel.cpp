@@ -405,7 +405,7 @@ QVariant SecHdrsTreeModel::data(const QModelIndex &index, int role) const
 	//if (role == Qt::ToolTipRole) return toolTip(index);
 
 	switch (role) {
-		case Qt::BackgroundColorRole :
+		case Qt::BackgroundRole :
 			return item->background(index.column());
 		case Qt::ForegroundRole:
 			return item->foreground(index.column());

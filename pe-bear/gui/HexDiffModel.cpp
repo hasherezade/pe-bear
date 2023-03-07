@@ -213,7 +213,7 @@ QVariant HexDiffModel::data(const QModelIndex &index, int role) const
 	if (role == Qt::ForegroundRole) {
 		return QVariant();
 	}
-	if (role == Qt::BackgroundColorRole) {
+	if (role == Qt::BackgroundRole) {
 		ContentIndx otherIndx = (myIndx == LEFT) ? RIGHT : LEFT;
 		bufsize_t minSize = (contentSize[LEFT] < contentSize[RIGHT]) ? contentSize[LEFT] : contentSize[RIGHT];
 		

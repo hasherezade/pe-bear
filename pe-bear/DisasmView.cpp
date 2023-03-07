@@ -1059,7 +1059,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 	offset_t tRva =  myDisasm.getTargetRVA(y, isOk);
 
 	if (isClickable(index) && isOk) {
-		if (role == Qt::BackgroundColorRole) return settings.branchingColor;
+		if (role == Qt::BackgroundRole) return settings.branchingColor;
 				
 		int32_t lval =  myDisasm.getTargetDelta(y);
 		bool isDelay = false;

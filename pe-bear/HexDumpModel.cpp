@@ -156,7 +156,7 @@ QVariant HexDumpModel::data(const QModelIndex &index, int role) const
 	if (offset >= myPeHndl->hoveredOffset 
 		&& offset < (myPeHndl->hoveredOffset + myPeHndl->hoveredSize))
 	{
-		if (role == Qt::BackgroundColorRole) return settings.hoveredColor;
+		if (role == Qt::BackgroundRole) return settings.hoveredColor;
 	}
 	
 	if (role == Qt::FontRole) {

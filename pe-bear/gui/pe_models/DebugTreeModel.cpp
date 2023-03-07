@@ -47,7 +47,7 @@ QVariant DebugTreeModel::data(const QModelIndex &index, int role) const
 	if (column != NAME && role == Qt::FontRole) return offsetFont;
 	if (role == Qt::ToolTipRole) return toolTip(index);
 
-	//if (role == Qt::BackgroundColorRole && !entry->isValid()) return errColor;
+	//if (role == Qt::BackgroundRole && !entry->isValid()) return errColor;
 	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
 
 	switch (column) {

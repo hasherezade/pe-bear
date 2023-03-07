@@ -194,7 +194,7 @@ QVariant ClrTreeModel::data(const QModelIndex &index, int role) const
 	ClrHdrTreeItem *item = static_cast<ClrHdrTreeItem*>(index.internalPointer());
 	if (item == NULL) return QVariant();
 
-	if (role == Qt::BackgroundColorRole)
+	if (role == Qt::BackgroundRole)
 		return item->background(index.column());
 
 	if (role == Qt::SizeHintRole) {

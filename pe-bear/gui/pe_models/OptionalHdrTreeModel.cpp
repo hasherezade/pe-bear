@@ -469,7 +469,7 @@ QVariant OptionalHdrTreeModel::data(const QModelIndex &index, int role) const
 	switch (role) {
 		case Qt::FontRole :
 			return item->font(index.column());
-		case Qt::BackgroundColorRole :
+		case Qt::BackgroundRole :
 			return item->background(index.column());
 		case Qt::ForegroundRole :
 			return item->foreground(index.column());

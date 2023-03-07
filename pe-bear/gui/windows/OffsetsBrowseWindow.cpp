@@ -45,7 +45,7 @@ QVariant OffsetsBrowseModel::data(const QModelIndex &index, int role) const
 	Comment *cmnt = cHndl.commentsVec[row];
 	if (cmnt == NULL) return QVariant();
 
-	if (role == Qt::BackgroundColorRole && column == COL_OFFSET) {
+	if (role == Qt::BackgroundRole && column == COL_OFFSET) {
 		Executable::addr_type aT = addrTypeAt(index);
 		if (m_PE->toRaw(cmnt->offset, aT) == INVALID_ADDR) return this->errColor;
 	}

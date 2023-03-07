@@ -213,7 +213,7 @@ QVariant RichHdrTreeModel::data(const QModelIndex &index, int role) const
 		return this->toolTip(index);
 	}
 
-	if (role == Qt::BackgroundColorRole)
+	if (role == Qt::BackgroundRole)
 		return item.background(index.column());
 
 	if ( role == Qt::SizeHintRole) {

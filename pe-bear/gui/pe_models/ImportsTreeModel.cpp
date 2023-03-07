@@ -51,7 +51,7 @@ QVariant ImportsTreeModel::data(const QModelIndex &index, int role) const
 	ImportEntryWrapper* entry =  dynamic_cast<ImportEntryWrapper*>(wrapperAt(index));
 	if (!entry) return QVariant();
 
-	if (role == Qt::BackgroundColorRole && !entry->isValid()) return errColor;
+	if (role == Qt::BackgroundRole && !entry->isValid()) return errColor;
 	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
 
 	switch (column) {
