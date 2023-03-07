@@ -5,5 +5,7 @@ GenericName=Portable Executable reversing tool
 Categories=Development;Utility;
 Comment=Portable Executable reversing tool with a friendly GUI
 Icon=@SCHEME_NAME@
-Exec=@PROJECT_NAME@
+Exec=@PROJECT_NAME@ %F
 Terminal=false
+MimeType=application/octet-stream;application/x-msdownload;
+
