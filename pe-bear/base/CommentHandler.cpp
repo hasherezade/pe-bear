@@ -170,7 +170,7 @@ bool CommentHandler::saveToFile(QString fileName)
 		qComment = qComment.trimmed();
 		
 		QString line = offsetStr + DELIMITER + qComment;
-		out << line << endl;
+		out << line << Qt::endl;
 	}
 	fOut.close();
 	return true;
