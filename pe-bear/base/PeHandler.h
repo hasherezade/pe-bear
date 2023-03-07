@@ -112,19 +112,17 @@ public:
 				break;
 			}
 		}
-		
+		// Warn about possible Mixed Mode PEs
 		if (hasDirectory(pe::DIR_COM_DESCRIPTOR)) {
 			uint64_t flags = this->clrDirWrapper.getNumValue(ClrDirWrapper::FLAGS, &isOk);
-			if (isOk) {
-				if ((flags & pe::COMIMAGE_FLAGS_ILONLY) == 0) {
-					isAtypical = true;
-					if (warnings) (*warnings) << "This .NET file may contain native code.";
-				}
+			if (isOk && (flags & pe::COMIMAGE_FLAGS_ILONLY) == 0) {
+				isAtypical = true;
+				if (warnings) (*warnings) << "This .NET file may contain native code.";
 			}
 		}
 		return isAtypical;
 	}
-	
+
 	bool updateFileModifTime()
 	{
 		QDateTime modDate = QDateTime(); //default: empty date

@@ -25,7 +25,7 @@ QVariant DebugTreeModel::headerData(int section, Qt::Orientation orientation, in
 	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
 	if (!dbgWrap) return QVariant();
 
-	int32_t fID = this->columnToFID(section);
+	const int32_t fID = this->columnToFID(section);
 	return dbgWrap->getFieldName(0, fID);
 }
 
@@ -71,7 +71,7 @@ QVariant DebugTreeModel::toolTip(const QModelIndex &index) const
 	if (translated.length()) {
 		return translated;
 	}
-	if (fieldID == DebugDirEntryWrapper::TIMESTAMP) {
+	if (fieldID == DebugDirEntryWrapper::TIMESTAMP && !this->m_PE->isReproBuild()) {
 		bool isOk = false;
 		int val = entry->getNumValue(fieldID, &isOk);
 		if (!isOk) return QVariant();

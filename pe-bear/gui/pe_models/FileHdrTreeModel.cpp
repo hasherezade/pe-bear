@@ -75,7 +75,7 @@ QVariant FileHdrTreeItem::data(int column) const
 			bool isOk = false;
 			uint64_t val = fileHdr.getNumValue(role, &isOk);
 			if (!isOk) return QVariant();
-			if (role == FileHdrWrapper::TIMESTAMP) {
+			if (role == FileHdrWrapper::TIMESTAMP && !m_PE->isReproBuild()) {
 				return getDateString(val);
 			}
 			if (role == FileHdrWrapper::MACHINE) {

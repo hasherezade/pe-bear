@@ -172,7 +172,7 @@ QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
 		case VALUE: return dataValue(index);
 		case MEANING: 
 		{
-			if (row == ResourceDirWrapper::TIMESTAMP) {
+			if (row == ResourceDirWrapper::TIMESTAMP && !m_PE->isReproBuild()) {
 				bool isOk = false;
 				int val = wrap->getNumValue(fId, &isOk);
 				return (isOk) ? getDateString(val) : QVariant();

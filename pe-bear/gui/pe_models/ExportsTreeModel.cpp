@@ -34,7 +34,7 @@ QVariant ExportsTreeModel::data(const QModelIndex &index, int role) const
 		case NAME: return wrap->getFieldName(fId);
 		case VALUE2:
 		{
-			if (fId == ExportDirWrapper::TIMESTAMP) {
+			if (fId == ExportDirWrapper::TIMESTAMP && !m_PE->isReproBuild()) {
 				bool isOk = false;
 				int val = wrap->getNumValue(fId, &isOk);
 				if (!isOk) return "";
