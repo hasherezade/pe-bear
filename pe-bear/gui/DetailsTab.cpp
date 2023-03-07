@@ -262,11 +262,13 @@ void DetailsTab::onFitSections()
 	bool fOk = !fileToResize;
 	bool iOk = !imageToResize;
 
+	bool modified = false;
 	if (imageToResize) {
 		iOk = this->myPeHndl->resizeImage(lastRva);
+		modified = true;
 	}
 	if (fileToResize) {
-		fOk = this->myPeHndl->resize(lastRaw);
+		fOk = this->myPeHndl->resize(lastRaw, modified);
 	}
 
 	if (fOk && iOk) {
