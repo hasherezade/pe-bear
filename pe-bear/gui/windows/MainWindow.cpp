@@ -866,7 +866,8 @@ void MainWindow::setSelectedStyle(QAction* pAction)
 void MainWindow::runNewInstance()
 {
 	const QString currentPath = QCoreApplication::instance()->applicationFilePath();
-	QProcess::startDetached(currentPath);
+	const QStringList arguments;
+	QProcess::startDetached(currentPath, arguments);
 }
 
 void MainWindow::open()
