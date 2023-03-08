@@ -370,9 +370,9 @@ QVariant OptionalHdrTreeItem::data(int column) const
 
 Qt::ItemFlags OptionalHdrTreeItem::flags(int column) const
 {
-	static Qt::ItemFlags fl = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	if (!optHdr.getFieldPtr(role)) return 0;
-
+	if (!optHdr.getFieldPtr(role)) return Qt::NoItemFlags;
+    
+	const Qt::ItemFlags fl = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	if (column != COL_VALUE || level == DETAILS) return fl;
 	return fl | Qt::ItemIsEditable;
 }

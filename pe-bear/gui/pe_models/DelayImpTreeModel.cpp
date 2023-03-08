@@ -278,7 +278,7 @@ Qt::ItemFlags DelayImpFuncModel::flags(const QModelIndex &index) const
 	if (column >= ADDED_COLS_NUM) return editable;
 	
 	DelayImpFuncWrapper* entry = dynamic_cast<DelayImpFuncWrapper*>(wrapperAt(index));
-	if (!entry) return 0;
+	if (!entry) return Qt::NoItemFlags;
 	
 	const bool byOrd = entry->isByOrdinal();
 	if (byOrd) {
