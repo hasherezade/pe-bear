@@ -756,7 +756,7 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 			const offset_t raw = this->getRawAt(y);
 			return "Not mapped. Raw = 0x" + QString::number(raw, 16);
 		}
-		if (role == Qt::TextColorRole) return QColor("red");
+		if (role == Qt::ForegroundRole) return QColor("red");
 	}
 
 	//rva valid
@@ -772,18 +772,18 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 	}
 
 	if (!myDisasm.isRvaContnuous(y)) {
-		if (role == Qt::TextColorRole) return QColor("magenta");
+		if (role == Qt::ForegroundRole) return QColor("magenta");
 	}
 
 	DWORD ep = m_PE->getEntryPoint();
 	size_t disChunk = myDisasm.getChunkSize(y);
 
 	if (ep >= rva && ep < (rva + disChunk)) {
-		if (role == Qt::TextColorRole) return QColor("cyan");
+		if (role == Qt::ForegroundRole) return QColor("cyan");
 		if (role == Qt::ToolTipRole) return "Entry Point = " + QString::number(ep, 16).toUpper();
 	}
 	// normal color
-	if (role == Qt::TextColorRole) return QColor("white");
+	if (role == Qt::ForegroundRole) return QColor("white");
 
 	return QVariant();
 }
@@ -1047,11 +1047,11 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 	}
 
 	if ( myDisasm.isCallToRet(y)) {
-		if (role == Qt::TextColorRole) return settings.nopColor;
+		if (role == Qt::ForegroundRole) return settings.nopColor;
 		if (role == Qt::DisplayRole && x == HINT_COL) return "(CALL -> RET) == NOP";
 	}
 	if (this->myDisasm.isBranching(y) && !this->myDisasm.isUnconditionalBranching(y)) {
-		if (role == Qt::TextColorRole && x != HINT_COL) return settings.conditionalColor;
+		if (role == Qt::ForegroundRole && x != HINT_COL) return settings.conditionalColor;
 	}
 	
 	//---------------------
@@ -1079,7 +1079,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 				if (comment.size() > 0) name += " ; " + comment;
 				return name;
 			}
-			if (role == Qt::TextColorRole) {
+			if (role == Qt::ForegroundRole) {
 				if (isDelay) return settings.delayImpColor;
 				return this->settings.importColor;
 			}
@@ -1113,7 +1113,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 		}
 	}
 
-	if (role == Qt::TextColorRole) {
+	if (role == Qt::ForegroundRole) {
 		using namespace minidis;
 		minidis::mnem_type mnem = myDisasm.getMnemType(y);
 		switch (mnem) {
