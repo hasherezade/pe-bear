@@ -292,25 +292,26 @@ install(TARGETS ${PROJECT_NAME}
 	COMPONENT ${PROJECT_NAME}
 )
 
-install(FILES "${CMAKE_SOURCE_DIR}/logo/main_ico.png"
-	DESTINATION "${CMAKE_INSTALL_DATADIR}/pixmaps"
-	RENAME "${SCHEME_NAME}.png"
-)
+IF (NOT WIN32)
+	install(FILES "${CMAKE_SOURCE_DIR}/logo/main_ico.png"
+		DESTINATION "${CMAKE_INSTALL_DATADIR}/pixmaps"
+		RENAME "${SCHEME_NAME}.png"
+	)
+	configure_file("${CMAKE_SOURCE_DIR}/xdg/launcher.desktop.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.desktop"
+		@ONLY
+	)
+	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.desktop"
+		DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
+		RENAME "${SCHEME_NAME}.desktop"
+	)
 
-configure_file("${CMAKE_SOURCE_DIR}/xdg/launcher.desktop.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.desktop"
-	@ONLY
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.desktop"
-	DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
-	RENAME "${SCHEME_NAME}.desktop"
-)
-
-configure_file("${CMAKE_SOURCE_DIR}/xdg/appdata.metainfo.xml.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.metainfo.xml"
-	@ONLY
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.metainfo.xml"
-	DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
-	RENAME "${SCHEME_NAME}.metainfo.xml"
-)
+	configure_file("${CMAKE_SOURCE_DIR}/xdg/appdata.metainfo.xml.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.metainfo.xml"
+		@ONLY
+	)
+	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.metainfo.xml"
+		DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
+		RENAME "${SCHEME_NAME}.metainfo.xml"
+	)
+endif()
