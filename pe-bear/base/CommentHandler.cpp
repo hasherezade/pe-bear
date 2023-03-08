@@ -163,14 +163,14 @@ bool CommentHandler::saveToFile(QString fileName)
 	QTextStream out(&fOut);
 
 	std::vector<Comment*>::iterator vecItr;
-    for (vecItr = this->commentsVec.begin(); vecItr != this->commentsVec.end(); ++vecItr ) {
+	for (vecItr = this->commentsVec.begin(); vecItr != this->commentsVec.end(); ++vecItr ) {
 		Comment* cmnt = *vecItr;
 		QString offsetStr = QString::number(cmnt->offset, 16);
 		QString qComment = cmnt->content;
 		qComment = qComment.trimmed();
 		
 		QString line = offsetStr + DELIMITER + qComment;
-		out << line << Qt::endl;
+		out << line << '\n';
 	}
 	fOut.close();
 	return true;
