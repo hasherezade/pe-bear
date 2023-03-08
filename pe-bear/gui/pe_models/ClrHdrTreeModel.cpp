@@ -182,7 +182,7 @@ int ClrTreeModel::columnCount(const QModelIndex &parent) const { return MAX_COL;
 
 bool ClrTreeModel::containsValue(QModelIndex index) const
 {
-	return (index.column()  == COL_VALUE);
+	return (index.column() == COL_VALUE);
 }
 
 QVariant ClrTreeModel::data(const QModelIndex &index, int role) const
@@ -236,7 +236,8 @@ Qt::ItemFlags ClrTreeModel::flags(const QModelIndex &index) const
 		return Qt::NoItemFlags;
 
 	ClrHdrTreeItem *item = static_cast<ClrHdrTreeItem*>(index.internalPointer());
-	if (item == NULL) return 0;
+	if (!item) return Qt::NoItemFlags;
+
 	return item->flags(index.column());
 }
 

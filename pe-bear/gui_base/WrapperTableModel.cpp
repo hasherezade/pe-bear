@@ -49,7 +49,7 @@ bool WrapperTableModel::setData(const QModelIndex &index, const QVariant &value,
 
 Qt::ItemFlags WrapperTableModel::flags(const QModelIndex &index) const
 {	
-	if (!index.isValid()) return 0;
+	if (!index.isValid()) return Qt::NoItemFlags;
 	Qt::ItemFlags f = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
 	if (this->containsOffset(index)) return f;

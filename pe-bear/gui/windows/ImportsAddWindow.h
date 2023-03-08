@@ -50,8 +50,8 @@ public:
 	
 	Qt::ItemFlags flags(const QModelIndex &index) const
 	{
-		if (!index.isValid()) return 0;
-		Qt::ItemFlags f = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+		if (!index.isValid()) return Qt::NoItemFlags;
+		const Qt::ItemFlags f = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 		return f;
 	}
 
