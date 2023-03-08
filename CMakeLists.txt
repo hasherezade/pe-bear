@@ -57,6 +57,7 @@ option(CAPSTONE_RISCV_SUPPORT "RISCV support" OFF)
 option(CAPSTONE_X86_SUPPORT "x86 support" ON)
 option(CAPSTONE_X86_REDUCE "x86 with reduce instruction sets to minimize library" OFF)
 option(CAPSTONE_X86_ATT_DISABLE "Disable x86 AT&T syntax" ON)
+option(CAPSTONE_SH_SUPPORT "SH support" OFF)
 
 # Add sub-directories
 #
