@@ -27,6 +27,16 @@ Signatures for PE-bear:
 
 > An archive of **old releases** is available here: https://github.com/hasherezade/pe-bear-releases
 
+### Available releases
+
+The **Linux** build requires appropriately **Qt_5.14 or Qt_5.15 to be installed**.
+
+The **Windows** build with *vs13* suffix(built with Visual Studio 2013) has no external dependencies.
+
+The **Windows** build with *vs17* suffix (built with Visual Studio 2017) requires [Microsoft Visual C++ 2015 Redistributable Package](https://www.microsoft.com/en-US/download/details.aspx?id=48145).
+
+The **Windows** build with *vs10* suffix is built with Qt4 (legacy) - in contrast to the other builds that are with Qt5 (recommended). It is prepared for the purpose of backward compatibility with old versions of Windows (i.e. XP).
+
 ## How to build
 
 ### Requires:
