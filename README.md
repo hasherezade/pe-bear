@@ -9,7 +9,7 @@ PE-bear
 [![Last Commit](https://img.shields.io/github/last-commit/hasherezade/pe-bear/main)](https://github.com/hasherezade/pe-bear/commits)
 
 [![GitHub release](https://img.shields.io/github/release/hasherezade/pe-bear.svg)](https://github.com/hasherezade/pe-bear/releases) 
-[![Github All Releases](https://img.shields.io/github/downloads/hasherezade/pe-bear-releases/total.svg)](https://github.com/hasherezade/pe-bear-releases/releases) 
+[![Github All Releases](https://img.shields.io/github/downloads/hasherezade/pe-bear-releases/total.svg)](https://github.com/hasherezade/pe-bear/releases) 
 [![Github Latest Release](https://img.shields.io/github/downloads/hasherezade/pe-bear/latest/total.svg)](https://github.com/hasherezade/pe-bear/releases) 
 
 PE-bear is a multiplatform reversing tool for PE files. Its objective is to deliver fast and flexible “first view” for malware analysts, stable and capable to handle malformed PE files.
