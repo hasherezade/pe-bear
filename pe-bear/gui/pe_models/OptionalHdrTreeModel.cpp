@@ -4,26 +4,34 @@
 DataDirTreeItem::DataDirTreeItem(PeHandler *peHndl, level_t level, int recordNum, OptionalHdrTreeItem *parent)
     : OptionalHdrTreeItem(peHndl, level, OptHdrWrapper::DATA_DIR, parent)
 {
-	if (this->level == DESC) {
-		this->recordNum = (-1);
-		int size = pe::DIR_ENTRIES_COUNT;
+	init();
+	this->recordNum = recordNum;
+	this->sID = recordNum;
+}
+
+void DataDirTreeItem::init()
+{
+	DataDirWrapper *dDir = wrapper();
+	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
+
+	//int recordsCount = pe::DIR_ENTRIES_COUNT;
+	if (recordsCount && this->level == DESC) {
 		//create subitems:
-		for (size_t childIndx = 0; childIndx < size; childIndx++) 
+		for (size_t childIndx = 0; childIndx < recordsCount; childIndx++) 
 			this->appendChild(new DataDirTreeItem(myPeHndl, DETAILS, childIndx, this));
 
 		return;
 	}
-	//---
-	this->recordNum = recordNum;
-	this->sID = recordNum;
 }
 
 QVariant DataDirTreeItem::background(int column) const
 {
 	DataDirWrapper *dDir = wrapper();
 	if(!dDir) return QVariant();
+	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
 
 	int fId = this->getFID(column);
+	if (fId >= recordsCount) return QVariant();
 
 	if (level == DESC && column > COL_NAME && column <= COL_VALUE2) {
 		QColor dataDirNameCol = addrColors.dataDirNameColor();
@@ -73,6 +81,13 @@ QVariant DataDirTreeItem::edit(int column) const
 
 Qt::ItemFlags DataDirTreeItem::flags(int column) const
 {
+	DataDirWrapper *dDir = wrapper();
+	if(!dDir) return Qt::NoItemFlags;
+	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
+
+	int fId = this->getFID(column);
+	if (fId >= recordsCount) return Qt::NoItemFlags;
+	
 	static Qt::ItemFlags fl = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	if (column == 0 || column > COL_VALUE2) return fl;
 
@@ -112,7 +127,9 @@ QVariant DataDirTreeItem::data(int column) const
 	if(!dDir) return QVariant();
 
 	int fId = this->getFID(column);
-	
+	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
+	if (fId >= recordsCount) return QVariant();
+
 	if (this->level == DESC) {
 		switch (column) {
 			case COL_NAME : return dDir->getName();
@@ -164,7 +181,12 @@ QVariant DataDirTreeItem::toolTip(int column) const
 	if (m_PE == NULL) return QVariant();
 
 	if (this->level == DESC) return QVariant();
-
+	
+	DataDirWrapper *dDir = wrapper();
+	int fId = this->getFID(column);
+	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
+	if (fId >= recordsCount) return QVariant();
+	
 	if (column == COL_OFFSET) return "Right click to follow";
 	IMAGE_DATA_DIRECTORY *dataDir = this->m_PE->getDataDirectory();
 
@@ -423,7 +445,7 @@ QVariant OptionalHdrTreeItem::dataValMeanings() const
 
 //-----------------------------------------------------------------------------
 OptionalHdrTreeModel::OptionalHdrTreeModel(PeHandler *peHndl, QObject *parent)
-	:  PeWrapperModel(peHndl, parent)
+	:  PeWrapperModel(peHndl, parent), dllCharact(NULL), dataDirItem(NULL)
 {
 	if (!m_PE) return;
 
@@ -434,8 +456,10 @@ OptionalHdrTreeModel::OptionalHdrTreeModel(PeHandler *peHndl, QObject *parent)
 	
 		OptHdrWrapper::OptHdrFID role = OptHdrWrapper::OptHdrFID(i);
 
-		if (role == OptHdrWrapper::DATA_DIR)
-			rootItem->appendChild(new DataDirTreeItem(peHndl, OptionalHdrTreeItem::DESC));
+		if (role == OptHdrWrapper::DATA_DIR) {
+			dataDirItem = new DataDirTreeItem(peHndl, OptionalHdrTreeItem::DESC);
+			rootItem->appendChild(dataDirItem);
+		}
 		else if (role == OptHdrWrapper::DLL_CHARACT) {
 			this->dllCharact = new OptHdrDllCharactTreeItem(peHndl, OptionalHdrTreeItem::DESC);
 			rootItem->appendChild(dllCharact);
@@ -447,10 +471,15 @@ OptionalHdrTreeModel::OptionalHdrTreeModel(PeHandler *peHndl, QObject *parent)
 
 void OptionalHdrTreeModel::reload()
 {
+	this->beginResetModel();
+
+	this->dataDirItem->removeAllChildren();
 	this->dllCharact->removeAllChildren();
-	this->reset();
+
+	dataDirItem->init();
 	this->dllCharact->init();
-	this->reset();
+	
+	this->endResetModel();
 	emit modelUpdated();
 }
 

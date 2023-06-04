@@ -78,6 +78,7 @@ public:
 	virtual bufsize_t getContentSize() const;
 
 protected:
+	void init();
 	int getFID(int column = 0) const { return recordNum; }
 	int getSID(int column) const { return column - COL_VALUE; }
 
@@ -142,4 +143,5 @@ public:
 
 private:
 	OptHdrDllCharactTreeItem* dllCharact;
+	DataDirTreeItem *dataDirItem;
 };
