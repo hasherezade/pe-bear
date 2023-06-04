@@ -1060,7 +1060,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 
 	if (isClickable(index) && isOk) {
 		if (role == Qt::BackgroundRole) return settings.branchingColor;
-				
+
 		int32_t lval =  myDisasm.getTargetDelta(y);
 		bool isDelay = false;
 		// is Import Call ?

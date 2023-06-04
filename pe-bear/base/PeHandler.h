@@ -71,6 +71,10 @@ public:
 			isAtypical = true;
 			if (warnings) (*warnings) << "The executable may not run: the ImageSize size doesn't fit sections";
 		}
+		if (m_PE->getImageBase(false) != m_PE->getImageBase(true)) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The executable has atypical ImageBase. It may be mapped at a default base: 0x" + QString::number(m_PE->getImageBase(true), 16);
+		}
 		if (m_PE->getSectionsCount() == 0) {
 			isAtypical = true;
 			if (warnings) (*warnings) << "The PE has no sections";
