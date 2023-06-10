@@ -196,7 +196,7 @@ void GeneralPanel::init()
 	packersTree.setModel(&this->packersModel);
 
 	packersDock = new QDockWidget(this);
-	packersDock->setFeatures(0);
+	packersDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	packersDock->setWidget(&packersTree);
 	packersDock->setWindowIcon(QIcon(":/icons/Locked.ico"));
 	packersDock->setWindowTitle("Found signatures");

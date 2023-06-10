@@ -48,7 +48,7 @@ void WrapperSplitter::init(PeTreeModel *upModel, PeTreeModel *downModel)
 		downTree.setModel(this->downModel);
 		this->downModel->setParent(&downTree);
 		downTree.expandAll();
-		this->dock.setFeatures(0);
+		this->dock.setFeatures(QDockWidget::NoDockWidgetFeatures);
 		dock.setWidget(&this->downTree);
 		reloadDocketTitle();
 		addWidget(&dock);
