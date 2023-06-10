@@ -37,7 +37,8 @@ signals:
 
 private:
 	void run();
-	QString makeImpHash(ImportDirWrapper* imp);
+	QString makeImpHash();
+	QString makeRichHdrHash();
 
 	PEFile* m_PE;
 	QMutex m_arrMutex;

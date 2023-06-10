@@ -21,8 +21,9 @@ CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, offset_t checksu
 {
 }
 
-QString CalcThread::makeImpHash(ImportDirWrapper* imports)
+QString CalcThread::makeImpHash()
 {
+	ImportDirWrapper* imports = m_PE->getImports();
 	if (!imports) return QString();
 
 	QStringList exts = {".ocx", ".sys", ".dll"};
@@ -59,8 +60,29 @@ QString CalcThread::makeImpHash(ImportDirWrapper* imports)
 	//std::cout << allImps.toStdString() << "\n";
 	QCryptographicHash calcHash(QCryptographicHash::Md5);
 	calcHash.addData((char*) allImps.toStdString().c_str(), allImps.length());
-	const QString impHash = QString(calcHash.result().toHex());
-	return impHash;
+	return QString(calcHash.result().toHex());
+}
+
+QString CalcThread::makeRichHdrHash()
+{
+	pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
+	pe::RICH_DANS_HEADER* dans = NULL;
+	if (sign) {
+		dans = m_PE->getRichHeaderBgn(sign);
+	}
+	if (!dans) {
+		return QString();
+	}
+	const size_t diff = (ULONGLONG)sign - (ULONGLONG)dans;
+	ByteBuffer tmpBuf((BYTE*)dans, diff, true);
+	DWORD* dw_ptr = (DWORD*)tmpBuf.getContent();
+	size_t dw_size = tmpBuf.getContentSize() / sizeof(DWORD);
+	for (int i = 0; i < dw_size; i++) {
+		dw_ptr[i] ^= sign->checksum;
+	}
+	QCryptographicHash calcHash(QCryptographicHash::Md5);
+	calcHash.addData((char*) tmpBuf.getContent(), tmpBuf.getContentSize());
+	return QString(calcHash.result().toHex());
 }
 
 void CalcThread::run()
@@ -89,29 +111,10 @@ void CalcThread::run()
 			fileHash = QString::number(checksum, 16);
 		}
 		else if (hashType == RICH_HDR_MD5) {
-			pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
-			pe::RICH_DANS_HEADER* dans = NULL;
-			if (sign) {
-				dans = m_PE->getRichHeaderBgn(sign);
-			}
-			if (dans) {
-				const size_t diff = (ULONGLONG)sign - (ULONGLONG)dans;
-				ByteBuffer tmpBuf((BYTE*)dans, diff, true);
-				DWORD* dw_ptr = (DWORD*)tmpBuf.getContent();
-				size_t dw_size = tmpBuf.getContentSize() / sizeof(DWORD);
-				for (int i = 0; i < dw_size; i++) {
-					dw_ptr[i] ^= sign->checksum;
-				}
-				QCryptographicHash calcHash(QCryptographicHash::Md5);
-				calcHash.addData((char*) tmpBuf.getContent(), tmpBuf.getContentSize());
-				fileHash = QString(calcHash.result().toHex());
-			}
+			fileHash = makeRichHdrHash();
 		}
 		else if (hashType == IMP_MD5) {
-			ImportDirWrapper* imp = m_PE->getImports();
-			if (imp) {
-				fileHash = makeImpHash(imp);
-			}
+			fileHash = makeImpHash();
 		}
 		else {
 			QCryptographicHash calcHash(qHashType);
