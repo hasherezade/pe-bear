@@ -10,10 +10,11 @@ enum InfoFieldId {
 	INFO_LOADED_SIZE,
 	INFO_UNITS,
 	INFO_CHECKSUM,
+	INFO_IMP_HASH,
+	INFO_RICHHDR_HASH,
 	INFO_MD5,
 	INFO_SHA1,
 	INFO_SHA256,
-	INFO_RICHHDR_HASH,
 	INFO_COUNTER
 };
 
@@ -40,6 +41,7 @@ QVariant InfoTableModel::headerData(int section, Qt::Orientation orientation, in
 #endif
 			case INFO_CHECKSUM: return "Checksum";
 			case INFO_RICHHDR_HASH: return "Rich Header Hash";
+			case INFO_IMP_HASH: return "ImpHash";
 		}
 	}
 	return QVariant();
@@ -66,6 +68,7 @@ int InfoTableModel::rowCount(const QModelIndex &parent) const
 
 QVariant InfoTableModel::data(const QModelIndex &index, int role) const
 {
+	const QString msg_notAvailable = "not available";
 	int row = index.row();
 	int column = index.column();
 	
@@ -104,7 +107,14 @@ QVariant InfoTableModel::data(const QModelIndex &index, int role) const
 			if (this->myPeHndl->richHdrWrapper.getPtr()) {
 				return myPeHndl->getRichHdrHash();
 			} else {
-				return QString("not available");
+				return msg_notAvailable;
+			}
+		}
+		case INFO_IMP_HASH: {
+			if (this->myPeHndl->importDirWrapper.getEntriesCount() > 0) {
+				return myPeHndl->getImpHash();
+			} else {
+				return msg_notAvailable;
 			}
 		}
 	}

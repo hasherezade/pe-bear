@@ -25,6 +25,7 @@ public:
 		SHA256,
 		CHECKSUM,
 		RICH_HDR_MD5,
+		IMP_MD5,
 		HASHES_NUM
 	};
 
@@ -36,7 +37,8 @@ signals:
 
 private:
 	void run();
-	
+	QString makeImpHash(ImportDirWrapper* imp);
+
 	PEFile* m_PE;
 	QMutex m_arrMutex;
 
@@ -162,6 +164,7 @@ public:
 	QString getCurrentSHA1() { return getCurrentHash(CalcThread::SHA1); }
 	QString getCurrentChecksum() { return getCurrentHash(CalcThread::CHECKSUM); }
 	QString getRichHdrHash() { return getCurrentHash(CalcThread::RICH_HDR_MD5); }
+	QString getImpHash() { return getCurrentHash(CalcThread::IMP_MD5); }
 	QString getCurrentHash(CalcThread::hash_type type);
 
 	void setPackerSignFinder(sig_ma::SigFinder* signFinder);

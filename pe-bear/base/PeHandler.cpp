@@ -8,12 +8,59 @@
 using namespace sig_ma;
 using namespace pe;
 
+inline QString stripExtension(const QString & fileName)
+{
+    return fileName.left(fileName.lastIndexOf("."));
+}
+
 enum operation_ids { SIMPLE = 0, OP_ADD_SECTION = 1 };
 
 
 CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, offset_t checksumOffset)
 	: m_PE(pe), hashType(hType), checksumOff(checksumOffset)
 {
+}
+
+QString CalcThread::makeImpHash(ImportDirWrapper* imports)
+{
+	if (!imports) return QString();
+
+	QStringList exts = {".ocx", ".sys", ".dll"};
+	const size_t librariesCount = imports->getEntriesCount();
+
+	QList<offset_t> thunks = imports->getThunksList();
+	const size_t functionsCount = thunks.size();
+
+	QStringList impsBlock;
+	for (int i = 0; i < thunks.size(); i++) {
+		offset_t thunk = thunks[i];
+		if (thunk == 0 || thunk == INVALID_ADDR) continue;
+
+		QString lib =  imports->thunkToLibName(thunk).toLower();
+		for (QStringList::iterator itr = exts.begin(); itr != exts.end(); ++itr) {
+			if (lib.endsWith(*itr)) {
+				lib = stripExtension(lib);
+				break;
+			}
+		}
+		ImportBaseFuncWrapper* func = imports->thunkToFunction(thunk);
+		if (!func) continue;
+		QString funcName;
+		if (!func->isByOrdinal()) {
+			funcName = func->getShortName().toLower();
+		} else {
+			//TODO: map ordinals to symbols for some known DLLs: "ws2_32.dll", "wsock32.dll", "oleaut32.dll"
+			funcName = "ord" + QString::number(func->getOrdinal(), 10);
+		}
+		impsBlock << QString(lib + "." + funcName);
+	}
+
+	const QString allImps = impsBlock.join(",");
+	//std::cout << allImps.toStdString() << "\n";
+	QCryptographicHash calcHash(QCryptographicHash::Md5);
+	calcHash.addData((char*) allImps.toStdString().c_str(), allImps.length());
+	const QString impHash = QString(calcHash.result().toHex());
+	return impHash;
 }
 
 void CalcThread::run()
@@ -58,6 +105,12 @@ void CalcThread::run()
 				QCryptographicHash calcHash(QCryptographicHash::Md5);
 				calcHash.addData((char*) tmpBuf.getContent(), tmpBuf.getContentSize());
 				fileHash = QString(calcHash.result().toHex());
+			}
+		}
+		else if (hashType == IMP_MD5) {
+			ImportDirWrapper* imp = m_PE->getImports();
+			if (imp) {
+				fileHash = makeImpHash(imp);
 			}
 		}
 		else {
