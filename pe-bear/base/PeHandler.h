@@ -24,6 +24,7 @@ public:
 		SHA1 = 1,
 		SHA256,
 		CHECKSUM,
+		RICH_HDR_MD5,
 		HASHES_NUM
 	};
 
@@ -160,6 +161,7 @@ public:
 	QString getCurrentMd5() { return getCurrentHash(CalcThread::MD5); }
 	QString getCurrentSHA1() { return getCurrentHash(CalcThread::SHA1); }
 	QString getCurrentChecksum() { return getCurrentHash(CalcThread::CHECKSUM); }
+	QString getRichHdrHash() { return getCurrentHash(CalcThread::RICH_HDR_MD5); }
 	QString getCurrentHash(CalcThread::hash_type type);
 
 	void setPackerSignFinder(sig_ma::SigFinder* signFinder);

@@ -40,7 +40,27 @@ void CalcThread::run()
 		if (hashType == CHECKSUM) {
 			long checksum = PEFile::computeChecksum((BYTE*) m_PE->getContent(), m_PE->getContentSize(), checksumOff);
 			fileHash = QString::number(checksum, 16);
-		} else {
+		}
+		else if (hashType == RICH_HDR_MD5) {
+			pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
+			pe::RICH_DANS_HEADER* dans = NULL;
+			if (sign) {
+				dans = m_PE->getRichHeaderBgn(sign);
+			}
+			if (dans) {
+				const size_t diff = (ULONGLONG)sign - (ULONGLONG)dans;
+				ByteBuffer tmpBuf((BYTE*)dans, diff, true);
+				DWORD* dw_ptr = (DWORD*)tmpBuf.getContent();
+				size_t dw_size = tmpBuf.getContentSize() / sizeof(DWORD);
+				for (int i = 0; i < dw_size; i++) {
+					dw_ptr[i] ^= sign->checksum;
+				}
+				QCryptographicHash calcHash(QCryptographicHash::Md5);
+				calcHash.addData((char*) tmpBuf.getContent(), tmpBuf.getContentSize());
+				fileHash = QString(calcHash.result().toHex());
+			}
+		}
+		else {
 			QCryptographicHash calcHash(qHashType);
 			calcHash.addData((char*) m_PE->getContent(), m_PE->getContentSize());
 			fileHash = QString(calcHash.result().toHex());

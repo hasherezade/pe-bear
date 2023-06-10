@@ -13,6 +13,7 @@ enum InfoFieldId {
 	INFO_MD5,
 	INFO_SHA1,
 	INFO_SHA256,
+	INFO_RICHHDR_HASH,
 	INFO_COUNTER
 };
 
@@ -38,6 +39,7 @@ QVariant InfoTableModel::headerData(int section, Qt::Orientation orientation, in
 			case INFO_SHA256: return "SHA256";
 #endif
 			case INFO_CHECKSUM: return "Checksum";
+			case INFO_RICHHDR_HASH: return "Rich Header Hash";
 		}
 	}
 	return QVariant();
@@ -98,6 +100,13 @@ QVariant InfoTableModel::data(const QModelIndex &index, int role) const
 		case INFO_SHA256: return myPeHndl->getCurrentSHA256();
 #endif
 		case INFO_CHECKSUM: return myPeHndl->getCurrentChecksum();
+		case INFO_RICHHDR_HASH: {
+			if (this->myPeHndl->richHdrWrapper.getPtr()) {
+				return myPeHndl->getRichHdrHash();
+			} else {
+				return QString("not available");
+			}
+		}
 	}
 	return QVariant();
 }
