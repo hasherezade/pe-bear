@@ -23,6 +23,7 @@ CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, offset_t checksu
 
 QString CalcThread::makeImpHash()
 {
+	static CommonOrdinalsLookup lookup;
 	ImportDirWrapper* imports = m_PE->getImports();
 	if (!imports) return QString();
 
@@ -48,12 +49,15 @@ QString CalcThread::makeImpHash()
 		if (!func) continue;
 		QString funcName;
 		if (!func->isByOrdinal()) {
-			funcName = func->getShortName().toLower();
+			funcName = func->getShortName();
 		} else {
-			//TODO: map ordinals to symbols for some known DLLs: "ws2_32.dll", "wsock32.dll", "oleaut32.dll"
-			funcName = "ord" + QString::number(func->getOrdinal(), 10);
+			int ord = func->getOrdinal();
+			funcName = lookup.findFuncName(lib, ord);
+			if (!funcName.length()) {
+				funcName = "ord" + QString::number(func->getOrdinal(), 10);
+			}
 		}
-		impsBlock << QString(lib + "." + funcName);
+		impsBlock << QString(lib + "." + funcName.toLower());
 	}
 
 	const QString allImps = impsBlock.join(",");
