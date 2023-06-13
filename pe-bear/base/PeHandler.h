@@ -302,6 +302,7 @@ signals:
 protected slots:
 	void onHashReady(QString hash, int hType);
 	void onCalcThreadFinished();
+	void runHashesCalculation();
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException
@@ -335,7 +336,6 @@ protected:
 	bool rewrapDataDirs();
 	bool updatePeOnModified(offset_t modOffset = INVALID_ADDR, bufsize_t modSize = 0);// throws exception
 	void updatePeOnResized();
-	void runHashesCalculation();
 
 	PEFile* m_PE;
 	FileBuffer *m_fileBuffer;

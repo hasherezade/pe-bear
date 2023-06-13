@@ -54,7 +54,7 @@ QString CalcThread::makeImpHash()
 			int ord = func->getOrdinal();
 			funcName = lookup.findFuncName(lib, ord);
 			if (!funcName.length()) {
-				funcName = "ord" + QString::number(func->getOrdinal(), 10);
+				funcName = "ord" + QString::number(ord, 10);
 			}
 		}
 		impsBlock << QString(lib + "." + funcName.toLower());
@@ -176,6 +176,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	}
 	//---
 	this->runHashesCalculation();
+	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
 }
 
 void PeHandler::associateWrappers()
@@ -1226,8 +1227,6 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 
 	rewrapDataDirs();
 
-	runHashesCalculation();
-
 	if (isSecHdrModified) {
 		emit secHeadersModified();
 	}
@@ -1237,7 +1236,6 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 void PeHandler::updatePeOnResized()
 {
 	rewrapDataDirs();
-	runHashesCalculation();
 
 	emit secHeadersModified();
 }
