@@ -45,6 +45,8 @@ protected:
 	void showEvent(QShowEvent * ev) { refrehSettingsView(); QDialog::showEvent(ev); }
 
 private:
+	int loadAvailableTranslations();
+
 	QVBoxLayout topLayout;
 	QPushButton dirButton, okButton, cancelButton;
 	QLabel uddDirLabel;

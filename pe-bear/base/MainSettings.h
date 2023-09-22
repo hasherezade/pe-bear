@@ -403,7 +403,12 @@ signals:
 	void settingsChanged();
 
 public:
-	MainSettings() : QObject(), followOnClick(false), autoSaveTags(true), autoReloadOnFileChange(RELOAD_ASK), uDataDir("") {}
+	MainSettings(): 
+		QObject(), followOnClick(false), autoSaveTags(true), autoReloadOnFileChange(RELOAD_ASK),
+		uDataDir(""), 
+		languageDir("Language")
+    {
+    }
 
 	void setFollowOnClick(bool enable) {  this->followOnClick = enable; emit settingsChanged(); }
 	bool isFollowOnClick() const { return this->followOnClick; }
@@ -425,6 +430,7 @@ public:
 
 	QString dirDump;
 	QString language;
+	const QString languageDir;
 
 protected:
 	bool followOnClick;

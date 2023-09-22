@@ -43,7 +43,11 @@ int main(int argc, char *argv[])
 
 	// Load language file
 	QTranslator translator;
-	QString trPath = mainSettings.userDataDir() + QDir::separator() + "Language" + QDir::separator() + mainSettings.language + QDir::separator() + "PELanguage.qm";
+	QString currLanguage = mainSettings.language;
+	if (currLanguage.length() == 0) {
+		currLanguage = QLocale::system().name().toLower();
+	}
+	QString trPath = mainSettings.userDataDir() + QDir::separator() + mainSettings.languageDir + QDir::separator() + currLanguage + QDir::separator() + "PELanguage.qm";
 	if (translator.load(trPath)) {
 		app.installTranslator(&translator); 
 	}

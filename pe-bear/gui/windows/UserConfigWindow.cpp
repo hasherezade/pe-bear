@@ -44,7 +44,7 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	fLayout3->addWidget(&languageLabel);
 	fLayout3->addWidget(&languageEdit);
 	languageEdit.insertItem(0, tr("(default)"));
-	languageEdit.insertItem(1, "zh_cn");
+	
 	languageEdit.setToolTip(tr("Changing the language version requires application restart"));
 
 	reloadFileLabel.setText(tr("Reload file on change? "));
@@ -81,9 +81,25 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	setAutoFillBackground(true);
 }
 
+int UserConfigWindow::loadAvailableTranslations()
+{
+	if (!settings) return 0;
+	int cntr = 0;
+	QString rootDir = settings->userDataDir() + QDir::separator() + settings->languageDir;
+	QDirIterator iter(rootDir, QDir::Dirs | QDir::NoDotAndDotDot);
+	while(iter.hasNext()) {
+		cntr++;
+		QString item = iter.next();
+		QFileInfo f(item);
+		languageEdit.insertItem(1, f.baseName());
+	}
+	return cntr;
+}
+
 void UserConfigWindow::setMainSettings(MainSettings *settings)
 {
 	this->settings = settings;
+	loadAvailableTranslations();
 	if (this->isVisible()) {
 		refrehSettingsView();
 	}
@@ -93,7 +109,7 @@ void UserConfigWindow::setReloadMode(const t_reload_mode rMode)
 {
 	int index = reloadFileStates.findData(rMode, Qt::UserRole);
 	if ( index != -1 ) { // -1 for not found
-	   reloadFileStates.setCurrentIndex(index);
+		reloadFileStates.setCurrentIndex(index);
 	}
 }
 
