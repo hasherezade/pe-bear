@@ -18,7 +18,7 @@ MenuHeader::MenuHeader(QWidget *parent)
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(customMenuEvent(QPoint)) );
 
-	this->copyAction = new QAction("Copy the offset", this);
+	this->copyAction = new QAction(tr("Copy the offset"), this);
 	connect(copyAction, SIGNAL(triggered()), this, SLOT(copyOffset()));
 
 	this->defaultMenu.addAction(copyAction);
@@ -46,7 +46,7 @@ void MenuHeader::mousePressEvent(QMouseEvent *event)
 		if (isOk) {
 			selectedOffset = offset;
 		}
-		copyAction->setText("Copy the offset: " + QString::number(selectedOffset, 16).toUpper());
+		copyAction->setText(tr("Copy the offset: ") + QString::number(selectedOffset, 16).toUpper());
 	}
 	QHeaderView::mousePressEvent(event);
 }

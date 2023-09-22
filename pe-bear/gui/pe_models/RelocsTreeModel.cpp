@@ -19,13 +19,13 @@ QVariant RelocsTreeModel::headerData(int section, Qt::Orientation orientation, i
 {
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET: return "Offset";
+		case OFFSET: return tr("Offset");
 	}
 	RelocDirWrapper* impWrap = dynamic_cast<RelocDirWrapper*>(wrapper());
 	if (!impWrap) return QVariant();
 	int32_t fID = this->columnToFID(section);
 	if (fID == RelocBlockWrapper::ENTRIES_PTR) {
-		return "Entries Count";
+		return tr("Entries Count");
 	}
 	return impWrap->getFieldName(0, fID);
 }
@@ -152,11 +152,11 @@ QVariant RelocEntriesModel::headerData(int section, Qt::Orientation orientation,
 {
 	if(role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET : return "Offset";
-		case VALUE : return "Value";
-		case TYPE: return "Type";
-		case DELTA: return "Offset from Page";
-		case RELOC_RVA: return "Reloc RVA";
+		case OFFSET : return tr("Offset");
+		case VALUE : return tr("Value");
+		case TYPE: return tr("Type");
+		case DELTA: return tr("Offset from Page");
+		case RELOC_RVA: return tr("Reloc RVA");
 	}
 	return QVariant();
 }

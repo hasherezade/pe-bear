@@ -19,8 +19,8 @@ QVariant DebugTreeModel::headerData(int section, Qt::Orientation orientation, in
 {
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "TypeName";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("TypeName");
 	}
 	DebugDirWrapper* dbgWrap = dynamic_cast<DebugDirWrapper*>(wrapper());
 	if (!dbgWrap) return QVariant();
@@ -247,9 +247,9 @@ QVariant DebugRDSIEntryTreeModel::headerData(int section, Qt::Orientation orient
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case VALUE: return "Value";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case VALUE: return tr("Value");
 	}
 	return QVariant();
 }

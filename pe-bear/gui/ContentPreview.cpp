@@ -122,7 +122,7 @@ void ContentPreview::onGoToRVA()
 
 	number = text.toUpper().toLongLong(&isValid, 16);
 	if (!isValid) {
-		QMessageBox::warning(0,"Warning!", "Wrong number format supplied!");
+		QMessageBox::warning(0, tr("Warning!"), tr("Wrong number format supplied!"));
 		return;
 	}
 
@@ -131,7 +131,7 @@ void ContentPreview::onGoToRVA()
 		raw = m_PE->rvaToRaw(number);
 	} catch (CustomException e) {
 		isValid = false;
-		QMessageBox::warning(0, "Warning!","RVA:"+ QString::number(number, 16) + " is invalid:\n" + e.what());
+		QMessageBox::warning(0, tr("Warning!"),"RVA:"+ QString::number(number, 16) + tr(" is invalid:") +"\n" + e.what());
 	}
 	if (!isValid) return;
 

@@ -80,35 +80,35 @@ void PEDockedWidget::setupActionsToolbar(QSplitter* owner)
 	dockWindow.addToolBar(Qt::TopToolBarArea, toolBar);;
 	
 	//const Qt::ShortcutContext context = Qt::WidgetWithChildrenShortcut;
- 	this->goToEntryPointA = new QAction(QString("&Preview Entry Point\n[CTRL + E]"), &dockWindow);
+ 	this->goToEntryPointA = new QAction(tr("&Preview Entry Point\n[CTRL + E]"), &dockWindow);
 	//goToEntryPointA->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 	//goToEntryPointA->setShortcutContext(context);
  	connect(goToEntryPointA, SIGNAL(triggered()), this, SLOT(goToEntryPoint()) );
  
- 	this->goToRvaAction = new QAction(QString("&Go to RVA/VA\n[CTRL + R]"), &dockWindow);
+ 	this->goToRvaAction = new QAction(tr("&Go to RVA/VA\n[CTRL + R]"), &dockWindow);
 	//goToRvaAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 	//goToRvaAction->setShortcutContext(context);
  	connect(goToRvaAction, SIGNAL(triggered()), this, SLOT(goToRVA()) );
  	
- 	this->goToRawAction = new QAction(QString("&Go to raw\n[CTRL + G]"), &dockWindow);
+ 	this->goToRawAction = new QAction(tr("&Go to raw+\n[CTRL + G]"), &dockWindow);
 	//goToRawAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_G));
 	//goToRawAction->setShortcutContext(context);
  	connect(goToRawAction, SIGNAL(triggered()), this, SLOT(goToOffset()) );
  
- 	backAction = new QAction(QString("&Back to last visited offset\n[CTRL + B]"), &dockWindow);
+	this->backAction = new QAction(tr("&Back to last visited offset\n[CTRL + B]"), &dockWindow);
 	//backAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
 	//backAction->setShortcutContext(context);
  	connect(backAction, SIGNAL(triggered()), this, SLOT(undoOffset()) );
  
- 	this->goToModifAction = new QAction(QString("&Go to last modification"), &dockWindow);
+ 	this->goToModifAction = new QAction(tr("&Go to last modification"), &dockWindow);
  	connect(goToModifAction, SIGNAL(triggered()), this, SLOT(goToLastModif()) );
  
- 	this->unModifyAction = new QAction( QString("&Undo last modifications\n[CTRL + Z]"), &dockWindow);
+ 	this->unModifyAction = new QAction( tr("&Undo last modifications\n[CTRL + Z]"), &dockWindow);
 	//unModifyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
 	//unModifyAction->setShortcutContext(context);
  	connect(unModifyAction, SIGNAL(triggered()), this, SLOT(unModify()) );
  
-	this->tagsAction = new QAction(QString("&Tag"), &dockWindow);
+	this->tagsAction = new QAction(tr("&Tag"), &dockWindow);
 	//tagsAction->setShortcut(QKeySequence(Qt::CTRL + ';'));
 	//tagsAction->setShortcutContext(context);
  	connect(tagsAction, SIGNAL(triggered()), this, SLOT(browseTags()) );
@@ -176,7 +176,7 @@ void PEDockedWidget::updateNavigActions()
 		const offset_t off = this->myPeHndl->prevOffsets.top();
 		num = ": " + QString::number(off, 16);
 	}
-	QString text = "&Back to last visited offset" + num + "\n[CTRL + B]";
+	QString text = tr("&Back to last visited offset") + num + "\n[CTRL + B]";
 	backAction->setText(text);
 	backAction->setEnabled(hasModif);
 }
@@ -203,7 +203,7 @@ void PEDockedWidget::goToLastModif()
 {
 	offset_t modS = this->myPeHndl->modifHndl.getLastModifiedOffset();
 	if (modS == INVALID_ADDR) {
-		QMessageBox::warning(0, "Cannot go", "No modifications!");
+		QMessageBox::warning(0, tr("Cannot go"), tr("No modifications!"));
 		return;
 	}
 
@@ -218,7 +218,7 @@ void PEDockedWidget::goToEntryPoint()
 	try {
 		raw = m_PE->rvaToRaw(m_PE->getEntryPoint());
 	} catch (CustomException e) {
-		QMessageBox::warning(0,"Warning!", "Wrong RVA supplied!"+ QString::fromStdString(e.what()));
+		QMessageBox::warning(0, tr("Warning!"), tr("Wrong RVA supplied!")+ QString::fromStdString(e.what()));
 		return;
 	}
 	myPeHndl->setDisplayed(false, raw);
@@ -261,13 +261,13 @@ void PEDockedWidget::goToAddress(bool isRaw)
 	try {
 		offset_t raw = m_PE->toRaw(number, aT, true);
 		if (raw == INVALID_ADDR) {
-			QMessageBox::warning(0, "Warning!", "Wrong address supplied!");
+			QMessageBox::warning(0, tr("Warning!"), tr("Wrong address supplied!"));
 			return;
 		}
 		myPeHndl->setDisplayed(false, raw);
 
 	} catch (CustomException e) {
-		QMessageBox::warning(0,"Warning!", "Wrong address supplied: "+ QString::fromStdString(e.what()));
+		QMessageBox::warning(0, tr("Warning!"), tr("Wrong address supplied: ")+ QString::fromStdString(e.what()));
 	}
 }
 
@@ -282,18 +282,18 @@ SectionMenu::SectionMenu(MainSettings &settings, QWidget *parent)
 
 void SectionMenu::createActions()
 {
-	this->dumpSelSecAction = new QAction("&Save the content as...", this);
+	this->dumpSelSecAction = new QAction(tr("&Save the content as..."), this);
 	connect(this->dumpSelSecAction, SIGNAL(triggered()), this, SLOT(dumpSelectedSection()) );
 
 	QIcon clearContentIco(":/icons/eraser.ico");
-	this->clearSelSecAction = new QAction(clearContentIco, "&Clear the content", this);
+	this->clearSelSecAction = new QAction(clearContentIco, tr("&Clear the content"), this);
 	connect(this->clearSelSecAction, SIGNAL(triggered()), this, SLOT(clearSelectedSection()) );
 
-	this->loadSelSecAction = new QAction("Substitute the content", this);
+	this->loadSelSecAction = new QAction(tr("Substitute the content"), this);
 	connect(this->loadSelSecAction, SIGNAL(triggered()), this, SLOT(loadSelectedSection()) );
 
 	QIcon disasmIco(":/icons/disasm.ico");
-	this->dumpDisasmAction = new QAction(disasmIco, "&Export section disassembly as...", this);
+	this->dumpDisasmAction = new QAction(disasmIco, tr("&Export section disassembly as..."), this);
 	connect(dumpDisasmAction, SIGNAL(triggered()), this, SLOT(exportSectionDisasm()) );
 
 	addAction(this->dumpSelSecAction);
@@ -311,11 +311,11 @@ void SectionMenu::sectionSelected(PeHandler *pe, SectionHdrWrapper *sec)
 	if (!pe) isEnabled = false;
 
 	this->setEnabled(isEnabled);
-	this->setTitle("No section selected");
+	this->setTitle(tr("No section selected"));
 
 	if (!isEnabled) return;
 
-	this->setTitle("Section: [" + sec->mappedName + "]");
+	this->setTitle(tr("Section: [") + sec->mappedName + "]");
 }
 
 void SectionMenu::dumpSelectedSection()
@@ -329,14 +329,14 @@ void SectionMenu::dumpSelectedSection()
 	if (outDir == "") outDir = peHndl->getDirPath();
 
 	QString defaultPath = outDir + QDir::separator() + peHndl->getShortName() + "[" + selectedSection->mappedName + "]";
-	QString path = QFileDialog::getSaveFileName(this, "Save as...", defaultPath);
+	QString path = QFileDialog::getSaveFileName(this, tr("Save as..."), defaultPath);
 	if (path.size() == 0) return;
 
 	if (pe->dumpSection(selectedSection, path)) {
-		QMessageBox::information(this, "Done!", "Dumped section: "+ selectedSection->mappedName +"\ninto: " + path);
+		QMessageBox::information(this, tr("Done!"), tr("Dumped section: ")+ selectedSection->mappedName +"\n"+ tr("into: ") + path);
 		return;
 	}
-	QMessageBox::warning(this, "Error", "Dumping section failed!");
+	QMessageBox::warning(this, tr("Error"), tr("Dumping section failed!"));
 }
 
 void SectionMenu::exportSectionDisasm()
@@ -347,17 +347,17 @@ void SectionMenu::exportSectionDisasm()
 	if (outDir == "") outDir = peHndl->getDirPath();
 
 	QString defaultPath = outDir + QDir::separator() + peHndl->getShortName() + "[" + selectedSection->mappedName + "].txt";
-	QString path = QFileDialog::getSaveFileName(this, "Save disasembly as...", defaultPath);
+	QString path = QFileDialog::getSaveFileName(this, tr("Save disasembly as..."), defaultPath);
 	if (path.size() == 0) return;
 
 	const offset_t startOff = selectedSection->getContentOffset(Executable::RAW, true);
 	const size_t previewSize = selectedSection->getContentSize(Executable::RAW, true);
 	
 	if (!peHndl->exportDisasm(path, startOff, previewSize)) {
-		QMessageBox::warning(this, "Error", "Dumping section failed!");
+		QMessageBox::warning(this, tr("Error"), tr("Dumping section failed!"));
 		return;
 	}
-	QMessageBox::information(this, "Done!", "Dumped section disasembly: "+ selectedSection->mappedName +"\ninto: " + path);
+	QMessageBox::information(this, tr("Done!"), tr("Dumped section disasembly: ")+ selectedSection->mappedName +"\n"+ tr("into: ") + path);
 	return;
 }
 
@@ -369,7 +369,7 @@ void SectionMenu::clearSelectedSection()
 
 	if (!selectedSection) return;
 
-	int answer = QMessageBox::warning(0, "Clearing section", "Do you really want to clear content of " + selectedSection->mappedName + "?", 
+	int answer = QMessageBox::warning(0, tr("Clearing section"), tr("Do you really want to clear content of ") + selectedSection->mappedName + "?",
 		QMessageBox::Yes | QMessageBox::No);
 
 	if (answer != QMessageBox::Yes) return;
@@ -384,7 +384,7 @@ void SectionMenu::clearSelectedSection()
 		peHndl->setBlockModified(secOffset, secSize);
 	}
 	if (!isOk) {
-		QMessageBox::warning(this, "Failed", "Cannot clear the section content");
+		QMessageBox::warning(this, tr("Failed"), tr("Cannot clear the section content"));
 	}
 }
 
@@ -396,17 +396,17 @@ void SectionMenu::loadSelectedSection()
 
 	if (!selectedSection) return;
 
-	QString path = QFileDialog::getOpenFileName(this, "Open", peHndl->getFullName(), "*");
+	QString path = QFileDialog::getOpenFileName(this, tr("Open"), peHndl->getFullName(), "*");
 	if (path.length() == 0) return;
 
 	QFile fIn(path);
 	if (fIn.open(QFile::ReadOnly) == false) {
-		QMessageBox::warning(this,"Failed", "Cannot open file");
+		QMessageBox::warning(this, tr("Failed"), tr("Cannot open file"));
 		return;
 	}
 
 	size_t loaded = peHndl->loadSectionContent(selectedSection, fIn);
 	fIn.close();
 
-	QMessageBox::information(this, "Loaded", "Loaded from file: 0x" + QString::number(loaded, 16) + " bytes");
+	QMessageBox::information(this, tr("Loaded"), tr("Loaded from file: 0x") + QString::number(loaded, 16) + " bytes");
 }

@@ -220,8 +220,8 @@ bool ResourcesDirSplitter::displayIcon(ResourceContentWrapper *resContent, const
 	if (!isOk) {
 		return false;
 	}
-	QString info = "Dimensions: " + QString::number(dimW, 10) + " x " + QString::number(dimH, 10) 
-		+ "\n" + "Colors: " + QString::number(colors, 10) + " bit";
+	QString info = tr("Dimensions: ") + QString::number(dimW, 10) + " x " + QString::number(dimH, 10)
+		+ "\n" + tr("Colors: ") + QString::number(colors, 10) + " bit";
 
 	this->pixmapInfo.setText(info);
 	this->pixmapInfo.setVisible(true);
@@ -293,7 +293,7 @@ void ResourcesDirSplitter::refreshLeafContent()
 			}
 			if (isOk) {
 				this->leafTab.setTabEnabled(this->contentTab, true);
-				this->leafTab.setToolTip("Image Preview");
+				this->leafTab.setToolTip(tr("Image Preview"));
 			}
 			break;
 		}
@@ -303,8 +303,8 @@ void ResourcesDirSplitter::refreshLeafContent()
 		return;
 	}
 	this->leafTab.setTabEnabled(this->contentTab, false);
-	this->leafTab.setToolTip("Preview not implemented yet");
-	this->contentText.setText("Error 501: Preview not implemented yet.");
+	this->leafTab.setToolTip(tr("Preview not implemented yet"));
+	this->contentText.setText(tr("Error 501: Preview not implemented yet."));
 }
 
 void ResourcesDirSplitter::init(WrapperTableModel *upModel, WrapperTableModel *downModel)
@@ -332,13 +332,13 @@ void ResourcesDirSplitter::init(WrapperTableModel *upModel, WrapperTableModel *d
 	connect(downModel, SIGNAL(modelUpdated()), this, SLOT(refreshLeafContent()));
 
 	if (downModel) {
-		int num = leafTab.addTab(&dock, "Table");
-		this->contentTab = leafTab.addTab(&contentDock, "Content");
+		int num = leafTab.addTab(&dock, tr("Table"));
+		this->contentTab = leafTab.addTab(&contentDock, tr("Content"));
 		dock.setFeatures(QDockWidget::NoDockWidgetFeatures);
 		
 		downTree.setModel(this->downModel);
 		dock.setWidget(&this->downTree);
-		dock.setWindowTitle("Resources");
+		dock.setWindowTitle(tr("Resources"));
 		addWidget(&leafTab);
 	}
 	this->contentText.setReadOnly(true);
@@ -365,7 +365,7 @@ bool ResourcesDirSplitter::initToolbar()
 {
 	toolBar.clear();
 	toolBar.setProperty("dataDir", true);
-	saveAction = new QAction( QString("&Save entries"), this);
+	saveAction = new QAction( QString(tr("&Save entries")), this);
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(onSaveEntries()) );
 	resizeComponents();
 	toolBar.addAction(saveAction);
@@ -431,11 +431,11 @@ void ResourcesDirSplitter::onSaveEntries()
 	}
 	
 	if (failed == 0) {
-		QString infoStr = "Dumped " + QString::number(dumped) + " entries to: " + pathDir;
-		if (invalid) infoStr += "\nUnable to dump entries: " + QString::number(invalid);
+		QString infoStr = tr("Dumped ") + QString::number(dumped) + tr(" entries to: ") + pathDir;
+		if (invalid) infoStr += "\n"+ tr("Unable to dump entries : ") + QString::number(invalid);
 		QMessageBox::information(this,"Dumped", infoStr);
 	} else {
-		QMessageBox::warning(this, "Failed", "Failed to dump!");
+		QMessageBox::warning(this, tr("Failed"), tr("Failed to dump!"));
 	}
 }
 
@@ -467,6 +467,6 @@ void ResourcesDirSplitter::fillList(size_t num)
 {
 	elementsList.clear();
 	for (size_t i = 0; i < num; i++) {
-		elementsList.addItem("Entry number: " + QString::number(i));
+		elementsList.addItem(tr("Entry number: ") + QString::number(i));
 	}
 }

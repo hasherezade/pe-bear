@@ -266,7 +266,7 @@ QVariant PEFileTreeItem::toolTip(int column) const
 			return fileTooltip;
 		}
 		if (role == PEFILE_OVERLAY) {
-			return "Overlay size: 0x" + QString::number(this->getOverlaySize(), 16);
+			return tr("Overlay size: 0x") + QString::number(this->getOverlaySize(), 16);
 		}
 	}
 	return data(column);
@@ -350,12 +350,12 @@ QVariant PEFileTreeItem::data(int column) const
 					return fileName + "*";
 				return fileName;
 			}
-			case PEFILE_IMG_DOS_HDR: return "DOS Header";
-			case PEFILE_DOS_STUB: return "DOS stub";
-			case PEFILE_IMG_NT_HDRS: return "NT Headers";
-			case PEFILE_SEC_HDRS: return "Section Headers";
-			case PEFILE_SECTIONS: return "Sections";
-			case PEFILE_OVERLAY: return "Overlay";
+			case PEFILE_IMG_DOS_HDR: return tr("DOS Header");
+			case PEFILE_DOS_STUB: return tr("DOS stub");
+			case PEFILE_IMG_NT_HDRS: return tr("NT Headers");
+			case PEFILE_SEC_HDRS: return tr("Section Headers");
+			case PEFILE_SECTIONS: return tr("Sections");
+			case PEFILE_OVERLAY: return tr("Overlay");
 		}
 		return QVariant();
 	}
@@ -418,7 +418,7 @@ QVariant PEFileSectionsTreeItem::data(int column) const
 	if (!m_PE) return QVariant();
 	if (column != 0) return QVariant();
 
-	if (this->level == DESC) return ("Sections");
+	if (this->level == DESC) return (tr("Sections"));
 	SectionHdrWrapper *sec = getMySection();
 	if (sec == NULL) return QVariant();
 	return sec->mappedName;
@@ -589,11 +589,11 @@ QVariant PEFileNTHdrTreeItem::data(int column) const
 
 	if (column != 0) return QVariant();
 
-	if (this->level == DESC) return ("NT Headers");
+	if (this->level == DESC) return (tr("NT Headers"));
 	switch (subrole) {
-		case PEFILE_NTHDR_SIGN : return "Signature";
-		case PEFILE_NTHDR_FILEHDR : return "File Header";
-		case PEFILE_NTHDR_OPTHDR : return "Optional Header";
+		case PEFILE_NTHDR_SIGN : return tr("Signature");
+		case PEFILE_NTHDR_FILEHDR : return tr("File Header");
+		case PEFILE_NTHDR_OPTHDR : return tr("Optional Header");
 	}
 	return QVariant();
 }

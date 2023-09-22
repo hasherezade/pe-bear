@@ -1,7 +1,8 @@
 #include <iostream>
 #include <QtGlobal>
 #include <QtCore>
-
+#include <QApplication>
+#include <QTranslator>
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
 #else
@@ -32,7 +33,13 @@ int main(int argc, char *argv[])
 #endif
 
 	QApplication app(argc, argv);
-
+	// Load language file
+	QApplication a(argc, argv);
+	QTranslator translator; 
+	if (translator.load("Language\\PELanguage.qm")) 
+	{
+		a.installTranslator(&translator); 
+	}
 	// workaround for a bug in Qt (not setting default font properly)
 	QApplication::setFont(QApplication::font("QMessageBox"));
 

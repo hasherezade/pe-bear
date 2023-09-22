@@ -55,12 +55,12 @@ t_reload_mode intToReloadMode(int val)
 bool MainSettings::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	this->autoSaveTags = settings.value("AutoSaveTags", true).toBool();
-	this->autoReloadOnFileChange = intToReloadMode(settings.value("AutoReloadOnChage", RELOAD_ASK).toInt());
+	this->autoSaveTags = settings.value(tr("AutoSaveTags"), true).toBool();
+	this->autoReloadOnFileChange = intToReloadMode(settings.value(tr("AutoReloadOnChage"), RELOAD_ASK).toInt());
 	this->uDataDir = settings.value("UDD", "").toString();
-	this->followOnClick = settings.value("FollowOnClick", false).toBool();
-	this->lExePath = settings.value("LastOpened", false).toString();
-	this->dirDump = settings.value("LastDumpDir", false).toString();
+	this->followOnClick = settings.value(tr("FollowOnClick"), false).toBool();
+	this->lExePath = settings.value(tr("LastOpened"), false).toString();
+	this->dirDump = settings.value(tr("LastDumpDir"), false).toString();
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -72,11 +72,11 @@ bool MainSettings::writePersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
 	settings.setValue("UDD", uDataDir);
-	settings.setValue("AutoSaveTags", autoSaveTags);
-	settings.setValue("AutoReloadOnChage", autoReloadOnFileChange);
-	settings.setValue("FollowOnClick", followOnClick);
-	settings.setValue("LastOpened", this->lExePath);
-	settings.setValue("LastDumpDir", this->dirDump);
+	settings.setValue(tr("AutoSaveTags"), autoSaveTags);
+	settings.setValue(tr("AutoReloadOnChage"), autoReloadOnFileChange);
+	settings.setValue(tr("FollowOnClick"), followOnClick);
+	settings.setValue(tr("LastOpened"), this->lExePath);
+	settings.setValue(tr("LastDumpDir"), this->dirDump);
 
 	if ( settings.status() == QSettings::NoError ) {
 		return true;
@@ -118,10 +118,10 @@ bool GuiSettings::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
 	
-	QFont gFont = readFontProperties(settings, "globalFont", this->defaultGlobalFont);
-	QFont hFont =  readFontProperties(settings, "hexFont", HexViewSettings::defaultFont());
-	QFont dFont = readFontProperties(settings, "disasmFont", DisasmViewSettings::defaultFont());
-	QString styleName = settings.value("style", "").toString();
+	QFont gFont = readFontProperties(settings, tr("globalFont"), this->defaultGlobalFont);
+	QFont hFont =  readFontProperties(settings, tr("hexFont"), HexViewSettings::defaultFont());
+	QFont dFont = readFontProperties(settings, tr("disasmFont"), DisasmViewSettings::defaultFont());
+	QString styleName = settings.value(tr("style"), "").toString();
 	
 	this->_setGlobalFont(gFont);
 	this->_setDisasmViewFont(dFont);
@@ -144,12 +144,12 @@ bool GuiSettings::writePersistent()
 	QSettings settings(COMPANY_NAME, APP_NAME);
 	
 	QFont currFont = QApplication::font();
-	writeFontProperties(settings, currFont, "globalFont");
-	writeFontProperties(settings, this->hexVSettings.myFont, "hexFont");
-	writeFontProperties(settings, this->disasmVSettings.myFont, "disasmFont");
+	writeFontProperties(settings, currFont, tr("globalFont"));
+	writeFontProperties(settings, this->hexVSettings.myFont, tr("hexFont"));
+	writeFontProperties(settings, this->disasmVSettings.myFont, tr("disasmFont"));
 	
 	// save the style:
-	settings.setValue("style", this->currentStyle);
+	settings.setValue(tr("style"), this->currentStyle);
 	
 	if ( settings.status() == QSettings::NoError ) {
 		return true;
@@ -160,8 +160,8 @@ bool GuiSettings::writePersistent()
 void GuiSettings::initStyles()
 {
 	this->defaultStylesheet = qApp->styleSheet();
-	this->defaultStyleName = "*System Default*";
+	this->defaultStyleName = tr("*System Default*");
 
 	nameToStyle[this->defaultStyleName] = this->defaultStylesheet;
-	nameToStyle["Dark"] = g_DarkStyle;
+	nameToStyle[tr("Dark")] = g_DarkStyle;
 }

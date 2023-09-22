@@ -7,10 +7,10 @@ QVariant ExportsTreeModel::headerData(int section, Qt::Orientation orientation, 
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case VALUE : return "Value";
-		case VALUE2: return "Meaning";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case VALUE : return tr("Value");
+		case VALUE2: return tr("Meaning");
 	}
 	return QVariant();
 }
@@ -64,7 +64,7 @@ QString ExportsTreeModel::makeDockerTitle(uint32_t upId)
 	if (!isOk) return "-";
 
 	std::string name = "Exported Functions";
-	QString numDesc = funcNum == 1 ? " entry" : " entries";
+	QString numDesc = funcNum == 1 ? tr(" entry") : tr(" entries");
 	QString desc = QString::fromStdString(name) + "   [ " + QString::number(funcNum) + numDesc + " ]"; 
 	return desc;
 }
@@ -187,12 +187,12 @@ QVariant ExportedFuncTreeModel::headerData(int section, Qt::Orientation orientat
 {
 	if(role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET : return "Offset";
-		case ORDINAL : return "Ordinal";
-		case VALUE : return "Function RVA";
-		case NAME_RVA : return "Name RVA";
-		case NAME : return "Name";
-		case FORWARDER: return "Forwarder";
+		case OFFSET : return tr("Offset");
+		case ORDINAL : return tr("Ordinal");
+		case VALUE : return tr("Function RVA");
+		case NAME_RVA : return tr("Name RVA");
+		case NAME : return tr("Name");
+		case FORWARDER: return tr("Forwarder");
 	}
 	return QVariant();
 }

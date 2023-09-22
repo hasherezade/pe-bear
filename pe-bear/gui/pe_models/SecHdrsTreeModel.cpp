@@ -179,7 +179,7 @@ QVariant SecTreeItem::toolTip(int column) const
 			case SEC_NAME :
 			{
 				int indx = m_PE->getSecIndex(sec);
-				return "index:\t" + QString::number(indx)+"\n"+ sec->mappedName;
+				return tr("index:")+"\t" + QString::number(indx)+"\n"+ sec->mappedName;
 			}
 			case SEC_CHARACT :
 			{
@@ -189,13 +189,13 @@ QVariant SecTreeItem::toolTip(int column) const
 			case SEC_RSIZE:
 			{
 				bufsize_t rounded = sec->getContentSize(Executable::RAW, true);
-				if (sec->getContentSize(Executable::RAW, false) != rounded) return "mapped:\n" + QString::number(rounded, 16);
+				if (sec->getContentSize(Executable::RAW, false) != rounded) return tr("mapped:")+"\n" + QString::number(rounded, 16);
 				break;
 			}
 			case SEC_VSIZE:
 			{
 				bufsize_t rounded = sec->getContentSize(Executable::RVA, true);
-				if (sec->getContentSize(Executable::RVA, false) != rounded) return "mapped:\n" + QString::number(rounded, 16);
+				if (sec->getContentSize(Executable::RVA, false) != rounded) return tr("mapped:")+"\n" + QString::number(rounded, 16);
 				break;
 			}
 			case SEC_RPTR:
@@ -203,8 +203,8 @@ QVariant SecTreeItem::toolTip(int column) const
 				const offset_t hdrOffset = sec->getContentOffset(Executable::RAW, false);
 				const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
 				if (hdrOffset != mappedOffset) {
-					const QString offsetStr = (mappedOffset != INVALID_ADDR) ? QString::number(mappedOffset, 16).toUpper() : "<invalid>";
-					return "mapped offset:\n" + offsetStr;
+					const QString offsetStr = (mappedOffset != INVALID_ADDR) ? QString::number(mappedOffset, 16).toUpper() : tr("<invalid>");
+					return tr("mapped offset:")+ "\n" + offsetStr;
 				}
 			}
 		}
@@ -266,14 +266,14 @@ QVariant SecTreeItem::data(int column) const
 				else return ">";
 			case SEC_VSIZE :
 				if (sec->getContentSize(Executable::RVA, false) != sec->getContentSize(Executable::RVA, true))
-					return "mapped: " + QString::number(sec->getContentSize(Executable::RVA, true), 16).toUpper();
+					return tr("mapped: ") + QString::number(sec->getContentSize(Executable::RVA, true), 16).toUpper();
 				return "^";
 				break;
 			case SEC_VPTR :
 				return QString::number(sec->getVirtualPtr() + sec->getContentSize(Executable::RVA, true), 16).toUpper();
 			case SEC_RSIZE :
 				if (sec->getContentSize(Executable::RAW, false) != sec->getContentSize(Executable::RAW, true))
-					return "mapped: " + QString::number(sec->getContentSize(Executable::RAW, true), 16).toUpper();
+					return tr("mapped: ") + QString::number(sec->getContentSize(Executable::RAW, true), 16).toUpper();
 				return "^";
 				break;
 			case SEC_RPTR : 
@@ -449,15 +449,15 @@ QVariant SecHdrsTreeModel::headerData(int section, Qt::Orientation /* orientatio
 	if (section >= SEC_FIELD_COUNTER) return QVariant();
 	switch (section)
 	{
-		case SEC_NAME: return "Name"; 
-		case SEC_VSIZE: return "Virtual Size";
-		case SEC_VPTR: return "Virtual Addr.";
-		case SEC_RSIZE: return "Raw size";
-		case SEC_RPTR: return "Raw Addr.";
-		case SEC_CHARACT: return "Characteristics";
-		case SEC_RELOC_PTR: return "Ptr to Reloc.";
-		case SEC_RELOC_NUM: return "Num. of Reloc.";
-		case SEC_LINENUM_NUM: return "Num. of Linenum.";
+		case SEC_NAME: return tr("Name");
+		case SEC_VSIZE: return tr("Virtual Size");
+		case SEC_VPTR: return tr("Virtual Addr.");
+		case SEC_RSIZE: return tr("Raw size");
+		case SEC_RPTR: return tr("Raw Addr.");
+		case SEC_CHARACT: return tr("Characteristics");
+		case SEC_RELOC_PTR: return tr("Ptr to Reloc.");
+		case SEC_RELOC_NUM: return tr("Num. of Reloc.");
+		case SEC_LINENUM_NUM: return tr("Num. of Linenum.");
 	}
 	return QVariant();
 }

@@ -57,7 +57,7 @@ void HexInputDialog::accepted()
 	getNumValue(&isValid);
 	
 	if (isValid == false) {
-		QMessageBox::warning(this, "Warning!", "Wrong number format supplied!");
+		QMessageBox::warning(this, tr("Warning!"), tr("Wrong number format supplied!"));
 		return;
 	}
 	QDialog::accept();

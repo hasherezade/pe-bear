@@ -18,9 +18,9 @@ QVariant DosHdrTableModel::headerData(int section, Qt::Orientation orientation, 
 {
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case COL_OFFSET: return "Offset";
-		case COL_NAME: return "Name";
-		case COL_VALUE:  return "Value";
+		case COL_OFFSET: return tr("Offset");
+		case COL_NAME: return tr("Name");
+		case COL_VALUE:  return tr("Value");
 	}
 	return QVariant();
 }

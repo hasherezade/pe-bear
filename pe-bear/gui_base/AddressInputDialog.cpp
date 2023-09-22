@@ -9,18 +9,18 @@
 //-----------
 
 AddressInputDialog::AddressInputDialog(Executable *exe, bool isRaw, ColorSettings &_addrColors, QWidget *parent)
-	: HexInputDialog("Go to address", "Address (hex):", parent),
+	: HexInputDialog(tr("Go to address"), tr("Address (hex):"), parent),
 	myExe(exe), isRawAddr(isRaw),
 	addrColors(_addrColors),
 	cbox_isRva(NULL), otherCaptionLabel(NULL), otherEdit(NULL)
 {
 	this->setMinimumSize( QSize(250, 150) );
-	cbox_isRva = new QCheckBox("+ ImageBase (RVA -> VA)");
+	cbox_isRva = new QCheckBox(tr("+ ImageBase (RVA -> VA)"));
 	if (!isRawAddr) {
 		layout_middleBox->addWidget(cbox_isRva);
 	}
 	
-	const QString otherLabel = (isRawAddr) ? "= Virtual:" : "= Raw:";
+	const QString otherLabel = (isRawAddr) ? tr("= Virtual:") : tr("= Raw:");
 	this->otherCaptionLabel = new QLabel(otherLabel);
 	layout_middleBox->addWidget(this->otherCaptionLabel);
 
@@ -92,12 +92,12 @@ void AddressInputDialog::validateAddr()
 		if (otherFmt != INVALID_ADDR) {
 			otherEdit->setText(QString::number(otherFmt, 16).toUpper());
 		} else {
-			otherEdit->setText("<invalid>");
+			otherEdit->setText(tr("<invalid>"));
 		}
 	}
 
 	if (isAccepted == false) {
-		this->le->setStyleSheet("border: 2px solid red;");
+		this->le->setStyleSheet(tr("border: 2px solid red;"));
 	} else {
 		this->le->setStyleSheet("");
 	}
@@ -123,7 +123,7 @@ void AddressInputDialog::setTextColor()
 	QPalette palette;
 	palette.setColor(QPalette::Text, addrColor);
 	le->setPalette(palette);
-	le->setStyleSheet(le->styleSheet() + "color : " + addrColor.name() + ";");
+	le->setStyleSheet(le->styleSheet() + "color : "+ addrColor.name() + ";");
 
 	QPalette otherPalette;
 	otherPalette.setColor(QPalette::Text, otherColor);
@@ -134,13 +134,13 @@ void AddressInputDialog::setTextColor()
 void AddressInputDialog::setDescriptions()
 {
 	Executable::addr_type aT = getAddrType();
-	QString desc = "Raw";
-	QString winDesc = (aT == Executable::RAW) ? "Raw Address" : "Virtual Address";
+	QString desc = tr("Raw");
+	QString winDesc = (aT == Executable::RAW) ? tr("Raw Address") : tr("Virtual Address");
 	if (aT == Executable::RVA) desc = "RVA";
 	if (aT == Executable::VA) desc = "VA";
 	
-	this->setWindowTitle("Go to " + winDesc);
-	this->captionLabel->setText("Go to " + desc + " (hex):");
+	this->setWindowTitle(tr("Go to ") + winDesc);
+	this->captionLabel->setText(tr("Go to ") + desc + " (hex):");
 }
 
 void AddressInputDialog::onAddrTypeChanged()

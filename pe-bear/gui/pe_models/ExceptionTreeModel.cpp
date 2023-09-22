@@ -18,7 +18,7 @@ QVariant ExceptionTreeModel::headerData(int section, Qt::Orientation orientation
 {
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET: return "Offset";
+		case OFFSET: return tr("Offset");
 	}
 	ExceptionDirWrapper* impWrap = dynamic_cast<ExceptionDirWrapper*>(wrapper());
 	if (!impWrap) return QVariant();

@@ -18,10 +18,10 @@ QVariant ImportsTreeModel::headerData(int section, Qt::Orientation orientation, 
 {
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case IS_BOUND : return "Bound?";
-		case FUNC_NUM: return "Func. Count";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case IS_BOUND : return tr("Bound?");
+		case FUNC_NUM: return tr("Func. Count");
 	}
 	ImportDirWrapper* impWrap = dynamic_cast<ImportDirWrapper*>(wrapper());
 	if (!impWrap) return QVariant();
@@ -173,9 +173,9 @@ QVariant ImportedFuncModel::headerData(int section, Qt::Orientation orientation,
 	if (entry == NULL) return "";
 
 	switch (section) {
-		case NAME: return "Name";
-		case ORDINAL : return "Ordinal";
-		case CALL_VIA: return "Call via";
+		case NAME: return tr("Name");
+		case ORDINAL : return tr("Ordinal");
+		case CALL_VIA: return tr("Call via");
 	}
 	return entry->getFieldName(fId);
 }

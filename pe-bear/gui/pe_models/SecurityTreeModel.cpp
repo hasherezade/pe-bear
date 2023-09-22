@@ -7,10 +7,10 @@ QVariant SecurityTreeModel::headerData(int section, Qt::Orientation orientation,
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case VALUE : return "Value";
-		case VALUE2: return "Meaning";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case VALUE : return tr("Value");
+		case VALUE2: return tr("Meaning");
 	}
 	return QVariant();
 }

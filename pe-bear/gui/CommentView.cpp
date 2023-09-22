@@ -8,7 +8,7 @@ CommentView::CommentView(PeHandler *peHandler, QWidget *parent)
 {
 	if (peHandler) commentHndl = &peHandler->comments;
 
-	this->filter = "Tag files (*.tag);;Text files (*.txt);;All Files (*)";
+	this->filter = tr("Tag files (*.tag);;Text files (*.txt);;All Files (*)");
 }
 
 void CommentView::onSetComment(offset_t offset)
@@ -16,7 +16,7 @@ void CommentView::onSetComment(offset_t offset)
 	bool isOk = false;
 	QString prev = this->commentHndl->getCommentAt(offset);
 	QString title = "RVA : "+ QString::number(offset, 16).toUpper();
-	QString text = QInputDialog::getText(this, title, "Comment", QLineEdit::Normal, prev,  &isOk);
+	QString text = QInputDialog::getText(this, title, tr("Comment"), QLineEdit::Normal, prev,  &isOk);
 	if (!isOk) return;
 
 	this->commentHndl->setComment(offset, text);
@@ -30,12 +30,12 @@ void CommentView::onSaveComments()
 	if (set) {
 		dialog.setDirectory(set->userDataDir());
 	}
-	QString fName = dialog.getSaveFileName(NULL, "Save", "", filter);
+	QString fName = dialog.getSaveFileName(NULL, tr("Save"), "", filter);
 	if (fName.size() == 0) {
 		return;
 	}
 	if (this->commentHndl->saveToFile(fName) == false) {
-		 QMessageBox::warning(this, "Failed", "Saving failed!", QMessageBox::Ok);
+		 QMessageBox::warning(this, tr("Failed"), tr("Saving failed!"), QMessageBox::Ok);
 	}
 }
 
@@ -46,11 +46,11 @@ void CommentView::onLoadComments()
 	if (set) {
 		dialog.setDirectory(set->userDataDir());
 	}
-	QString fName = dialog.getOpenFileName(NULL, "Open", "", filter);
+	QString fName = dialog.getOpenFileName(NULL, tr("Open"), "", filter);
 	if (fName.size() == 0) return;
 
 	if (loadComments(fName) == false) {
-		 QMessageBox::warning(this, "Failed", "Loading failed!", QMessageBox::Ok);
+		 QMessageBox::warning(this, tr("Failed"), tr("Loading failed!"), QMessageBox::Ok);
 		 return;
 	}
 	//---

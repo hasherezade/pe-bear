@@ -147,7 +147,7 @@ void HexTableView::initHeaderMenu()
 {
 	if (!vHdr) return;
 	QMenu &hdrMenu = vHdr->defaultMenu;
-	QMenu *naviSubMenu = hdrMenu.addMenu("Navigation");
+	QMenu *naviSubMenu = hdrMenu.addMenu(tr("Navigation"));
 
 	QString pageSize = QString::number(PREVIEW_SIZE, 16);
 
@@ -161,7 +161,7 @@ void HexTableView::initHeaderMenu()
 	connect(pgDn, SIGNAL(triggered()), this, SLOT(setPageDown()));
 	naviSubMenu->addAction(pgDn);
 
-	back = new QAction("Back to offset", &hdrMenu);
+	back = new QAction(tr("Back to offset"), &hdrMenu);
 	back->setShortcut(Qt::Key_B);
 	connect(back, SIGNAL(triggered()), this, SLOT(undoOffset()));
 	naviSubMenu->addAction(back);
@@ -172,29 +172,29 @@ void HexTableView::initMenu()
 	QMenu* menu = &defaultMenu;
 	//QMenu* editSubmenu = menu.addMenu("&Selection");
 
-	QAction *copySelAction = new QAction("Copy", menu);
+	QAction *copySelAction = new QAction(tr("Copy"), menu);
 	copySelAction->setShortcut(Qt::CTRL + Qt::Key_C);
 
 	menu->addAction(copySelAction);
 	connect(copySelAction, SIGNAL(triggered()), this, SLOT(copySelected()));
 
-	QAction *pasteSelAction = new QAction("Paste to selected", menu);
+	QAction *pasteSelAction = new QAction(tr("Paste to selected"), menu);
 	pasteSelAction->setShortcut(Qt::CTRL + Qt::Key_V);
 	menu->addAction(pasteSelAction);
 	connect(pasteSelAction, SIGNAL(triggered()), this, SLOT(pasteToSelected()));
 
-	QMenu* fillSubmenu = menu->addMenu("Fill selected");
+	QMenu* fillSubmenu = menu->addMenu(tr("Fill selected"));
 	
-	QAction *clearSelAction = new QAction("Clear", fillSubmenu);
+	QAction *clearSelAction = new QAction(tr("Clear"), fillSubmenu);
 	clearSelAction->setShortcut(Qt::Key_Delete);
 	fillSubmenu->addAction(clearSelAction);
 	connect(clearSelAction, SIGNAL(triggered()), this, SLOT(clearSelected()));
 
-	QAction *fillSelAction = new QAction("NOP", fillSubmenu);
+	QAction *fillSelAction = new QAction(tr("NOP"), fillSubmenu);
 	fillSubmenu->addAction(fillSelAction);
 	connect(fillSelAction, SIGNAL(triggered()), this, SLOT(fillSelected()));
 
-	undo = new QAction("Undo", menu);
+	undo = new QAction(tr("Undo"), menu);
 	undo->setShortcut(Qt::CTRL + Qt::Key_Z);
 	connect(undo, SIGNAL(triggered()), this, SLOT(undoLastModification()));
 }
@@ -271,11 +271,11 @@ void HexTableView::copySelected()
 	//mimeData->setText(getSelectedText(separator, separator));
 	QString text = getSelectedText(separator, separator);
 #if QT_VERSION >= 0x050000
-	mimeData->setData("text/plain", text.toLatin1());
+	mimeData->setData(tr("text/plain"), text.toLatin1());
 #else
-	mimeData->setData("text/plain", text.toAscii());
+	mimeData->setData(tr("text/plain"), text.toAscii());
 #endif
-	mimeData->setData("application/octet-stream", bytes);
+	mimeData->setData(tr("application/octet-stream"), bytes);
 	QApplication::clipboard()->setMimeData(mimeData);
 }
 
@@ -309,7 +309,7 @@ void HexTableView::pasteToSelected()
 	if (bufSize == 0) return;
 
 	if (!isIndexListContinuous(list)) {
-		QMessageBox::warning(0, "Warning!", "Select continuous area!");
+		QMessageBox::warning(0, tr("Warning!"), tr("Select continuous area!"));
 		return;
 	}
 	offset_t first = hexModel->contentOffsetAt(list.at(0));
@@ -325,7 +325,7 @@ void HexTableView::pasteToSelected()
 	
 	bool success = hexModel->myPeHndl->substBlock(first, clipSize, buf);
 	if (success == false) {
-		QMessageBox::warning(0, "Error!", "Modification in this area in  unacceptable!\n(Causes format corruption)");
+		QMessageBox::warning(0, tr("Error!"), tr("Modification in this area in  unacceptable!")+"\n"+tr("(Causes format corruption)"));
 		return;
 	}
 }
@@ -340,7 +340,7 @@ void HexTableView::fillSelected()
 	if (size == 0) return;
 
 	if (!isIndexListContinuous(list)) {
-		QMessageBox::warning(0,"Warning!", "Select continuous area!");
+		QMessageBox::warning(0, tr("Warning!"), tr("Select continuous area!"));
 		return;
 	}
 
@@ -348,7 +348,7 @@ void HexTableView::fillSelected()
 	if (first == INVALID_ADDR) return;
 
 	if (hexModel->myPeHndl->fillBlock(first, size, 0x90) == false) {
-		QMessageBox::warning(0, "Error!", "Modification in this area in  unacceptable!\n(Causes format corruption)");
+		QMessageBox::warning(0, tr("Error!"), tr("Modification in this area in  unacceptable!")+"\n"+ tr("(Causes format corruption)"));
 		return;
 	}
 }
@@ -364,14 +364,14 @@ void HexTableView::clearSelected()
 	if (size == 0) return;
 
 	if (!isIndexListContinuous(list)) {
-		QMessageBox::warning(0,"Warning!", "Select continuous area!");
+		QMessageBox::warning(0, tr("Warning!"), tr("Select continuous area!"));
 		return;
 	}
 	offset_t first = hexModel->contentOffsetAt(list.at(0));
 	if (first == INVALID_ADDR) return;
 
 	if (hexModel->myPeHndl->fillBlock(first, size, 0) == false) {
-		QMessageBox::warning(0, "Error!", "Modification in this area in  unacceptable!\n(Causes format corruption)");
+		QMessageBox::warning(0, tr("Error!"), tr("Modification in this area in  unacceptable!")+"\n"+ tr("(Causes format corruption)"));
 		return;
 	}
 }
@@ -405,7 +405,7 @@ void HexTableView::updateUndoAction()
 	if (!hexModel) return; 
 	if (hexModel->myPeHndl->prevOffsets.size() > 0) {
 		this->back->setEnabled(true);
-		this->back->setText("Back to: 0x" + QString::number(hexModel->myPeHndl->prevOffsets.top(), 16).toUpper());
+		this->back->setText(tr("Back to: 0x") + QString::number(hexModel->myPeHndl->prevOffsets.top(), 16).toUpper());
 	} else {
 		this->back->setEnabled(false);
 	}

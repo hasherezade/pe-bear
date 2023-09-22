@@ -13,11 +13,11 @@ FollowablePeTreeView::FollowablePeTreeView(QWidget *parent)
 	setSelectionMode(QAbstractItemView::SingleSelection);
 	setAlternatingRowColors(true);
 
-	followOffsetAction = new QAction("Follow offset", this);
+	followOffsetAction = new QAction(tr("Follow offset"), this);
 	this->defaultMenu.addAction(followOffsetAction);
 	connect(followOffsetAction, SIGNAL(triggered()), this, SLOT(followOffset()));
 	
-	onClick = new QAction("Follow on click", this);
+	onClick = new QAction(tr("Follow on click"), this);
 	onClick->setCheckable(true);
 	MainSettings* set =  getSettings();
 	if (set) {
@@ -139,12 +139,12 @@ void FollowablePeTreeView::followOffset()
 	try {
 		offset_t raw = pe()->toRaw(this->selectedOffset, this->addrType, true);
 		if (raw == INVALID_ADDR) {
-			QMessageBox::warning(this, "Failed!", "Cannot follow - invalid address!");
+			QMessageBox::warning(this, tr("Failed!"), tr("Cannot follow - invalid address!"));
 			return;
 		}
 		peHndl()->setDisplayed(false, raw);
 
 	} catch (CustomException &e) {
-		QMessageBox::warning(this, "Cannot follow!", e.getInfo());
+		QMessageBox::warning(this, tr("Cannot follow!"), e.getInfo());
 	}
 }

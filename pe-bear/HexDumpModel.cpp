@@ -62,7 +62,7 @@ QVariant HexDumpModel::headerData(int section, Qt::Orientation orientation, int 
 			return QString::number(offset, 16).toUpper();
 		}
 		if ( role == Qt::ToolTipRole) {
-			return QString::number(offset, 16).toUpper() +"\nRight click to follow.";
+			return QString::number(offset, 16).toUpper() +"\n"+ tr("Right click to follow.");
 		}
 	}
 
@@ -163,7 +163,7 @@ QVariant HexDumpModel::data(const QModelIndex &index, int role) const
 		return settings.myFont;
 	}
 	if (role == Qt::ToolTipRole) {
-		return "Double-click to edit";
+		return tr("Double-click to edit");
 	}
 	if (role == Qt::ForegroundRole) {
 		bool isActiveArea = this->myPeHndl->isInActiveArea(offset);

@@ -33,14 +33,14 @@ QVariant ResourcesTreeModel::headerData(int section, Qt::Orientation orientation
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case VALUE : return "Value";
-		case VALUE2: return "Value";
-		case MEANING: return "Meaning";
-		case MEANING2: return "Meaning";
-		case RES_NAME: return "Type";
-		case ENTRIES_NUM: return "Entries Count";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case VALUE : return tr("Value");
+		case VALUE2: return tr("Value");
+		case MEANING: return tr("Meaning");
+		case MEANING2: return tr("Meaning");
+		case RES_NAME: return tr("Type");
+		case ENTRIES_NUM: return tr("Entries Count");
 	}
 	return QVariant();
 }
@@ -156,7 +156,7 @@ QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
 		&& fId >= this->getWrapperFieldsCount())
 	{
 		if (role == Qt::DecorationRole) return ViewSettings::getScaledPixmap(":/icons/List.ico");
-		if (role == Qt::ToolTipRole) return "List";
+		if (role == Qt::ToolTipRole) return tr("List");
 	}
 	
 	if (role == Qt::ToolTipRole) return toolTip(index);
@@ -190,9 +190,9 @@ QVariant ResourceLeafModel::headerData(int section, Qt::Orientation orientation,
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case VALUE : return "Value";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case VALUE : return tr("Value");
 	}
 	return QVariant();
 }

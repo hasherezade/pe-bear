@@ -28,7 +28,7 @@ bool PeTreeItem::containsRVA(int column, int row) const
 QVariant PeTreeItem::toolTip(int column) const
 {
 	if (!m_PE) return QVariant();
-	if (canFollow(column, 0)) return "Right click to follow";
+	if (canFollow(column, 0)) return tr("Right click to follow");
 	return data(column);
 }
 
@@ -99,7 +99,7 @@ QVariant PeTreeModel::toolTip(QModelIndex index) const
 {
 	if (!index.isValid()) return "";
 
-	QString desc = "Right click to follow ";
+	QString desc = tr("Right click to follow ");
 	
 	switch (addrTypeAt(index)) {
 		case Executable::RAW: return desc + "[raw]";
