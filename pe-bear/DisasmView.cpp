@@ -756,7 +756,7 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 			const offset_t raw = this->getRawAt(y);
 			return tr("Not mapped. Raw = 0x") + QString::number(raw, 16);
 		}
-		if (role == Qt::ForegroundRole) return QColor(tr("red"));
+		if (role == Qt::ForegroundRole) return QColor("red");
 	}
 
 	//rva valid
@@ -772,18 +772,18 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 	}
 
 	if (!myDisasm.isRvaContnuous(y)) {
-		if (role == Qt::ForegroundRole) return QColor(tr("magenta"));
+		if (role == Qt::ForegroundRole) return QColor("magenta");
 	}
 
 	DWORD ep = m_PE->getEntryPoint();
 	size_t disChunk = myDisasm.getChunkSize(y);
 
 	if (ep >= rva && ep < (rva + disChunk)) {
-		if (role == Qt::ForegroundRole) return QColor(tr("cyan"));
+		if (role == Qt::ForegroundRole) return QColor("cyan");
 		if (role == Qt::ToolTipRole) return tr("Entry Point = ") + QString::number(ep, 16).toUpper();
 	}
 	// normal color
-	if (role == Qt::ForegroundRole) return QColor(tr("white"));
+	if (role == Qt::ForegroundRole) return QColor("white");
 
 	return QVariant();
 }
