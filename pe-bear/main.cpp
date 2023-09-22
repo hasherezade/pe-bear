@@ -49,7 +49,8 @@ int main(int argc, char *argv[])
 	}
 	QString trPath = mainSettings.userDataDir() + QDir::separator() + mainSettings.languageDir + QDir::separator() + currLanguage + QDir::separator() + "PELanguage.qm";
 	if (translator.load(trPath)) {
-		app.installTranslator(&translator); 
+		app.installTranslator(&translator);
+		mainSettings.language = currLanguage;
 	}
 
 	app.setApplicationName(TITLE);
