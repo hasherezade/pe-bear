@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
 
 	QApplication app(argc, argv);
 	// Load language file
+	QTranslator translator; 
 	if (translator.load("Language\\PELanguage.qm")) {
 		app.installTranslator(&translator); 
 	}
