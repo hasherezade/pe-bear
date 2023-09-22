@@ -10,5 +10,5 @@ pebear.exe
 # How to translate
 Download the language file, use QT linguist to load and select the language to be translated, and click Publish to generate qm file after translation.
 # reference data
-https://doc.qt.io/qt-5/qtlinguist-index.html
-https://doc.qt.io/qt-5/linguist-translators.html
+* https://doc.qt.io/qt-5/qtlinguist-index.html
+* https://doc.qt.io/qt-5/linguist-translators.html
