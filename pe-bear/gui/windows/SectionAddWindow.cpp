@@ -146,4 +146,5 @@ void SectionAddWindow::onOkClicked()
 
 	QMessageBox::information(this, tr("Success!"), tr("Section ")+ name + tr(" added!"));
 	this->hide();
+	
 }

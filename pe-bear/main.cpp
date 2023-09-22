@@ -34,11 +34,8 @@ int main(int argc, char *argv[])
 
 	QApplication app(argc, argv);
 	// Load language file
-	QApplication a(argc, argv);
-	QTranslator translator; 
-	if (translator.load("Language\\PELanguage.qm")) 
-	{
-		a.installTranslator(&translator); 
+	if (translator.load("Language\\PELanguage.qm")) {
+		app.installTranslator(&translator); 
 	}
 	// workaround for a bug in Qt (not setting default font properly)
 	QApplication::setFont(QApplication::font("QMessageBox"));

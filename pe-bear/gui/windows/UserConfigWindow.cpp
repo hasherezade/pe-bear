@@ -12,7 +12,7 @@ void DirEdit::validateDir(const QString &input)
 {
 	QDir dir(input);
 	if (dir.exists() == false) {
-		this->setStyleSheet(tr("border: 2px solid red;"));
+		this->setStyleSheet("border: 2px solid red;");
 	} else {
 		this->setStyleSheet("");
 	}

@@ -250,7 +250,7 @@ void DisasmTreeView::copySelected()
 	}
 	QMimeData *mimeData = new QMimeData;
 	mimeData->setText(getSelectedText("\t", "\n"));
-	mimeData->setData(tr("application/octet-stream"), bytes);
+	mimeData->setData("application/octet-stream", bytes);
 	QApplication::clipboard()->setMimeData(mimeData);
 }
 

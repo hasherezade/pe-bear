@@ -271,11 +271,11 @@ void HexTableView::copySelected()
 	//mimeData->setText(getSelectedText(separator, separator));
 	QString text = getSelectedText(separator, separator);
 #if QT_VERSION >= 0x050000
-	mimeData->setData(tr("text/plain"), text.toLatin1());
+	mimeData->setData("text/plain", text.toLatin1());
 #else
-	mimeData->setData(tr("text/plain"), text.toAscii());
+	mimeData->setData("text/plain", text.toAscii());
 #endif
-	mimeData->setData(tr("application/octet-stream"), bytes);
+	mimeData->setData("application/octet-stream", bytes);
 	QApplication::clipboard()->setMimeData(mimeData);
 }
 
