@@ -69,7 +69,7 @@ QString WrapperTableModel::makeDockerTitle(uint32_t upId)
 	}
 	QString name = childEntry->getName();
 	uint32_t funcNum = childEntry->getEntriesCount();
-	QString numDesc = funcNum == 1 ? " entry" : " entries";
+	QString numDesc = funcNum == 1 ? tr(" entry") : tr(" entries");
 	QString desc = name + "   [ " + QString::number(funcNum) + numDesc + " ]"; 
 	return desc;
 }

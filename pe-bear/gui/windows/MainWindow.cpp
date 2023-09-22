@@ -1,7 +1,8 @@
 #include "MainWindow.h"
 #include <QtGlobal>
 #include <bearparser/bearparser.h>
-
+#include <QApplication>
+#include <QTranslator>
 #include "../../HexView.h"
 #include "../../base/RegKeyManager.h"
 
@@ -128,7 +129,7 @@ void MainWindow::reloadFile(const QString &path, const bool isDeleted)
 	}
 	_reload(hndl, isDeleted);
 	if (!isDeleted) {
-		this->statusBar.showMessage("File reloaded: "+ path);
+		this->statusBar.showMessage(tr("File reloaded: ")+ path);
 	}
 }
 
@@ -144,9 +145,9 @@ bool MainWindow::checkFileChanges(const QString &path)
 	const bool isFileDeleted = fileInfo.exists() ? false : true;
 
 	if (isFileDeleted) {
-		this->statusBar.showMessage("File deleted: "+ path);
+		this->statusBar.showMessage(tr("File deleted: ")+ path);
 	} else {
-		this->statusBar.showMessage("File changed: "+ path);
+		this->statusBar.showMessage(tr("File changed: ")+ path);
 	}
 	
 	const t_reload_mode rMode = this->mainSettings.isReloadOnFileChange();
@@ -156,10 +157,10 @@ bool MainWindow::checkFileChanges(const QString &path)
 	}
 	bool shouldReload = (rMode == RELOAD_AUTO);
 	if (!shouldReload || isFileDeleted) {
-		const QString wndTitle = (!isFileDeleted) ? "File changed!" : "File deleted!";
+		const QString wndTitle = (!isFileDeleted) ?tr("File changed!") : tr("File deleted!");
 		const QString wndInfo = (!isFileDeleted) 
-			? "The file:\n" + path + "\n- has changed.\n\nDo you want to reload?" 
-			: "The file:\n" + path + "\n- has been deleted.\n\nDo you want to unload?";
+			? tr("The file:")+"\n" + path + "\n"+tr("- has changed.") + "\n" + tr("Do you want to reload ? " )
+			: tr("The file:") +"\n" + path + "\n"+tr("- has been deleted.")+"\n"+tr("Do you want to unload?");
 
 		QMessageBox msgbox(this);
 
@@ -170,8 +171,8 @@ bool MainWindow::checkFileChanges(const QString &path)
 		msgbox.addButton(QMessageBox::No);
 		msgbox.setDefaultButton(QMessageBox::Yes);		
 #if QT_VERSION >= 0x050000
-		QCheckBox cb("Remember the answer", &msgbox);
-		cb.setToolTip("Can be changed in: [Settings] -> [Configure...]");
+		QCheckBox cb(tr("Remember the answer"), &msgbox);
+		cb.setToolTip(tr("Can be changed in: [Settings] -> [Configure...]"));
 		cb.setChecked(false);
 		msgbox.setCheckBox(&cb);
 #endif
@@ -207,8 +208,8 @@ bool MainWindow::checkFileChanges(const QString &path)
 bool MainWindow::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	restoreGeometry(settings.value("geometry").toByteArray());
-	restoreState(settings.value("windowState").toByteArray());
+	restoreGeometry(settings.value(tr("geometry")).toByteArray());
+	restoreState(settings.value(tr("windowState")).toByteArray());
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -219,8 +220,8 @@ bool MainWindow::readPersistent()
 bool MainWindow::writePersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	settings.setValue("geometry", saveGeometry());
-	settings.setValue("windowState", saveState());
+	settings.setValue(tr("geometry"), saveGeometry());
+	settings.setValue(tr("windowState"), saveState());
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -250,30 +251,30 @@ void MainWindow::setupWidgets()
 	sectionsTree.setSelectionMode(QAbstractItemView::SingleSelection);
 	sectionsTree.setSelectionBehavior( QAbstractItemView::SelectRows);
 	urlLabel.setProperty("hasUrl",true);
-	urlLabel.setText("<a href=\"" + QString(PEBEAR_LINK) + "\">Check for updates</a>");
+	urlLabel.setText("<a href=\"" + QString(PEBEAR_LINK) + tr("\">Check for updates</a>"));
 	urlLabel.setTextFormat(Qt::RichText);
 	urlLabel.setTextInteractionFlags(Qt::TextBrowserInteraction);
 	urlLabel.setOpenExternalLinks(true);
-	urlLabel.setToolTip("Check if new version is available or\nwrite a comment about your user experience!");
+	urlLabel.setToolTip(tr("Check if new version is available or")+ "\n"+tr("write a comment about your user experience!"));
 }
 
 void MainWindow::createTreeActions()
 {
-	dumpAllSecAction =  new ExeDependentAction(QIcon(":/icons/dump.ico"), "Dump all sections to...", this);
+	dumpAllSecAction =  new ExeDependentAction(QIcon(":/icons/dump.ico"), tr("Dump all sections to..."), this);
 	connect(this->dumpAllSecAction, SIGNAL(triggered(PeHandler*)), this, SLOT(dumpAllSections(PeHandler*)));
 	
 	QIcon addIco(":/icons/add_entry.ico");
-	addSecAction =  new ExeDependentAction(addIco, "Add a new section", this);
+	addSecAction =  new ExeDependentAction(addIco, tr("Add a new section"), this);
 	connect(this->addSecAction, SIGNAL(triggered(PeHandler*)), this, SLOT(addSection(PeHandler*)));
 
 	QIcon saveIco(":/icons/Save.ico");
-	this->saveAction = new ExeDependentAction(saveIco, "&Save the executable as...", this);
+	this->saveAction = new ExeDependentAction(saveIco, tr("&Save the executable as..."), this);
 	connect(this->saveAction, SIGNAL(triggered(PeHandler*)), this, SLOT(savePE(PeHandler*)));
 
-	reloadAction = new ExeDependentAction(QIcon(":/icons/reload.ico"), "&Reload", this);
+	reloadAction = new ExeDependentAction(QIcon(":/icons/reload.ico"), tr("&Reload"), this);
 	connect(reloadAction, SIGNAL(triggered(PeHandler*)), this, SLOT(reload(PeHandler*)) );
 
-	unloadAction = new ExeDependentAction(QIcon(":/icons/Delete.ico"), "&Unload", this);
+	unloadAction = new ExeDependentAction(QIcon(":/icons/Delete.ico"), tr("&Unload"), this);
 	connect(unloadAction, SIGNAL(triggered(PeHandler*)), this, SLOT(closePE(PeHandler*)));
 
 	sectionsTree.setMenu(&sectionsTreeMenu);
@@ -281,7 +282,7 @@ void MainWindow::createTreeActions()
 
 	sectionsTree.enableMenu(true);
 
-	sectionMenu.setTitle("Edit the section\n");
+	sectionMenu.setTitle(tr("Edit the section")+"\n");
 	sectionsTreeMenu.addMenu(&sectionMenu);
 	sectionsTreeMenu.addSeparator();
 
@@ -298,64 +299,64 @@ void MainWindow::createActions()
 	createTreeActions();
 
 	//Actions
-	newInstance = new QAction(QIcon(":/icons/add_entry.ico"), "&New Instance", this);
+	newInstance = new QAction(QIcon(":/icons/add_entry.ico"), tr("&New Instance"), this);
 	newInstance->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
 	newInstance->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->newInstance, SIGNAL(triggered()), this, SLOT(runNewInstance()));
 
-	openAction = new QAction(QIcon(":/icons/Add.ico"), "&Load PEs", this);
+	openAction = new QAction(QIcon(":/icons/Add.ico"), tr("&Load PEs"), this);
 	openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
 	openAction->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->openAction, SIGNAL(triggered()), this, SLOT(open()));
 	
-	unloadAllAction = new QAction(QIcon(":/icons/DeleteAll.ico"), "&Unload All", this);
+	unloadAllAction = new QAction(QIcon(":/icons/DeleteAll.ico"), tr("&Unload All"), this);
 	connect(this->unloadAllAction, SIGNAL(triggered()), this, SLOT(unloadAllPEs()));
 
-	dumpAllPEsSecAction = new QAction(QIcon(":/icons/dump.ico"), "Dump all sections to...", this);
+	dumpAllPEsSecAction = new QAction(QIcon(":/icons/dump.ico"), tr("Dump all sections to..."), this);
 	connect(this->dumpAllPEsSecAction, SIGNAL(triggered()), this, SLOT(dumpSectionsFromAllPEs()));
 	
-	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), "Export disassembly to...", this);
+	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), tr("Export disassembly to..."), this);
 	connect(this->exportAllPEsDisasmAction, SIGNAL(triggered()), this, SLOT(exportDisasmFromAllPEs()));
 	
-	setRegKeyAction = new QAction("Add to Explorer", this);
+	setRegKeyAction = new QAction(tr("Add to Explorer"), this);
 	this->setRegKeyAction->setCheckable(true);
 	this->setRegKeyAction->setChecked(isRegKey());
 	connect(this->setRegKeyAction, SIGNAL(triggered(bool)), this, SLOT(setRegistryKey(bool)));
 
-	viewSignAction = new QAction(QIcon(":/icons/List.ico"), "&List", this);
+	viewSignAction = new QAction(QIcon(":/icons/List.ico"), tr("&List"), this);
 	connect(this->viewSignAction, SIGNAL(triggered()), this, SLOT(viewSignatures()));
-	openSignAction = new QAction("&Load", this);
+	openSignAction = new QAction(tr("&Load"), this);
 	connect(this->openSignAction, SIGNAL(triggered()), this, SLOT(openSignatures()));
 
-	infoAction = new QAction("&Info", this);
+	infoAction = new QAction(tr("&Info"), this);
 	connect(this->infoAction, SIGNAL(triggered()), this, SLOT(info()));
 
-	openDiffWindowAction = new QAction("Compare", this);
+	openDiffWindowAction = new QAction(tr("Compare"), this);
 	connect(this->openDiffWindowAction, SIGNAL(triggered()), this, SLOT(openDiffWindow()) );
 	
-	hexViewFontAction = new QAction("HexView Font", this);
+	hexViewFontAction = new QAction(tr("HexView Font"), this);
 	connect(this->hexViewFontAction, SIGNAL(triggered()), this, SLOT(changeHexFont()) );
 	
-	disasmViewFontAction = new QAction("DisasmView Font", this);
+	disasmViewFontAction = new QAction(tr("DisasmView Font"), this);
 	connect(this->disasmViewFontAction, SIGNAL(triggered()), this, SLOT(changeDisasmFont()) );
 	
-	globalFontAction = new QAction("Global Font", this);
+	globalFontAction = new QAction(tr("Global Font"), this);
 	connect(this->globalFontAction, SIGNAL(triggered()), this, SLOT(changeGlobalFont()) );
 
-	defaultFontsAction = new QAction("Reset to defaults", this);
+	defaultFontsAction = new QAction(tr("Reset to defaults"), this);
 	connect(this->defaultFontsAction, SIGNAL(triggered()), this, SLOT(setDefaultFonts()));
 
-	zoomInAction = new QAction("Zoom In", this);
+	zoomInAction = new QAction(tr("Zoom In"), this);
 	zoomInAction->setShortcut(QKeySequence::ZoomIn);
 	zoomInAction->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->zoomInAction, SIGNAL(triggered()), this, SLOT(zoomInFonts()));
 	
-	zoomOutAction = new QAction("Zoom Out", this);
+	zoomOutAction = new QAction(tr("Zoom Out"), this);
 	zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 	zoomOutAction->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->zoomOutAction, SIGNAL(triggered()), this, SLOT(zoomOutFonts()));
 	
-	zoomDefault = new QAction("Default size", this);
+	zoomDefault = new QAction(tr("Default size"), this);
 	zoomDefault->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
 	zoomDefault->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->zoomDefault, SIGNAL(triggered()), this, SLOT(setDefaultZoom()));
@@ -364,17 +365,17 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
 	//Create toolbar menus:
-	this->fileMenu = menuBar()->addMenu("&File");
-	this->settingsMenu = menuBar()->addMenu("&Settings");
-	this->viewMenu = menuBar()->addMenu("&View");
+	this->fileMenu = menuBar()->addMenu(tr("&File"));
+	this->settingsMenu = menuBar()->addMenu(tr("&Settings"));
+	this->viewMenu = menuBar()->addMenu(tr("&View"));
 
-	QMenu *zoomMenu = this->viewMenu->addMenu("Zoom");
+	QMenu *zoomMenu = this->viewMenu->addMenu(tr("Zoom"));
 	zoomMenu->addAction(zoomInAction);
 	zoomMenu->addAction(zoomOutAction);
 	zoomMenu->addAction(zoomDefault);
 	zoomMenu->insertSeparator(zoomDefault);
 	
-	QMenu *fontMenu = this->viewMenu->addMenu("Fon&t");
+	QMenu *fontMenu = this->viewMenu->addMenu(tr("Fon&t"));
 	fontMenu->addAction(globalFontAction);
 	fontMenu->addAction(hexViewFontAction);
 	fontMenu->addAction(disasmViewFontAction);
@@ -383,7 +384,7 @@ void MainWindow::createMenus()
 
 	this->stylesGroup = new QActionGroup(this);
 	stylesGroup->setExclusive(true);
-	QMenu *styleMenu = this->viewMenu->addMenu("Style");
+	QMenu *styleMenu = this->viewMenu->addMenu(tr("Style"));
 	QList<QString> myStyles = this->guiSettings.getStyles();
 	QList<QString>::iterator itr;
 	for (itr = myStyles.begin(); itr != myStyles.end(); ++itr) {
@@ -398,7 +399,7 @@ void MainWindow::createMenus()
 	connect(styleMenu, SIGNAL(triggered(QAction*)), this, SLOT(setSelectedStyle(QAction*)));
 
 	// Signatures menu
-	this->signaturesMenu = this->settingsMenu->addMenu("Si&gnatures");
+	this->signaturesMenu = this->settingsMenu->addMenu(tr("Si&gnatures"));
 
 	menuBar()->addAction(this->openDiffWindowAction);
 	menuBar()->addAction(this->infoAction);
@@ -414,7 +415,7 @@ void MainWindow::createMenus()
 #endif
 	
 	this->settingsMenu->addSeparator();
-	QAction* appearanceAction = new QAction("Configure...", this);
+	QAction* appearanceAction = new QAction(tr("Configure..."), this);
 	this->settingsMenu->addAction(appearanceAction);
 	connect(appearanceAction, SIGNAL(triggered()), this, SLOT(editAppearance()));
 	//---
@@ -423,7 +424,7 @@ void MainWindow::createMenus()
 	
 	// Process all loaded PEs:
 	this->fileMenu->addSeparator();
-	this->fromLoadedPEsMenu = this->fileMenu->addMenu("From all loaded...");
+	this->fromLoadedPEsMenu = this->fileMenu->addMenu(tr("From all loaded..."));
 	this->fromLoadedPEsMenu->addAction(this->dumpAllPEsSecAction);
 	this->fromLoadedPEsMenu->addAction(this->exportAllPEsDisasmAction);
 }
@@ -486,7 +487,7 @@ void MainWindow::onExeHandlerAdded(PeHandler* hndl)
 {
 	if (hndl == NULL) return;
 
-	const QString loadInfo = "Loaded: " + hndl->getFullName();
+	const QString loadInfo = tr("Loaded: ") + hndl->getFullName();
 	this->statusBar.showMessage(loadInfo);
 	this->loadTagsForPe(hndl);
 }
@@ -533,11 +534,11 @@ void MainWindow::dropEvent(QDropEvent* ev)
 	this->setCursor(cur);
 	
 	if (cntr > 1) {
-		this->statusBar.showMessage("Loaded :"+ QString::number(cntr));
-		QString loadedStr = "Loaded "+ QString::number(cntr);
-		QString failedStr = "\nFailed to load: " + QString::number(failed);
+		this->statusBar.showMessage(tr("Loaded :")+ QString::number(cntr));
+		QString loadedStr = tr("Loaded ")+ QString::number(cntr);
+		QString failedStr = "\n"+ tr("Failed to load: ") + QString::number(failed);
 		if (failed) loadedStr += failedStr;
-		QMessageBox::information(this, "Done!", loadedStr);
+		QMessageBox::information(this, tr("Done!"), loadedStr);
 	}
 }
 
@@ -549,7 +550,7 @@ void MainWindow::setRegistryKey(bool enable)
 	}
 	path = "\""+ path + "\"";
 	
-	QString accessErrInfo = "In order to do it you must run " + QString(TITLE) + " as administrator";
+	QString accessErrInfo = tr("In order to do it you must run ") + QString(TITLE) + tr(" as administrator");
 
 	bool isSet = false;
 	const size_t extensionsCount = 4;
@@ -560,19 +561,19 @@ void MainWindow::setRegistryKey(bool enable)
 			isSet = RegKeyManager::addRegPath(extensions[i], TITLE, path.toStdString());
 			if (!isSet) break;
 		}
-		if (!isSet) QMessageBox::warning(this, "Cannot set!", accessErrInfo);
+		if (!isSet) QMessageBox::warning(this, tr("Cannot set!"), accessErrInfo);
 
 	} else {
 		for (size_t i = 0; i < extensionsCount; i++) {
 			isSet = RegKeyManager::removeRegPath(extensions[i], TITLE);
 			if (!isSet) break;
 		}
-		if (!isSet) QMessageBox::warning(this, "Cannot remove!", accessErrInfo);
+		if (!isSet) QMessageBox::warning(this, tr("Cannot remove!"), accessErrInfo);
 	}
 
 	this->setRegKeyAction->setChecked(isRegKey());
 	if (isSet) {
-		QMessageBox::information(this, "OK", "Done!");
+		QMessageBox::information(this, tr("OK"), tr("Done!"));
 	}
 }
 
@@ -649,11 +650,11 @@ void MainWindow::dumpSectionsFromAllPEs()
 		}
 	}
 	if (dumped != count) {
-		QMessageBox::warning(this, "Error", "Dumping sections from some of the PEs failed!");
+		QMessageBox::warning(this, tr("Error"), tr("Dumping sections from some of the PEs failed!"));
 	}
 	if (dumped > 0) {
-		QMessageBox::information(this, "Done!", "Dumped sections from: " + QString::number(dumped)
-			+ " PEs into:\n" + dirPath);
+		QMessageBox::information(this, tr("Done!"), tr("Dumped sections from: ") + QString::number(dumped)
+			+ tr(" PEs into:")+"\n" + dirPath);
 	}
 }
 
@@ -692,11 +693,11 @@ void MainWindow::exportDisasmFromAllPEs()
 		}
 	}
 	if (dumped != count) {
-		QMessageBox::warning(this, "Error", "Exporting disasm from some of the PEs failed!");
+		QMessageBox::warning(this, tr("Error"), tr("Exporting disasm from some of the PEs failed!"));
 	}
 	if (dumped > 0) {
-		QMessageBox::information(this, "Done!", "Exported disasm from: " + QString::number(dumped)
-			+ " PEs into:\n" + dirPath);
+		QMessageBox::information(this, tr("Done!"), tr("Exported disasm from: ") + QString::number(dumped)
+			+ tr(" PEs into:") + "\n" + dirPath);
 	}
 }
 
@@ -754,50 +755,50 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::info()
 {
 	QPixmap p(":/main_ico.ico");
-	QString msg = "<b>" + QString::fromLatin1(TITLE) + " - Portable Executable reversing tool</b>";
+	QString msg = "<b>" + QString::fromLatin1(TITLE) +tr( " - Portable Executable reversing tool</b>");
 	msg += "<br/>";
-	msg += "version: " + currentVer.toString() + "\n";
+	msg +=tr( "version: ") + currentVer.toString() + "\n";
 	msg += "<br/>";
-	msg += "built on: " + QString(__DATE__) + "\n";
+	msg += tr("built on: ") + QString(__DATE__) + "\n";
 	msg += "<br/>";
 #ifdef COMMIT_HASH
 	QString hash = QString(COMMIT_HASH);
 	if (hash.length() > 0) {
-		msg += "commit hash: " + QString(COMMIT_HASH) + "<br/>";
+		msg += tr("commit hash: ") + QString(COMMIT_HASH) + "<br/>";
 	}
 #endif
-	msg += "author: Hasherezade (<a href='" + QString(MY_SITE_LINK) + "'>homepage</a>)<br/>";
-	msg += "Source code & more info: <a href='" + QString(SOURCE_LINK) + "'>here</a><br/>";
+	msg += tr("author: Hasherezade (<a href='") + QString(MY_SITE_LINK) + tr("'>homepage</a>)<br/>");
+	msg += tr("Source code & more info: <a href='") + QString(SOURCE_LINK) +tr( "'>here</a><br/>");
 	msg += "<br/>";
-	msg += "<i>using:</i><br/>";
+	msg += tr("<i>using:</i><br/>");
 #if QT_VERSION < 0x050000
 	msg += "Qt 4";
 #else
 	msg += "Qt " + QString::number(QT_VERSION_MAJOR, 10) + "." + QString::number(QT_VERSION_MINOR, 10) + "." + QString::number(QT_VERSION_PATCH, 10);
 #endif
 	msg += "<br/>";
-	msg += "bearparser";
-	msg += " (<a href='" + QString(BEARPARSER_LICENSE) + "'>LICENSE</a>)<br/>";
+	msg += tr("bearparser");
+	msg += " (<a href='" + QString(BEARPARSER_LICENSE) + tr("'>LICENSE</a>)<br/>");
 
 #ifdef BUILD_WITH_UDIS86
 	msg += "Udis86\n";
 #else
-	msg += "Capstone Engine";
-	msg += " (<a href='" + QString(CAPSTONE_LICENSE) + "'>LICENSE</a>)";
+	msg += tr("Capstone Engine");
+	msg += " (<a href='" + QString(CAPSTONE_LICENSE) + tr("'>LICENSE</a>)");
 
 	msg += "<br/><br/>";
 #endif
-	msg += "\nThis software is provided by the copyright holders and contributors \"as is\", without any warranty.";
+	msg += "\n"+ tr( "This software is provided by the copyright holders and contributors \"as is\", without any warranty.");
 	msg += "<br/>";
 
 #if QT_VERSION < 0x050000
-	msg += "\nWARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.";
+	msg += "\n" +tr("WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.");
 #endif
 
 	QMessageBox msgBox(this);
 	msgBox.setProperty("hasUrl", true);
 
-	msgBox.setWindowTitle("Info");
+	msgBox.setWindowTitle(tr("Info"));
 	msgBox.setTextFormat(Qt::RichText);
 
 	msgBox.setText(msg);
@@ -872,13 +873,13 @@ void MainWindow::runNewInstance()
 
 void MainWindow::open()
 {
-	QString filter = "All Files (*);;Applications (*.exe);;Libraries (*.dll);;Drivers (*.sys);;Screensavers (*.scr)";
-	QFileDialog dialog(NULL, "Open", QDir::homePath(), filter);
+	QString filter = (tr("All Files (*);;Applications (*.exe);;Libraries (*.dll);;Drivers (*.sys);;Screensavers (*.scr)"));
+	QFileDialog dialog(NULL, tr("Open"), QDir::homePath(), filter);
 	dialog.setFileMode(QFileDialog::ExistingFiles);
-	QStringList fNames = dialog.getOpenFileNames(NULL, "Open", this->mainSettings.lastExePath(), filter);
+	QStringList fNames = dialog.getOpenFileNames(NULL, tr("Open"), this->mainSettings.lastExePath(), filter);
 
 	if (fNames.size() == 0) {
-		this->statusBar.showMessage("No file chosen");
+		this->statusBar.showMessage(tr("No file chosen"));
 		return;
 	}
 	openMultiplePEs(fNames);
@@ -898,9 +899,9 @@ void MainWindow::onSigSearchResult(int foundCount, int reqType)
 {
 	if (reqType == 0) return;
 	if (foundCount > 0) {
-		QMessageBox::information(this, "Done!", "Found: " + QString::number(foundCount));
+		QMessageBox::information(this, tr("Done!"), tr("Found: " )+ QString::number(foundCount));
 	} else {
-		QMessageBox::information(this, "Done!", "Not found!");
+		QMessageBox::information(this, tr("Done!"), tr("Not found!"));
 	}
 }
 
@@ -940,7 +941,7 @@ bool MainWindow::autoSaveTags(PeHandler *hndl)
 ExeFactory::exe_type MainWindow::recognizeFileType(QString fName, const bool showAlert)
 {
 	if (!QFile::exists(fName)) {
-		if (showAlert) QMessageBox::warning(this, "Open error!", "File does not exist:\n" + fName);
+		if (showAlert) QMessageBox::warning(this, tr("Open error!"), tr("File does not exist:") + "\n" + fName);
 		return ExeFactory::NONE;
 	}
 
@@ -955,21 +956,21 @@ ExeFactory::exe_type MainWindow::recognizeFileType(QString fName, const bool sho
 		fileView = NULL;
 	}
 	if (!fileView) {
-		if (showAlert) QMessageBox::warning(this, "Open error!", "Failed loading the file:\n" + fName + "\n" + msg);
+		if (showAlert) QMessageBox::warning(this, tr("Open error!"),  tr("Failed loading the file:")+"\n" + fName + "\n" + msg);
 		return ExeFactory::NONE;
 	}
 
 	ExeFactory::exe_type type = ExeFactory::findMatching(fileView);
 	if (!this->m_PEHandlers.isSupportedType(type)) {
-		QString msg = "Not supported filetype!";
+		QString msg = tr("Not supported filetype!");
 
 		if (type != ExeFactory::NONE) {
 			//if the type is recognized but not supported, show it:
-			msg = "Not supported filetype: "
+			msg = tr("Not supported filetype: ")
 				+ ExeFactory::getTypeName(type);
 		}
 		this->statusBar.showMessage(msg + " [" + fName + "]");
-		if (showAlert) QMessageBox::warning(this, "Cannot load!", "Cannot load:\n" + fName + "\n" + msg);
+		if (showAlert) QMessageBox::warning(this, tr("Cannot load!"), tr( "Cannot load:") + "\n" + fName + "\n" + msg);
 		type = ExeFactory::NONE;
 	}
 	delete fileView; fileView = NULL;
@@ -982,13 +983,13 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 	if (link.length() > 0) fName = link;
 
 	if (this->m_PEHandlers.getByName(fName)) {
-		this->statusBar.showMessage("File: [" + fName + "] is already loaded!");
-		if (showAlert) QMessageBox::warning(this, tr(TITLE), "This file is already loaded!", QMessageBox::Ok);
+		this->statusBar.showMessage(tr("File: [") + fName + tr("] is already loaded!"));
+		if (showAlert) QMessageBox::warning(this, tr(TITLE), tr("This file is already loaded!"), QMessageBox::Ok);
 		return NULL;
 	}
 
 	if (!QFile::exists(fName)) {
-		if (showAlert) QMessageBox::warning(this, "Open error!", "Invalid path or access rights:\n" + fName);
+		if (showAlert) QMessageBox::warning(this, tr("Open error!"),  tr("Invalid path or access rights:") + "\n" + fName);
 		return NULL;
 	}
 	const ExeFactory::exe_type type = recognizeFileType(fName, showAlert);
@@ -999,42 +1000,42 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 	if (this->m_PEHandlers.openExe(fName, type, true)) {
 		hndl = this->m_PEHandlers.getByName(fName);
 		if (hndl) {
-			this->statusBar.showMessage("File: " + fName);
+			this->statusBar.showMessage(tr("File: ") + fName);
 			this->mainSettings.setLastExePath(fName);
 			hndl->setPackerSignFinder(&this->vSign);
 			connect(hndl, SIGNAL(foundSignatures(int, int)), this, SLOT(onSigSearchResult(int, int)));
 		}
 	}
 	if (!hndl) {
-		QString msg = "Error occured during loading the file: " + fName + "\nType: " + ExeFactory::getTypeName(type);
+		QString msg = tr("Error occured during loading the file: ") + fName +"\n" + tr("Type: ") + ExeFactory::getTypeName(type);
 		this->statusBar.showMessage(msg + " [" + fName + "]");
-		if (showAlert) QMessageBox::warning(this, "Cannot load!", msg);
+		if (showAlert) QMessageBox::warning(this, tr( "Cannot load!"), msg);
 		return NULL;
 	}
 	if (hndl->getPe()->isTruncated()) {
-		QString alert = "The file: \n " + fName + "\n is too big and was loaded truncated!";
-		QMessageBox::StandardButton res = QMessageBox::warning(this, "Too big file!", alert, QMessageBox::Ok);
+		QString alert = tr("The file:  ")+"\n" + fName +"\n"+ tr( " is too big and was loaded truncated!");
+		QMessageBox::StandardButton res = QMessageBox::warning(this, tr("Too big file!"), alert, QMessageBox::Ok);
 	}
 	// show warnings:
 	QStringList peInfo;
 	if (hndl->isPeAtypical(&peInfo)) {
-		this->statusBar.showMessage("WARNING: " + hndl->getFullName() + ": " + peInfo.join(";"));
-		if (showAlert) QMessageBox::warning(this, "Warning", hndl->getFullName() + ":\n" + peInfo.join("\n"));
+		this->statusBar.showMessage(tr("WARNING: ") + hndl->getFullName() + ": " + peInfo.join(";"));
+		if (showAlert) QMessageBox::warning(this, tr("Warning"), hndl->getFullName() + ":\n" + peInfo.join("\n"));
 	}
 	return hndl; 
 }
 
 void MainWindow::openSignatures()
 {
-	QString filter = "Text Files (*.txt);;All Files (*)";
-	QString fName= QFileDialog::getOpenFileName(NULL, "Open file with signatures", NULL, filter);
+	QString filter = tr("Text Files (*.txt);;All Files (*)");
+	QString fName= QFileDialog::getOpenFileName(NULL, tr("Open file with signatures"), NULL, filter);
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
 		int i = vSign.loadSignatures(filename);
 		signWindow.onSigListUpdated();
 		QMessageBox msgBox;
-		msgBox.setText("Added new signatures: " + QString::number(i));
+		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
 		msgBox.exec();
 	}//
 	this->m_PEHandlers.checkAllSignatures();
@@ -1048,15 +1049,15 @@ void MainWindow::savePE(PeHandler* selectedPeHndl)
 	PEFile *pe = selectedPeHndl->getPe();
 	if (!pe) return;
 
-	QString filter = "All Files (*);;Applications (*.exe);;Libraries (*.dll);;Drivers (*.sys);;Screensavers (*.scr)";
+	QString filter = tr("All Files (*);;Applications (*.exe);;Libraries (*.dll);;Drivers (*.sys);;Screensavers (*.scr)");
 	QString filename = QFileDialog::getSaveFileName(NULL, "Save as...", selectedPeHndl->getDirPath(), filter);
 	if (filename.size() == 0) return;
 
 	bufsize_t dSize = FileBuffer::dump(filename, *pe);
 	if (dSize) {
-		QMessageBox::information(this,"Success","Dumped PE to: " + filename);
+		QMessageBox::information(this,tr("Success"),tr("Dumped PE to: ") + filename);
 	} else {
-		QMessageBox::warning(this,"Failed", "Dumping failed!");
+		QMessageBox::warning(this,tr("Failed"), tr("Dumping failed!"));
 	}
 }
 
@@ -1116,11 +1117,11 @@ void MainWindow::dumpAllSections(PeHandler* selectedPeHndl)
 	
 	const size_t dumped = dumpAllPeSections(pe, dirPath, selectedPeHndl->getShortName());
 	if (dumped > 0) {
-		QMessageBox::information(this, "Done!", "Dumped: " + QString::number(dumped)
-			+ " sections into:\n" + dirPath);
+		QMessageBox::information(this, tr("Done!"), tr("Dumped: ") + QString::number(dumped)
+			+ tr(" sections into:") +"\n"+ dirPath);
 	}
 	else {
-		QMessageBox::warning(this, "Error", "Dumping sections failed!");
+		QMessageBox::warning(this, tr("Error"),tr( "Dumping sections failed!"));
 	}
 }
 
@@ -1138,7 +1139,7 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
 	SectionHdrWrapper *sec = selectedPeHndl->getPe()->getSecHdrAtOffset(offset, Executable::RAW, false);
 	if (sec == NULL) {
-		QMessageBox::warning(this, "Cannot search!", "No section selected");
+		QMessageBox::warning(this, tr("Cannot search!"), tr("No section selected"));
 		return;
 	}
 	offset_t secBgn = sec->getContentOffset(Executable::RAW, true);

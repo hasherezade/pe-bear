@@ -19,8 +19,8 @@ QVariant DelayImpTreeModel::headerData(int section, Qt::Orientation orientation,
 {
 	if (role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
 	}
 	ExeNodeWrapper* impWrap = dynamic_cast<ExeNodeWrapper*>(wrapper());
 	if (!impWrap) return QVariant();
@@ -147,10 +147,10 @@ QVariant DelayImpFuncModel::headerData(int section, Qt::Orientation orientation,
 	if (entry == NULL) return "";
 
 	switch (section) {
-		case OFFSET: return "Call via";
-		case NAME: return "Name";
-		case ORDINAL : return "Ordinal";
-		case HINT: return "Hint";
+		case OFFSET: return tr("Call via");
+		case NAME: return tr("Name");
+		case ORDINAL : return tr("Ordinal");
+		case HINT: return tr("Hint");
 	}
 	return entry->getFieldName(fId);
 }

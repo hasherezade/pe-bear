@@ -38,7 +38,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 
 	funcNameValidator = new QRegExpValidator(QRegExp("[0-9A-Za-z._#@?-]{1,}"));
 	funcNameEdit.setValidator(funcNameValidator);
-	funcNameEdit.setToolTip("A function name, or ordinal prefixed by '#', i.e. #123");
+	funcNameEdit.setToolTip(tr("A function name, or ordinal prefixed by '#', i.e. #123"));
 	
 	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&propertyLayout1);
@@ -64,7 +64,7 @@ ImportsAddWindow::ImportsAddWindow(ImportsAutoadderSettings& _settings, QWidget 
 	ui_elementsView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui_elementsView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	propertyLayout3.addWidget(new QLabel("List of imports to be added:", this));
+	propertyLayout3.addWidget(new QLabel(tr("List of imports to be added:"), this));
 	propertyLayout4.addWidget(ui_elementsView);
 	topLayout.addLayout(&propertyLayout3);
 	topLayout.addLayout(&propertyLayout4);

@@ -16,27 +16,27 @@ void DataDirWrapperSplitter::onMoveDirTable()
 	QString typeStr = (aType == Executable::RVA) ? "RVA" : "Raw";
 
 	QString text = QInputDialog::getText(this, 
-		"Move Dir. Table", "Target "+ typeStr + ":\n(required free space: 0x" + QString::number(size, 16).toUpper() + ")", 
+		tr("Move Dir. Table"), tr("Target ")+ typeStr + ":\n"+ tr("(required free space : 0x") + QString::number(size, 16).toUpper() + ")",
 		QLineEdit::Normal, "",  &ok);
 
 	if (ok == false) return;
 
 	offset_t target = text.toLongLong(&ok, 16);
 	if (ok == false) {
-		QMessageBox::warning(NULL, "Input error", "Invalid format!"); 
+		QMessageBox::warning(NULL, tr("Input error"), tr("Invalid format!"));
 		return;
 	}
 
 	offset_t targetRaw = m_PE->toRaw(target, aType);
 	if (targetRaw == INVALID_ADDR) {
-		QMessageBox::warning(NULL, "Input error", "Offset out of scope!"); 
+		QMessageBox::warning(NULL, tr("Input error"), tr("Offset out of scope!"));
 		return;
 	}
 	if (myPeHndl->moveDataDirEntry(this->dataDirId, targetRaw)) {
-		QMessageBox::information(NULL, "Done!","Directory Table moved!");
+		QMessageBox::information(NULL, tr("Done!"), tr("Directory Table moved!"));
 	} else {
-		QMessageBox::warning(NULL, "Cannot move!", 
-			"Not enough free space to fit the table!\n Required size: 0x" + QString::number(size, 16));
+		QMessageBox::warning(NULL, tr("Cannot move!"),
+			tr("Not enough free space to fit the table!")+"\n"+ tr(" Required size : 0x") + QString::number(size, 16));
 	}
 }
 
@@ -46,7 +46,7 @@ QString DataDirWrapperSplitter::chooseDumpOutDir()
 	if (!myPeHndl) return EMPTY_STR;
 	//---
 	QFileDialog dialog;
-	dialog.setWindowTitle("Choose target directory");
+	dialog.setWindowTitle(tr("Choose target directory"));
 	dialog.setFileMode(QFileDialog::Directory);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 
@@ -78,7 +78,7 @@ void DataDirWrapperSplitter::setScaledIcons()
 
 bool DataDirWrapperSplitter::initToolbar()
 {
-	this->moveDirTable = new QAction(QString("&Move the Data Directory table"), this);
+	this->moveDirTable = new QAction(QString(tr("&Move the Data Directory table")), this);
 	toolBar.setProperty("dataDir", true);
 	toolBar.addAction(moveDirTable);
 	setScaledIcons();
@@ -90,7 +90,7 @@ bool DataDirWrapperSplitter::initToolbar()
 
 bool SecurityDirSplitter::initToolbar()
 {
-	this->saveCertAction = new QAction(QString("&Save certificate"), this);
+	this->saveCertAction = new QAction(QString(tr("&Save certificate")), this);
 	connect(saveCertAction, SIGNAL(triggered()), this, SLOT(onSaveCert()) );
 	setScaledIcons();
 	toolBar.addAction(saveCertAction);
@@ -116,14 +116,14 @@ void SecurityDirSplitter::onSaveCert()
 
 	bufsize_t certLen = myPeHndl->securityDirWrapper.getFieldSize(SecurityDirWrapper::CERT_CONTENT);
 	
-	QString filter = "All Files (*)";
-	QString filename = QFileDialog::getSaveFileName(this, "Dump certificate content as...", myPeHndl->getDirPath(), filter);
+	QString filter = tr("All Files (*)");
+	QString filename = QFileDialog::getSaveFileName(this, tr("Dump certificate content as..."), myPeHndl->getDirPath(), filter);
 	if (filename.size() == 0)
 		return;
 
 	if (m_PE->dumpFragment(offset, certLen, filename)) {
-		QMessageBox::information(this,"Success","Dumped to: " + filename);
+		QMessageBox::information(this, tr("Success"),tr("Dumped to: ") + filename);
 	} else {
-		QMessageBox::warning(this,"Failed", "Dumping failed!");
+		QMessageBox::warning(this, tr("Failed"), tr("Dumping failed!"));
 	}
 }

@@ -13,7 +13,7 @@ SectionAddWindow::SectionAddWindow(QWidget *parent)
 	secVsizeEdit.setMaximum(0);
 	secRsizeEdit.setMaximum(0);
 
-	this->fileButton.setText("Choose a file");
+	this->fileButton.setText(tr("Choose a file"));
 	connect(&fileButton, SIGNAL(clicked()), this, SLOT(onFileChose()));
 	this->fileCBox.setText(EMPTY_FILE_TXT);
 	this->fileCBox.setChecked(false);
@@ -90,7 +90,7 @@ void SectionAddWindow::onFileChose()
 
 	QFile file(path);
 	if (file.open(QFile::ReadOnly) == false) {
-		QMessageBox::warning(this, "Error", "Cannot read this file");
+		QMessageBox::warning(this, tr("Error"), tr("Cannot read this file"));
 		this->fileCBox.setText(EMPTY_FILE_TXT);
 		return;
 	}
@@ -123,7 +123,7 @@ void SectionAddWindow::onOkClicked()
 
 	try {
 		SectionHdrWrapper* sec = currPeHndl->addSection(name, rVal, vVal);
-		if (!sec) throw CustomException("Cannot add a new section");
+		if (!sec) throw CustomException(tr("Cannot add a new section"));
 
 		sec->setNumValue(SectionHdrWrapper::CHARACT, accessRights);
 
@@ -131,7 +131,7 @@ void SectionAddWindow::onOkClicked()
 
 			QFile file(this->filePath);
 			if (file.open(QFile::ReadOnly) == false) {
-				QMessageBox::warning(this, "Error", "Cannot read this file");
+				QMessageBox::warning(this, tr("Error"), tr("Cannot read this file"));
 				this->fileCBox.setText(EMPTY_FILE_TXT);
 				return;
 			}
@@ -140,10 +140,11 @@ void SectionAddWindow::onOkClicked()
 			sec = NULL;// after reloading PEFile, pointer is no longer valid
 		}
 	} catch (CustomException e) {
-		QMessageBox::critical(this, "Error", e.what());
+		QMessageBox::critical(this, tr("Error"), e.what());
 		return;
 	}
 
-	QMessageBox::information(this, "Success!", "Section "+ name +" added!");
+	QMessageBox::information(this, tr("Success!"), tr("Section ")+ name + tr(" added!"));
 	this->hide();
+	
 }

@@ -189,13 +189,13 @@ void DiffWindow::hexSelected(ContentIndx contentIndx)
 #else
 		temp.sprintf("%lld = %llu = %016llX", (long long)lEndianNum, (unsigned long long)lEndianNum, (unsigned long long)lEndianNum);
 #endif
-		str.append("LEndian : " + temp + "\n");
+		str.append(tr("LEndian : ") + temp + "\n");
 #if QT_VERSION >= 0x050000
 		temp = QString::asprintf("%lld = %llu = %016llX", (long long)bEndianNum, (unsigned long long)bEndianNum, (unsigned long long)bEndianNum);
 #else
 		temp.sprintf("%lld = %llu = %016llX", (long long)bEndianNum, (unsigned long long)bEndianNum, (unsigned long long)bEndianNum);
 #endif
-		str.append("BEndian : " + temp + "\n");
+		str.append(tr("BEndian : ") + temp + "\n");
 
 	} else if (size > sizeof(uint16_t)) {
 		str.append("DWORD\n");
@@ -210,7 +210,7 @@ void DiffWindow::hexSelected(ContentIndx contentIndx)
 #else
 		temp.sprintf("%d = %u = %08X", (int32_t) bEndianNum, (uint32_t) bEndianNum, (uint32_t) bEndianNum);
 #endif
-		str.append("BEndian : " + temp + "\n");
+		str.append(tr("BEndian : ") + temp + "\n");
 
 	} else if (size > sizeof(uint8_t)) {
 		str.append("WORD\n");
@@ -219,7 +219,7 @@ void DiffWindow::hexSelected(ContentIndx contentIndx)
 #else
 		temp.sprintf("%d = %u = %04X", (int16_t) lEndianNum, (uint16_t) lEndianNum, (uint16_t) lEndianNum);
 #endif
-		str.append("LEndian : " + temp + "\n");
+		str.append(tr("LEndian : ") + temp + "\n");
 
 #if QT_VERSION >= 0x050000
 		temp = QString::asprintf( "%d = %u = %04X", (int16_t) bEndianNum, (uint16_t) bEndianNum, (uint16_t) bEndianNum);
@@ -230,10 +230,10 @@ void DiffWindow::hexSelected(ContentIndx contentIndx)
 	} else {
 		str.append("BYTE\n");
 		temp = QString::number((int8_t) lEndianNum, 10) + " = " + QString::number((uint8_t) lEndianNum, 10) + " = " + QString::number((uint8_t) lEndianNum, 16).toUpper();
-		str.append("LEndian : " + temp + "\n");
+		str.append(tr("LEndian : ") + temp + "\n");
 		
 		temp = QString::number((int8_t) bEndianNum, 10) + " = " + QString::number((uint8_t) bEndianNum, 10) + " = " + QString::number((uint8_t) bEndianNum, 16).toUpper();
-		str.append("BEndian : " + temp + "\n");
+		str.append(tr("BEndian : ")+ temp + "\n");
 	}
 	this->numEdit[contentIndx].setText(str);
 }
@@ -470,12 +470,12 @@ void DiffWindow::itemMarked(const QModelIndex & current, const QModelIndex & pre
 	if (diff == (-1)) {
 		if (contentSize[LEFT] != contentSize[RIGHT]) {
 			if (contentSize[LEFT] > contentSize[RIGHT])
-				this->statusBar.showMessage("LEFT == RIGHT, till: 0x" + QString::number(contentSize[RIGHT], 16).toUpper() + "; LEFT longer.");
+				this->statusBar.showMessage(tr("LEFT == RIGHT, till: 0x") + QString::number(contentSize[RIGHT], 16).toUpper() + tr("; LEFT longer."));
 			else
-				this->statusBar.showMessage("LEFT == RIGHT, till: 0x" + QString::number(contentSize[LEFT], 16).toUpper() + "; RIGHT longer.");
+				this->statusBar.showMessage(tr("LEFT == RIGHT, till: 0x") + QString::number(contentSize[LEFT], 16).toUpper() + tr("; RIGHT longer."));
 		} else
-			this->statusBar.showMessage("LEFT == RIGHT");
+			this->statusBar.showMessage(tr("LEFT == RIGHT"));
 	} else
-		this->statusBar.showMessage("First difference at: 0x" + QString::number(diff, 16).toUpper());
+		this->statusBar.showMessage(tr("First difference at: 0x") + QString::number(diff, 16).toUpper());
 }
 

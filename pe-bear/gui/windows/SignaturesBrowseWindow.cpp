@@ -17,9 +17,9 @@ QVariant SignaturesBrowseModel::headerData(int section, Qt::Orientation orientat
 	if (orientation == Qt::Horizontal) {
 		switch (section) {
 			case COL_ID: return "ID";
-			case COL_NAME : return "Name";
-			case COL_SIZE: return "Size";
-			case COL_PREVIEW: return "Signature Content Preview";
+			case COL_NAME : return tr("Name");
+			case COL_SIZE: return tr("Size");
+			case COL_PREVIEW: return tr("Signature Content Preview");
 		}
 	}
 	return QVariant();
@@ -83,7 +83,7 @@ SignaturesBrowseWindow::SignaturesBrowseWindow(sig_ma::SigFinder* vSign, QWidget
 	signsTree.setItemsExpandable(false);
 	signsTree.setRootIsDecorated(false);
 
-	filterLabel.setText("Search in columns:");
+	filterLabel.setText(tr("Search in columns:"));
 	topLayout.addWidget(&filterLabel);
 	topLayout.addWidget(&filterEdit);
 
@@ -113,8 +113,8 @@ void SignaturesBrowseWindow::onFilterChanged(QString str)
 
 void SignaturesBrowseWindow::createMenu()
 {
-	QMenu* fileSubmenu = menuBar()->addMenu("File");
-	QAction* loadAction = new QAction("Load", fileSubmenu);
+	QMenu* fileSubmenu = menuBar()->addMenu(tr("File"));
+	QAction* loadAction = new QAction(tr("Load"), fileSubmenu);
 	connect(loadAction, SIGNAL(triggered()), this, SLOT(openSignatures()));
 	fileSubmenu->addAction(loadAction);
 }
@@ -128,13 +128,13 @@ void SignaturesBrowseWindow::onSigListUpdated()
 	if (vSign) {
 		sigCount = vSign->signaturesVec().size();
 	}
-	sigInfo.setText("Total signatures: " + QString::number(sigCount, 10));
+	sigInfo.setText(tr("Total signatures: ") + QString::number(sigCount, 10));
 }
 
 void SignaturesBrowseWindow::openSignatures()
 {
-	QString filter = "Text Files (*.txt);;All Files (*)";
-	QString fName= QFileDialog::getOpenFileName(NULL, "Open file with signatures", NULL, filter);
+	QString filter = tr("Text Files (*.txt);;All Files (*)");
+	QString fName= QFileDialog::getOpenFileName(NULL, tr("Open file with signatures"), NULL, filter);
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
@@ -142,7 +142,7 @@ void SignaturesBrowseWindow::openSignatures()
 		emit signaturesUpdated();
 		//---
 		QMessageBox msgBox;
-		msgBox.setText("Added new signatures: " + QString::number(i));
+		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
 		msgBox.exec();
 	}
 

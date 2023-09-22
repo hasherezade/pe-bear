@@ -136,7 +136,7 @@ QVariant ClrFlagsTreeItem::data(int column) const
 		DWORD flags = getAllFlags();
 		switch (column) {
 			case COL_OFFSET : return QString::number(getContentOffset(),16).toUpper();
-			case COL_NAME: return ("Flags");
+			case COL_NAME: return (tr("Flags"));
 			case COL_VALUE: return QString::number(flags, 16).toUpper();
 		}
 		return QVariant();
@@ -222,10 +222,10 @@ QVariant ClrTreeModel::headerData(int section, Qt::Orientation /* orientation */
 {
 	if(role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case COL_OFFSET : return "Offset";
-		case COL_NAME : return "Name";
-		case COL_VALUE : return "Value";
-		case COL_MEANING : return "Meaning";
+		case COL_OFFSET : return tr("Offset");
+		case COL_NAME : return tr("Name");
+		case COL_VALUE : return tr("Value");
+		case COL_MEANING : return tr("Meaning");
 	}
 	return QVariant();
 }

@@ -10,9 +10,9 @@ QVariant LdConfigTreeModel::headerData(int section, Qt::Orientation orientation,
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case OFFSET: return "Offset";
-		case NAME: return "Name";
-		case VALUE : return "Value";
+		case OFFSET: return tr("Offset");
+		case NAME: return tr("Name");
+		case VALUE : return tr("Value");
 		case MEANING: return "";
 	}
 	return QVariant();
@@ -47,7 +47,7 @@ QVariant LdConfigTreeModel::data(const QModelIndex &index, int role) const
 	if (column == MEANING) {
 		if (wrap->hasSubfieldWrapper(fId)) {
 			if (role == Qt::DecorationRole) return ViewSettings::getScaledPixmap(":/icons/List.ico");
-			if (role == Qt::ToolTipRole) return "List";
+			if (role == Qt::ToolTipRole) return tr("List");
 		}
 		if (fId == LdConfigDirWrapper::GUARD_FLAGS) {
 			if (role == Qt::DecorationRole) return ViewSettings::getScaledPixmap(":/icons/information.ico");
@@ -80,7 +80,7 @@ QString LdConfigTreeModel::makeDockerTitle(uint32_t upId)
 		return "";
 	}
 	uint32_t funcNum = node->getSubfieldWrapperCount(upId);
-	QString numDesc = funcNum == 1 ? " entry" : " entries";
+	QString numDesc = funcNum == 1 ? tr(" entry") : tr(" entries");
 	QString desc = name + "   [ " + QString::number(funcNum) + numDesc + " ]";
 	return desc;
 }
@@ -150,7 +150,7 @@ QVariant LdEntryTreeModel::headerData(int section, Qt::Orientation orientation, 
 	LdConfigEntryWrapper *elW = getEntryWrapperAtID(0);
 	if (elW == NULL) return QVariant();
 	if (section == OFFSET) {
-		return "Offset";
+		return tr("Offset");
 	}
 	return elW->getFieldName(section - 1);
 }

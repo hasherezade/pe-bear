@@ -133,8 +133,8 @@ QVariant DataDirTreeItem::data(int column) const
 	if (this->level == DESC) {
 		switch (column) {
 			case COL_NAME : return dDir->getName();
-		    case COL_VALUE : return ("Address");
-		    case COL_VALUE2 : return ("Size");
+		    case COL_VALUE : return (tr("Address"));
+		    case COL_VALUE2 : return (tr("Size"));
 		}
 		return QVariant();
 	}
@@ -187,12 +187,12 @@ QVariant DataDirTreeItem::toolTip(int column) const
 	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
 	if (fId >= recordsCount) return QVariant();
 	
-	if (column == COL_OFFSET) return "Right click to follow";
+	if (column == COL_OFFSET) return tr("Right click to follow");
 	IMAGE_DATA_DIRECTORY *dataDir = this->m_PE->getDataDirectory();
 
 	DWORD va = dataDir[recordNum].VirtualAddress;
 	DWORD size = dataDir[recordNum].Size;
-	if (va == 0 && size == 0) return "<empty>";
+	if (va == 0 && size == 0) return tr("<empty>");
 
 	SectionHdrWrapper *sec = m_PE->getSecHdrAtOffset(va, Executable::RVA);
 	if (sec == NULL)
@@ -327,7 +327,7 @@ QVariant OptionalHdrTreeItem::toolTip(int column) const
 	int fieldIndx = column;
 	if (!myPeHndl || !m_PE) return QVariant();
 
-	if (column == COL_OFFSET) return "Right click to follow";
+	if (column == COL_OFFSET) return tr("Right click to follow");
 
 	if (role == OptHdrWrapper::DLL_CHARACT) {
 		bool isOk;
@@ -526,10 +526,10 @@ QVariant OptionalHdrTreeModel::headerData(int section, Qt::Orientation orien, in
 	if(role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case COL_OFFSET : return "Offset";
-		case COL_NAME : return "Name";
-		case COL_VALUE : return "Value";
-		case COL_VALUE2 : return "Value";
+		case COL_OFFSET : return tr("Offset");
+		case COL_NAME : return tr("Name");
+		case COL_VALUE : return tr("Value");
+		case COL_VALUE2 : return tr("Value");
 	}
 	return QVariant();
 }

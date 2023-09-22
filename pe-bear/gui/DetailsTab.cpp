@@ -135,8 +135,8 @@ DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 #endif
 	
 	// sections graph
-	dockedRDiagram->setWindowTitle("Raw");
-	dockedVDiagram->setWindowTitle("Virtual");
+	dockedRDiagram->setWindowTitle(tr("Raw"));
+	dockedVDiagram->setWindowTitle(tr("Virtual"));
 
 	dockedRDiagram->setWidget(this->secRawDiagram);
 	this->dockedRDiagram->setParent(&this->secDiagramSplitter);
@@ -147,63 +147,63 @@ DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 
 	// IMPORTS
 	dirSplitters[pe::DIR_IMPORT] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_IMPORT, importsModel, impFuncModel, NULL);
-	dirSplitters[pe::DIR_IMPORT]->title = "Imports";
+	dirSplitters[pe::DIR_IMPORT]->title = tr("Imports");
 	setupImportsToolbar();
 
 	// EXPORTS
 	dirSplitters[pe::DIR_EXPORT] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_EXPORT, exportsModel, expFuncModel, NULL);
-	dirSplitters[pe::DIR_EXPORT]->title = "Exports";
+	dirSplitters[pe::DIR_EXPORT]->title = tr("Exports");
 	//---
 	// TLS
 	dirSplitters[pe::DIR_TLS] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_TLS, tlsModel, tlsCallbacksModel, NULL);
-	dirSplitters[pe::DIR_TLS]->title = "TLS";
+	dirSplitters[pe::DIR_TLS]->title = tr("TLS");
 
 	// BASE_RELOCS
 	dirSplitters[pe::DIR_BASERELOC] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_BASERELOC, relocsModel, relocEntriesModel, NULL);
-	dirSplitters[pe::DIR_BASERELOC]->title = "BaseReloc.";
+	dirSplitters[pe::DIR_BASERELOC]->title = tr("BaseReloc");
 	
 	//SECURITY
 	dirSplitters[pe::DIR_SECURITY] = new SecurityDirSplitter(this->myPeHndl, securityModel, NULL, NULL);
-	dirSplitters[pe::DIR_SECURITY]->title = "Security";
+	dirSplitters[pe::DIR_SECURITY]->title = tr("Security");
 
 	// LD_CONFIG
 	dirSplitters[pe::DIR_LOAD_CONFIG] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_LOAD_CONFIG, ldConfigModel, ldEntryModel, NULL);
-	dirSplitters[pe::DIR_LOAD_CONFIG]->title = "LoadConfig";
+	dirSplitters[pe::DIR_LOAD_CONFIG]->title = tr("LoadConfig");
 	
 	// BOUND_IMPORTS
 	dirSplitters[pe::DIR_BOUND_IMPORT] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_BOUND_IMPORT, boundImpModel, NULL, NULL);
-	dirSplitters[pe::DIR_BOUND_IMPORT]->title = "BoundImports";
+	dirSplitters[pe::DIR_BOUND_IMPORT]->title = tr("BoundImports");
 
 	// DELAY_IMPORTS
 	dirSplitters[pe::DIR_DELAY_IMPORT] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_DELAY_IMPORT, delayImpModel, delayFuncModel, NULL);
-	dirSplitters[pe::DIR_DELAY_IMPORT]->title = "DelayedImps";
+	dirSplitters[pe::DIR_DELAY_IMPORT]->title = tr("DelayedImps");
 	
 	// DEBUG
 	dirSplitters[pe::DIR_DEBUG] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_DEBUG, debugModel, debugEntryModel, NULL);
-	dirSplitters[pe::DIR_DEBUG]->title = "Debug";
+	dirSplitters[pe::DIR_DEBUG]->title = tr("Debug");
 
 	// EXCEPTION
 	dirSplitters[pe::DIR_EXCEPTION] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_EXCEPTION, exceptionModel, NULL, NULL);
-	dirSplitters[pe::DIR_EXCEPTION]->title = "Exception";
+	dirSplitters[pe::DIR_EXCEPTION]->title = tr("Exception");
 
 	// RESOURCES
 	dirSplitters[pe::DIR_RESOURCE] = new ResourcesDirSplitter(this->myPeHndl, resourcesModel, resourcesLeafModel, NULL);
-	dirSplitters[pe::DIR_RESOURCE]->title = "Resources";
+	dirSplitters[pe::DIR_RESOURCE]->title = tr("Resources");
 	
 	//CLR
 	dirSplitters[pe::DIR_COM_DESCRIPTOR] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_COM_DESCRIPTOR, clrModel, NULL, NULL);
-	dirSplitters[pe::DIR_COM_DESCRIPTOR]->title = ".NET Hdr";
+	dirSplitters[pe::DIR_COM_DESCRIPTOR]->title = tr(".NET Hdr");
 
-	cDisasmTab = addTab(&disasmView, "Disasm");
-	cGeneralTab = addTab(&generalPanel, "General");
+	cDisasmTab = addTab(&disasmView, tr("Disasm"));
+	cGeneralTab = addTab(&generalPanel, tr("General"));
 
-	cDOSHdrTab = addTab(&dosHdrTree, "DOS Hdr");
+	cDOSHdrTab = addTab(&dosHdrTree, tr("DOS Hdr"));
 	if (peHndl && peHndl->getPe() && peHndl->getPe()->getRichHeaderSign()) {
-		cRichHdrTab = addTab(&richHdrTree, "Rich Hdr");
+		cRichHdrTab = addTab(&richHdrTree, tr("Rich Hdr"));
 	}
-	cFileHdrsTab = addTab(&fileHdrTree, "File Hdr");
-	cOptHdrsTab = addTab(&optionalHdrTree, "Optional Hdr");
-	cSecHdrsTab = addTab(&hdrsSplitter, "Section Hdrs");
+	cFileHdrsTab = addTab(&fileHdrTree, tr("File Hdr"));
+	cOptHdrsTab = addTab(&optionalHdrTree, tr("Optional Hdr"));
+	cSecHdrsTab = addTab(&hdrsSplitter, tr("Section Hdrs"));
 
 	setScaledIcons();
 	reloadDirView();
@@ -242,21 +242,21 @@ void DetailsTab::onFitSections()
 	const bool fileToResize = fileSize != lastRaw;
 	const bool imageToResize = imageSize != lastRva;
 
-	QString info = "Last mapped raw = "+ QString::number(lastRaw, 16) + " when File Size = "+ QString::number(fileSize, 16);
-	info += "\nLast mapped RVA = " +  QString::number(lastRva, 16) + " when Image Size = "+ QString::number(imageSize, 16);
+	QString info = tr("Last mapped raw = ")+ QString::number(lastRaw, 16) + tr(" when File Size = ") + QString::number(fileSize, 16);
+	info += "\n" + tr("Last mapped RVA = ") +  QString::number(lastRva, 16) + tr(" when Image Size = ")+ QString::number(imageSize, 16);
 
 	if (!fileToResize && !imageToResize) {
-		QMessageBox::information(NULL, "No resizing required!", info);
+		QMessageBox::information(NULL, tr("No resizing required!"), info);
 		return;
 	}
 
-	QString whatToResize = fileToResize ? "File": "";
+	QString whatToResize = fileToResize ? tr("File"): "";
 	if (imageToResize) {
-		if (whatToResize.length() > 0) whatToResize +=" and ";
-		whatToResize += "Image";
+		if (whatToResize.length() > 0) whatToResize += tr(" and ");
+		whatToResize += tr("Image");
 	}
-	QString confirmation = "Do you want to resize " + whatToResize  +" to fit?\n";
-	QMessageBox::StandardButton reply = QMessageBox::question(NULL, "Do you really want to resize?", confirmation + '\n' + info,  QMessageBox::Yes|QMessageBox::No);                     
+	QString confirmation = tr("Do you want to resize ") + whatToResize  + tr(" to fit?") + "\n";
+	QMessageBox::StandardButton reply = QMessageBox::question(NULL, tr("Do you really want to resize?"), confirmation + '\n' + info,  QMessageBox::Yes|QMessageBox::No);                     
 	if (reply != QMessageBox::Yes) return;  
 
 	bool fOk = !fileToResize;
@@ -272,18 +272,18 @@ void DetailsTab::onFitSections()
 	}
 
 	if (fOk && iOk) {
-		QMessageBox::information(NULL, "Done!", "Resizing succeeded!");
+		QMessageBox::information(NULL, tr("Done!"), tr("Resizing succeeded!"));
 		return;
 	}
 
-	if (!fOk) QMessageBox::warning(NULL, "Failed!", "Failed resizing the File!");
-	if (!iOk) QMessageBox::warning(NULL, "Failed!", "Failed resizing the Image!");
+	if (!fOk) QMessageBox::warning(NULL, tr("Failed!"), tr("Failed resizing the File!"));
+	if (!iOk) QMessageBox::warning(NULL, tr("Failed!"), tr("Failed resizing the Image!"));
 }
 
 void DetailsTab::onAddImportLib()
 {
 	if (!myPeHndl->addImportLib()) {
-		QMessageBox::warning(NULL, "Failed!", "No space to add a new entry!\nYou must move the table first!");
+		QMessageBox::warning(NULL, tr("Failed!"), tr("No space to add a new entry!")+"\n"+tr("You must move the table first!"));
 		return;
 	}
 }
@@ -294,12 +294,12 @@ void DetailsTab::onAddImportFunc()
 
 	QModelIndexList list = dirSplitters[pe::DIR_IMPORT]->getUpperViewSelected();
 	if (list.size() == 0) {
-		QMessageBox::warning(NULL, "Failed", "No library selected!");
+		QMessageBox::warning(NULL, tr("Failed"), tr("No library selected!"));
 		return;
 	}
 	uint32_t selectedLib = list.at(0).row();
 	if (!myPeHndl->addImportFunc(selectedLib)) {
-		QMessageBox::warning(NULL, "Failed!", "No space to add a function entry!");
+		QMessageBox::warning(NULL, tr("Failed!"), tr("No space to add a function entry!"));
 		return;
 	}
 }
@@ -325,10 +325,10 @@ void DetailsTab::onAutoAddImports()
 	}
 	try {
 		if (!myPeHndl->autoAddImports(settings)) {
-			QMessageBox::critical(this, "Error", "Auto adding imports failed!");
+			QMessageBox::critical(this, tr("Error"), tr("Auto adding imports failed!"));
 		}
 	} catch (CustomException &e) {
-		QMessageBox::critical(this, "Error", e.what());
+		QMessageBox::critical(this, tr("Error"), e.what());
 		return;
 	}
 }
@@ -387,10 +387,10 @@ void DetailsTab::setupSectionsToolbar(QSplitter *owner)
 	sectionsToolBar->setProperty("dataDir", true);
 	owner->addWidget(sectionsToolBar);
 
-	this->addSection = new QAction(QString("&Add a section"), this);
+	this->addSection = new QAction(QString(tr("&Add a section")), this);
 	connect(addSection, SIGNAL(triggered()), this, SLOT(onAddSection()) );
 
-	this->fitSections = new QAction(QString("&Resize to fit sections"), this);
+	this->fitSections = new QAction(QString(tr("&Resize to fit sections")), this);
 	connect(fitSections, SIGNAL(triggered()), this, SLOT(onFitSections()) );
 
 	sectionsToolBar->addAction(addSection);
@@ -403,13 +403,13 @@ void DetailsTab::setupImportsToolbar()
 
 	QToolBar *toolBar = &dirSplitters[pe::DIR_IMPORT]->toolBar;
 
-	this->addImportLib = new QAction(QString("Add a &library"), this);
+	this->addImportLib = new QAction(QString(tr("Add a &library")), this);
 	connect(addImportLib, SIGNAL(triggered()), this, SLOT(onAddImportLib()) );
 
-	this->addImportFunc = new QAction(QString("Add a &function to the library"), this);
+	this->addImportFunc = new QAction(QString(tr("Add a &function to the library")), this);
 	connect(addImportFunc, SIGNAL(triggered()), this, SLOT(onAddImportFunc()) );
 	
-	this->autoAddImports = new QAction(QString("Add imports via &wizard"), this);
+	this->autoAddImports = new QAction(QString(tr("Add imports via &wizard")), this);
 	connect(autoAddImports, SIGNAL(triggered()), this, SLOT(onAutoAddImports()) );
 
 	toolBar->addAction(addImportLib);
@@ -420,7 +420,7 @@ void DetailsTab::setupImportsToolbar()
 void DetailsTab::setDisasmTabText(offset_t raw)
 {
 	if (!m_PE) {
-		setTabText(this->cDisasmTab, "Disasm");
+		setTabText(this->cDisasmTab, tr("Disasm"));
 		return;
 	}
 	int size = PREVIEW_SIZE;
@@ -437,14 +437,14 @@ void DetailsTab::setDisasmTabText(offset_t raw)
 	if (sec && sec == sec2) {
 		secName = ": " + sec->mappedName;
 	} else if (sec || sec2) {
-		QString sec1Name = sec ? "[" + sec->mappedName + "]" : "Headers";
+		QString sec1Name = sec ? "[" + sec->mappedName + "]" : tr("Headers");
 		QString sec2Name = sec2 ? "[" + sec2->mappedName + "]" : "";
 
 		secName = ": " + sec1Name;
 		if (sec2Name.size()) 
 			secName += " to " + sec2Name;
 	}
-	setTabText(this->cDisasmTab, "Disasm" + secName);
+	setTabText(this->cDisasmTab, tr( "Disasm") + secName);
 }
 
 void DetailsTab::shirtTabsAfter(pe::dir_entry dirNum, bool toTheLeft)
@@ -503,7 +503,7 @@ void DetailsTab::manageDirTab(pe::dir_entry dirNum)
 		QIcon dataDirIco = ViewSettings::makeScaledIcon(":/icons/data_dir_gray.ico", iconDim, iconDim);
 
 		this->setTabIcon(dirTabIds[dirNum], dataDirIco);
-		this->setTabToolTip(dirTabIds[dirNum], "Data Directory[" + QString::number(dirNum) + "]: " + dirSplitters[dirNum]->title);
+		this->setTabToolTip(dirTabIds[dirNum], tr("Data Directory[") + QString::number(dirNum) + "]: " + dirSplitters[dirNum]->title);
 		// shift tabs:
 		shirtTabsAfter(dirNum, false);
 	}

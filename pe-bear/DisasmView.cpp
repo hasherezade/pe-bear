@@ -223,8 +223,8 @@ void DisasmTreeView::onFollowOffset(offset_t offset, Executable::addr_type aT)
 		hndl->setDisplayed(false, raw);
 
 	} catch (CustomException e) {
-		this->lastErrorString = "Address: "+ QString::number(offset, 16) +" is invalid:\n" + e.what();
-		QMessageBox::warning(0, "Warning!", this->lastErrorString );
+		this->lastErrorString = tr("Address: ")+ QString::number(offset, 16) + tr(" is invalid:") + "\n" + e.what();
+		QMessageBox::warning(0, tr("Warning!"), this->lastErrorString );
 	}
 }
 
@@ -262,7 +262,7 @@ void DisasmTreeView::pasteToSelected()
 
 	QModelIndexList list = this->uniqOffsets(model->selectedIndexes());
 	if (!this->isIndexListContinuous(list)) {
-		QMessageBox::warning(0, "Warning!", "Select continuous area!");
+		QMessageBox::warning(0, tr("Warning!"), tr("Select continuous area!"));
 		return;
 	}
 	if (list.size() == 0) return;
@@ -287,21 +287,21 @@ void DisasmTreeView::initMenu()
 {
 	QMenu *menu = &defaultMenu;;
 
-	QAction *copySelAction = new QAction("Copy", menu);
+	QAction *copySelAction = new QAction(tr("Copy"), menu);
 	copySelAction->setShortcut(Qt::CTRL + Qt::Key_C);
 
 	menu->addAction(copySelAction);
 	connect(copySelAction, SIGNAL(triggered()), this, SLOT(copySelected()));
 
-	QAction *pasteSelAction = new QAction("Paste to selected", menu);
+	QAction *pasteSelAction = new QAction(tr("Paste to selected"), menu);
 	pasteSelAction->setShortcut(Qt::CTRL + Qt::Key_V);
 	menu->addAction(pasteSelAction);
 	connect(pasteSelAction, SIGNAL(triggered()), this, SLOT(pasteToSelected()));
 
-	QMenu *followMenu = new QMenu("Follow", menu);
+	QMenu *followMenu = new QMenu(tr("Follow"), menu);
 	menu->addMenu(followMenu);
 
-	OffsetDependentAction* followRvaAction = new OffsetDependentAction(Executable::RVA, "Selection RVA:\t", followMenu);
+	OffsetDependentAction* followRvaAction = new OffsetDependentAction(Executable::RVA, tr("Selection RVA:") + "\t", followMenu);
 	followMenu->addAction(followRvaAction);
 	connect(this, SIGNAL(currentRvaChanged(offset_t)), followRvaAction, SLOT(onOffsetChanged(offset_t)) );
 	connect(followRvaAction, SIGNAL(triggered(offset_t, Executable::addr_type)), this, SLOT(onFollowOffset(offset_t, Executable::addr_type)));
@@ -335,7 +335,7 @@ void DisasmTreeView::initMenu()
 
 	//set EP at offset:
 	QPixmap epIco(":/icons/arrow-right.ico");
-	OffsetDependentAction* setEpAction = new OffsetDependentAction(Executable::RVA, "Set EP =", menu);
+	OffsetDependentAction* setEpAction = new OffsetDependentAction(Executable::RVA, tr("Set EP ="), menu);
 	setEpAction->setIcon(epIco);
 	menu->addAction(setEpAction);
 	connect(this, SIGNAL(currentRvaChanged(offset_t)), setEpAction, SLOT(onOffsetChanged(offset_t)) );
@@ -347,23 +347,23 @@ void DisasmTreeView::initHeaderMenu()
 	QMenu &hdrMenu = vHdr.defaultMenu;
 	//------------
 
-	QMenu *hdrSettings = new QMenu("Settings", &hdrMenu);
+	QMenu *hdrSettings = new QMenu(tr("Settings"), &hdrMenu);
 	hdrMenu.addSeparator();
 	hdrMenu.addMenu(hdrSettings);
 
 	imgBaseA = hdrSettings->addAction("RVA -> VA");
 	imgBaseA->setCheckable(true);
-	imgBaseA->setToolTip("Add ImageBase");
+	imgBaseA->setToolTip(tr("Add ImageBase"));
 	imgBaseA->setChecked(false);
 
 	/*Bitmode setting actions */
 	QActionGroup *group = new QActionGroup(this);
 	group->setExclusive(true);
-	QMenu* bitModeSubmenu = hdrSettings->addMenu("&Bit mode");
+	QMenu* bitModeSubmenu = hdrSettings->addMenu(tr("&Bit mode"));
 	const int MODES_NUM = 4;
 	QAction *actions[MODES_NUM];
 
-	actions[0] = group->addAction("Automatic");
+	actions[0] = group->addAction(tr("Automatic"));
 	actions[0]->setData(0);
 
 	for (int i = 1; i < MODES_NUM; i++) {
@@ -723,9 +723,9 @@ QVariant DisasmModel::horizHeader(int section, int role) const
 	if (role != Qt::DisplayRole) return QVariant();
 
 	switch (section) {
-		case HEX_COL: return " Hex ";
-		case DISASM_COL: return " Disasm ";
-		case HINT_COL: return " Hint ";
+		case HEX_COL: return tr(" Hex ");
+		case DISASM_COL: return tr(" Disasm ");
+		case HINT_COL: return tr(" Hint ");
 	}
 	return QVariant();
 }
@@ -751,12 +751,12 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 	offset_t rva = this->getRvaAt(y);
 
 	if (rva == INVALID_ADDR) {
-		if (role == Qt::DisplayRole) return "<invalid>";
+		if (role == Qt::DisplayRole) return tr("<invalid>");
 		if (role == Qt::ToolTipRole) {
 			const offset_t raw = this->getRawAt(y);
-			return "Not mapped. Raw = 0x" + QString::number(raw, 16);
+			return tr("Not mapped. Raw = 0x") + QString::number(raw, 16);
 		}
-		if (role == Qt::ForegroundRole) return QColor("red");
+		if (role == Qt::ForegroundRole) return QColor(tr("red"));
 	}
 
 	//rva valid
@@ -768,22 +768,22 @@ QVariant DisasmModel::verticHeader(int section, int role) const
 	}
 
 	if (role == Qt::ToolTipRole) {
-		return QString::number(rva, 16).toUpper() +"\nRight click to follow";
+		return QString::number(rva, 16).toUpper() +"\n"+ tr("Right click to follow");
 	}
 
 	if (!myDisasm.isRvaContnuous(y)) {
-		if (role == Qt::ForegroundRole) return QColor("magenta");
+		if (role == Qt::ForegroundRole) return QColor(tr("magenta"));
 	}
 
 	DWORD ep = m_PE->getEntryPoint();
 	size_t disChunk = myDisasm.getChunkSize(y);
 
 	if (ep >= rva && ep < (rva + disChunk)) {
-		if (role == Qt::ForegroundRole) return QColor("cyan");
-		if (role == Qt::ToolTipRole) return "Entry Point = " + QString::number(ep, 16).toUpper();
+		if (role == Qt::ForegroundRole) return QColor(tr("cyan"));
+		if (role == Qt::ToolTipRole) return tr("Entry Point = ") + QString::number(ep, 16).toUpper();
 	}
 	// normal color
-	if (role == Qt::ForegroundRole) return QColor("white");
+	if (role == Qt::ForegroundRole) return QColor(tr("white"));
 
 	return QVariant();
 }
@@ -1098,7 +1098,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 			
 			if (role == Qt::ToolTipRole) {
 				if (tRva >= imgSize) {
-					return "RVA out of ImageSize: 0x" + QString::number(imgSize, 16);
+					return tr("RVA out of ImageSize: 0x") + QString::number(imgSize, 16);
 				}
 				if (lval < 0) {
 					return "$- 0x" + QString::number(~lval + 1, 16);
@@ -1108,7 +1108,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 		}
 		
 		if (role == Qt::ToolTipRole && x == DISASM_COL) {
-			QString s = "Click arrow icon to follow  (RVA: " + QString::number(tRva, 16).toUpper() + ")";
+			QString s = tr("Click arrow icon to follow  (RVA: ") + QString::number(tRva, 16).toUpper() + ")";
 			return s;
 		}
 	}
@@ -1128,7 +1128,7 @@ QVariant DisasmModel::data(const QModelIndex &index, int role) const
 		}
 	}
 	if (role == Qt::ToolTipRole && x == HEX_COL) {
-		return "Double-click to edit";
+		return tr("Double-click to edit");
 	}
 	if (x == HEX_COL) {
 		if (role == Qt::DisplayRole || role == Qt::ToolTipRole || role == Qt::EditRole) {

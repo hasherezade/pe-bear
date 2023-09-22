@@ -21,10 +21,10 @@ QVariant PackersTableModel::headerData(int section, Qt::Orientation orientation,
 	if (role != Qt::DisplayRole) return QVariant();
 	if (orientation == Qt::Horizontal) {
 		switch (section) {
-			case COL_OFFSET: return "Offset";
-			case COL_NAME: return "Name";
-			case COL_SIG: return "Signature";
-			case COL_SECTION:  return "Section";
+			case COL_OFFSET: return tr("Offset");
+			case COL_NAME: return tr("Name");
+			case COL_SIG: return tr("Signature");
+			case COL_SECTION:  return tr("Section");
 		}
 	}
 	return QVariant();

@@ -26,32 +26,32 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	setMinimumWidth(270);
 	setLayout(&topLayout);
 
-	dirButton.setText("Open");
+	dirButton.setText(tr("Open"));
 	connect(&dirButton, SIGNAL(clicked()), this, SLOT(onDirChose()));
 	
 	QHBoxLayout *fLayout1 = new QHBoxLayout();
 	QHBoxLayout *fLayout2 = new QHBoxLayout();
-	uddDirLabel.setText("User Data Directory: ");
+	uddDirLabel.setText(tr("User Data Directory: "));
 	topLayout.addWidget(&uddDirLabel);
 	fLayout1->addWidget(&uddDirEdit);
 	fLayout1->addWidget(&dirButton);
 
-	reloadFileLabel.setText("Reload file on change? ");
-	reloadFileStates.addItem("Ignore  ", RELOAD_IGNORE);
-	reloadFileStates.addItem("Ask     ", RELOAD_ASK);
-	reloadFileStates.addItem("Reload  ", RELOAD_AUTO);
+	reloadFileLabel.setText(tr("Reload file on change? "));
+	reloadFileStates.addItem(tr("Ignore  "), RELOAD_IGNORE);
+	reloadFileStates.addItem(tr("Ask     "), RELOAD_ASK);
+	reloadFileStates.addItem(tr("Reload  "), RELOAD_AUTO);
 	
 	fLayout2->addWidget(&reloadFileLabel);
 	fLayout2->addWidget(&reloadFileStates);
 	fLayout2->setSizeConstraint(QLayout::SetMaximumSize);
 	
-	autoSaveTagsCBox.setText("Auto-save tags");
+	autoSaveTagsCBox.setText(tr("Auto-save tags"));
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
-	okButton.setText("Save");
+	okButton.setText(tr("Save"));
 	connect(&okButton, SIGNAL(clicked()), this, SLOT(onOkClicked()));
 
 	cancelButton.setDefault(true);
-	cancelButton.setText("Cancel");
+	cancelButton.setText(tr("Cancel"));
 	connect(&cancelButton, SIGNAL(clicked()), this, SLOT(hide()));
 
 	buttonLayout->addWidget(&okButton);

@@ -26,21 +26,21 @@ InfoTableModel::InfoTableModel(PeHandler *peHndl, QObject *parent)
 QVariant InfoTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role != Qt::DisplayRole) return QVariant();
-	if (orientation == Qt::Horizontal) return "File info";
+	if (orientation == Qt::Horizontal) return tr("File info");
 	if (orientation == Qt::Vertical) {
 		switch (section) {
-			case INFO_NAME: return "Path";
-			case INFO_IS_TRUNCATED : return "Is Truncated?";
-			case INFO_UNITS : return "File Alignment Units";
-			case INFO_LOADED_SIZE: return "Loaded size";
-			case INFO_FILE_SIZE: return "File size";
+			case INFO_NAME: return tr("Path");
+			case INFO_IS_TRUNCATED : return tr("Is Truncated?");
+			case INFO_UNITS : return tr("File Alignment Units");
+			case INFO_LOADED_SIZE: return tr("Loaded size");
+			case INFO_FILE_SIZE: return tr("File size");
 			case INFO_MD5:  return "MD5";
 			case INFO_SHA1: return "SHA1";
 #if QT_VERSION >= 0x050000
 			case INFO_SHA256: return "SHA256";
 #endif
-			case INFO_CHECKSUM: return "Checksum";
-			case INFO_RICHHDR_HASH: return "Rich Header Hash";
+			case INFO_CHECKSUM: return tr("Checksum");
+			case INFO_RICHHDR_HASH: return tr("Rich Header Hash");
 			case INFO_IMP_HASH: return "ImpHash";
 		}
 	}
@@ -68,12 +68,12 @@ int InfoTableModel::rowCount(const QModelIndex &parent) const
 
 QVariant InfoTableModel::data(const QModelIndex &index, int role) const
 {
-	const QString msg_notAvailable = "not available";
+	const QString msg_notAvailable = tr("not available");
 	int row = index.row();
 	int column = index.column();
 	
 	if (row == INFO_UNITS || row == INFO_LOADED_SIZE) {
-		if (role == Qt::ToolTipRole) return "(decimal)\nedit to resize the file";
+		if (role == Qt::ToolTipRole) return tr("(decimal)") + "\n" + tr("edit to resize the file");
 	}
 	if (row != INFO_UNITS && row != INFO_LOADED_SIZE) {
 		if (role == Qt::BackgroundRole) return QColor(211, 211, 211, 100); // not editable
@@ -85,10 +85,10 @@ QVariant InfoTableModel::data(const QModelIndex &index, int role) const
 		case INFO_NAME: return this->myPeHndl->getFullName();
 		case INFO_IS_TRUNCATED : {
 			if (role == Qt::ToolTipRole) {
-				static QString info = "Some files are too large and they must be loaded truncated.";
+				static QString info = tr("Some files are too large and they must be loaded truncated.");
 				return info;
 			}
-			return m_PE->isTruncated() ? "Yes" : "No";
+			return m_PE->isTruncated() ? tr("Yes") : tr("No");
 		}
 		case INFO_LOADED_SIZE: return static_cast<qlonglong>(m_PE->getRawSize());
 		case INFO_FILE_SIZE: return static_cast<qlonglong>(m_PE->getFileSize());
@@ -140,27 +140,27 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 			newSize = data.toInt();
 	}
 
-	static QString alert = "Do your really want to resize file?";
+	static QString alert = tr("Do your really want to resize file?");
 	static QPixmap enlarge(":/icons/enlarge.ico");
 	static QPixmap shrink(":/icons/shrink.ico");
 
 	QMessageBox msgBox;
 	msgBox.setText(alert);
 
-	msgBox.addButton("Yes, continue", QMessageBox::AcceptRole);
-	msgBox.addButton("No, abort", QMessageBox::RejectRole);
+	msgBox.addButton(tr("Yes, continue"), QMessageBox::AcceptRole);
+	msgBox.addButton(tr("No, abort"), QMessageBox::RejectRole);
 	QString info;
 
 	int64_t currentSize = m_PE->getRawSize();
 	int64_t dif;
 	if (!m_PE->canResize(newSize)) {
 		QMessageBox msgBox;
-		msgBox.setText("Incorrect new size supplied!");
+		msgBox.setText(tr("Incorrect new size supplied!"));
 
 		if (newSize < currentSize)
-			msgBox.setInformativeText("Choose the size that will not damage headers!");
+			msgBox.setInformativeText(tr("Choose the size that will not damage headers!"));
 		else
-			msgBox.setInformativeText("Too big!");
+			msgBox.setInformativeText(tr("Too big!"));
 		msgBox.exec();
 		return false;
 	}
@@ -169,11 +169,11 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 	if (newSize < currentSize) {
 		dif = currentSize - newSize;
 		msgBox.setIconPixmap(shrink);
-		info = "bytes are going to be cropped!";
+		info = tr("bytes are going to be cropped!");
 	} else {
 		dif = newSize - currentSize;
 		msgBox.setIconPixmap(enlarge);
-		info = "bytes are going to be added!";
+		info = tr("bytes are going to be added!");
 	}
 	msgBox.setInformativeText( QString::number((uint32_t) dif) + " (0x"+ QString::number((uint32_t)dif, 16) + ") "+ info);
 
@@ -182,7 +182,7 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 	bool isOk = myPeHndl->resize(newSize);
 	if (!isOk) {
 		QMessageBox msgBox;
-		msgBox.setText("Resizing failed!");
+		msgBox.setText(tr("Resizing failed!"));
 		msgBox.exec();
 	}
 	return isOk;
@@ -218,7 +218,7 @@ void GeneralPanel::init()
 	packersDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	packersDock->setWidget(&packersTree);
 	packersDock->setWindowIcon(QIcon(":/icons/Locked.ico"));
-	packersDock->setWindowTitle("Found signatures");
+	packersDock->setWindowTitle(tr("Found signatures"));
 	this->addWidget(packersDock);
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
 }

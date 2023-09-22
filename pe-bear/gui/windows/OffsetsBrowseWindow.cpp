@@ -10,7 +10,7 @@ QVariant OffsetsBrowseModel::headerData(int section, Qt::Orientation orientation
 		switch (section) {
 			case COL_OFFSET : return "RVA";
 			case COL_ID : return "ID";
-			case COL_NAME : return "Comment";
+			case COL_NAME : return tr("Comment");
 		}
 	}
 	return QVariant();
@@ -125,13 +125,13 @@ OffsetsBrowseWindow::~OffsetsBrowseWindow()
 void OffsetsBrowseWindow::createMenu()
 {
 	// tag menu
-	QMenu* tagSubmenu = menuBar()->addMenu("File");
+	QMenu* tagSubmenu = menuBar()->addMenu(tr("File"));
 
-	QAction* loadCommentAction = new QAction("Load", tagSubmenu);
+	QAction* loadCommentAction = new QAction(tr("Load"), tagSubmenu);
 	connect(loadCommentAction, SIGNAL(triggered()), this, SLOT(onLoadComment()));
 	tagSubmenu->addAction(loadCommentAction);
 	
-	QAction* saveCommentAction = new QAction("Save", tagSubmenu);
+	QAction* saveCommentAction = new QAction(tr("Save"), tagSubmenu);
 	connect(saveCommentAction, SIGNAL(triggered()), this, SLOT(onSaveComment()));
 	tagSubmenu->addAction(saveCommentAction);
 }
@@ -157,6 +157,6 @@ void OffsetsBrowseWindow::dropEvent(QDropEvent* ev)
 	this->setCursor(cur);
 
 	if (loaded == false) {
-		QMessageBox::warning(this, "Failed", "Loading failed!", QMessageBox::Ok);
+		QMessageBox::warning(this, tr("Failed"), tr("Loading failed!"), QMessageBox::Ok);
 	}
 }

@@ -207,7 +207,7 @@ QVariant RichHdrTreeModel::data(const QModelIndex &index, int role) const
 		size_t cnt = richHdr->compIdCount() - 1;
 		if (index.row() == (RichHdrWrapper::CHECKSUM + cnt)) {
 			if (index.column() == COL_MEANING) {
-				return "Calculated checksum";
+				return tr("Calculated checksum");
 			}
 		}
 		return this->toolTip(index);
@@ -242,15 +242,15 @@ QVariant RichHdrTreeModel::headerData(int section, Qt::Orientation /* orientatio
 {
 	if(role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case COL_OFFSET : return "Offset";
-		case COL_NAME : return "Name";
-		case COL_VALUE : return "Value";
-		case COL_CLEAN_VALUE: return "Unmasked Value";
-		case COL_MEANING : return "Meaning";
-		case COL_CID_PROD : return "ProductId";
-		case COL_CID_BUILD : return "BuildId";
-		case COL_CID_COUNT : return "Count";
-		case COL_CID_VSVER: return "VS version";
+		case COL_OFFSET : return tr("Offset");
+		case COL_NAME : return tr("Name");
+		case COL_VALUE : return tr("Value");
+		case COL_CLEAN_VALUE: return tr("Unmasked Value");
+		case COL_MEANING : return tr("Meaning");
+		case COL_CID_PROD : return tr("ProductId");
+		case COL_CID_BUILD : return tr("BuildId");
+		case COL_CID_COUNT : return tr("Count");
+		case COL_CID_VSVER: return tr("VS version");
 	}
 	return QVariant();
 }

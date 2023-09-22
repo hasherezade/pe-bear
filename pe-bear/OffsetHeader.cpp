@@ -17,10 +17,10 @@ OffsetHeader::OffsetHeader(QWidget *parent)
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(customMenuEvent(QPoint)) );
 	
-	this->followAction = new QAction("Follow the offset", this);
+	this->followAction = new QAction(tr("Follow the offset"), this);
 	connect(followAction, SIGNAL(triggered()), this, SLOT(followOffset()));
 
-	this->copyAction = new QAction("Copy the offset", this);
+	this->copyAction = new QAction(tr("Copy the offset"), this);
 	connect(copyAction, SIGNAL(triggered()), this, SLOT(copyOffset()));
 
 	this->defaultMenu.addAction(followAction);
@@ -32,7 +32,7 @@ void OffsetHeader::customMenuEvent(QPoint p)
 	if (!hexModel) return;
 	
 	if (selectedOffset == INVALID_ADDR) {
-		followAction->setText("Invalid offset");
+		followAction->setText(tr("Invalid offset"));
 		followAction->setEnabled(false);
 	
 	} else {

@@ -33,9 +33,9 @@ QVariant TLSTreeModel::headerData(int section, Qt::Orientation orientation, int 
 {
 	if(role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case COL_OFFSET : return "Offset";
-		case COL_NAME : return "Name";
-		case COL_VALUE : return "Value";
+		case COL_OFFSET : return tr("Offset");
+		case COL_NAME : return tr("Name");
+		case COL_VALUE : return tr("Value");
 	}
 	return QVariant();
 }
@@ -47,7 +47,7 @@ QString TLSTreeModel::makeDockerTitle(uint32_t upId)
 	size_t entriesNum = w->getEntriesNum();
 
 	std::string name = "TLS Callbacks";
-	QString numDesc = entriesNum == 1 ? " entry" : " entries";
+	QString numDesc = entriesNum == 1 ? tr(" entry") : tr(" entries");
 	QString desc = QString::fromStdString(name) + "   [ " + QString::number(entriesNum) + numDesc + " ]"; 
 	return desc;
 }
@@ -89,8 +89,8 @@ QVariant TLSCallbacksModel::headerData(int section, Qt::Orientation orientation,
 {
 	if(role != Qt::DisplayRole) return QVariant();
 	switch (section) {
-		case OFFSET : return "Offset";
-		case VALUE : return "Callback";
+		case OFFSET : return tr("Offset");
+		case VALUE : return tr("Callback");
 	}
 	return QVariant();
 }

@@ -242,27 +242,27 @@ size_t SecDiagramModel::getSecNum()
 
 void SectionsDiagram::createActions()
 {
-	this->dataViewAction = new QAction("Show mapped raw", this);
+	this->dataViewAction = new QAction(tr("Show mapped raw"), this);
 	this->dataViewAction->setCheckable(true);
 	connect(this->dataViewAction, SIGNAL(triggered(bool)), &settings, SLOT(setShowMapped(bool)));
 
-	this->enableDrawEPAction = new QAction("Entry Point", this);
+	this->enableDrawEPAction = new QAction(tr("Entry Point"), this);
 	this->enableDrawEPAction->setCheckable(true);
 	connect(this->enableDrawEPAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawEP(bool)));
 
-	this->enableDrawSecHdrsAction = new QAction("Sections Headers end", this);
+	this->enableDrawSecHdrsAction = new QAction(tr("Sections Headers end"), this);
 	this->enableDrawSecHdrsAction->setCheckable(true);
 	connect(this->enableDrawSecHdrsAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawSecHdrs(bool)));
 
-	this->enableGridAction = new QAction("Grid (Alignment Units)", this);
+	this->enableGridAction = new QAction(tr("Grid (Alignment Units)"), this);
 	this->enableGridAction->setCheckable(true);
 	connect(this->enableGridAction, SIGNAL(triggered(bool)), &settings, SLOT(setEnableGrid(bool)));
 
-	this->enableOffsetsAction = new QAction("Sections &Offsets", this);
+	this->enableOffsetsAction = new QAction(tr("Sections &Offsets"), this);
 	this->enableOffsetsAction->setCheckable(true);
 	connect(this->enableOffsetsAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawOffsets(bool)));
 
-	this->enableSecNamesAction = new QAction("Sections &Names", this);
+	this->enableSecNamesAction = new QAction(tr("Sections &Names"), this);
 	this->enableSecNamesAction->setCheckable(true);
 	connect(this->enableSecNamesAction, SIGNAL(triggered(bool)), &settings, SLOT(setDrawSecNames(bool)));
 
