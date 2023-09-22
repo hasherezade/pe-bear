@@ -43,7 +43,7 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	fLayout1A->addWidget(&dirButton);
 	fLayout3->addWidget(&languageLabel);
 	fLayout3->addWidget(&languageEdit);
-	languageEdit.insertItem(0, tr("(default)"));
+	languageEdit.insertItem(0, tr("en_US (default)"));
 	
 	languageEdit.setToolTip(tr("Changing the language version requires application restart"));
 

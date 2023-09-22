@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	QTranslator translator;
 	QString currLanguage = mainSettings.language;
 	if (currLanguage.length() == 0) {
-		currLanguage = QLocale::system().name().toLower();
+		currLanguage = QLocale::system().name();
 	}
 	QString trPath = mainSettings.userDataDir() + QDir::separator() + mainSettings.languageDir + QDir::separator() + currLanguage + QDir::separator() + "PELanguage.qm";
 	if (translator.load(trPath)) {
