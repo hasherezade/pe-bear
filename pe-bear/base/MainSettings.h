@@ -424,6 +424,7 @@ public:
 	bool writePersistent();
 
 	QString dirDump;
+	QString language;
 
 protected:
 	bool followOnClick;

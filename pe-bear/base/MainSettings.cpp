@@ -55,13 +55,13 @@ t_reload_mode intToReloadMode(int val)
 bool MainSettings::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	this->autoSaveTags = settings.value(tr("AutoSaveTags"), true).toBool();
-	this->autoReloadOnFileChange = intToReloadMode(settings.value(tr("AutoReloadOnChage"), RELOAD_ASK).toInt());
+	this->autoSaveTags = settings.value("AutoSaveTags", true).toBool();
+	this->autoReloadOnFileChange = intToReloadMode(settings.value("AutoReloadOnChage", RELOAD_ASK).toInt());
 	this->uDataDir = settings.value("UDD", "").toString();
-	this->followOnClick = settings.value(tr("FollowOnClick"), false).toBool();
-	this->lExePath = settings.value(tr("LastOpened"), false).toString();
-	this->dirDump = settings.value(tr("LastDumpDir"), false).toString();
-
+	this->followOnClick = settings.value("FollowOnClick", false).toBool();
+	this->lExePath = settings.value("LastOpened", false).toString();
+	this->dirDump = settings.value("LastDumpDir", false).toString();
+	this->language = settings.value("language", false).toString();
 	if (settings.status() != QSettings::NoError ) {
 		return false;
 	}
@@ -72,12 +72,12 @@ bool MainSettings::writePersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
 	settings.setValue("UDD", uDataDir);
-	settings.setValue(tr("AutoSaveTags"), autoSaveTags);
-	settings.setValue(tr("AutoReloadOnChage"), autoReloadOnFileChange);
-	settings.setValue(tr("FollowOnClick"), followOnClick);
-	settings.setValue(tr("LastOpened"), this->lExePath);
-	settings.setValue(tr("LastDumpDir"), this->dirDump);
-
+	settings.setValue("AutoSaveTags", autoSaveTags);
+	settings.setValue("AutoReloadOnChage", autoReloadOnFileChange);
+	settings.setValue("FollowOnClick", followOnClick);
+	settings.setValue("LastOpened", this->lExePath);
+	settings.setValue("LastDumpDir", this->dirDump);
+	settings.setValue("language", this->language);
 	if ( settings.status() == QSettings::NoError ) {
 		return true;
 	}

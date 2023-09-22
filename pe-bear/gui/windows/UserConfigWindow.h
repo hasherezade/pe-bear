@@ -49,7 +49,9 @@ private:
 	QPushButton dirButton, okButton, cancelButton;
 	QLabel uddDirLabel;
 	DirEdit uddDirEdit;
-	
+	QLabel languageLabel;
+	QComboBox languageEdit;
+
 	QLabel reloadFileLabel;
 	QComboBox reloadFileStates;
 	QCheckBox autoSaveTagsCBox;

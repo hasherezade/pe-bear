@@ -39,8 +39,8 @@ protected:
 };
 
 //-----------------------------------------------------------
-MainWindow::MainWindow(QWidget *parent) 
-	: QMainWindow(parent), 
+MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent) 
+	: QMainWindow(parent), mainSettings(_mainSettings),
 	m_PeHndl(NULL), m_Timer(this),
 	diffWindow(this->m_PEHandlers, this), secAddWindow(this), userConfigWindow(this),
 	sectionsTree(this), sectionMenu(mainSettings, this),
@@ -51,7 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
 	guiSettings()
 {
 	// load the saved settings:
-	this->mainSettings.readPersistent();
 	MainSettingsHolder::setMainSettings(&this->mainSettings);
 	userConfigWindow.setMainSettings(&this->mainSettings);
 

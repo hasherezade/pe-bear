@@ -34,7 +34,7 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent = 0);
+	MainWindow(MainSettings &_mainSettings, QWidget *parent = 0);
 	~MainWindow() { stopTimer(); }
 
 	bool openPE(QString name);
@@ -160,7 +160,7 @@ private:
 	QTimer m_Timer;
 
 	sig_ma::SigFinder vSign;
-	MainSettings mainSettings;
+	MainSettings &mainSettings;
 	GuiSettings guiSettings;
 
 	QString winDesc;

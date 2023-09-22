@@ -10,6 +10,7 @@
 #endif
 
 #include "gui/windows/MainWindow.h"
+#include "base/MainSettings.h"
 
 QStringList collectSuppliedFiles(int argc, char *argv[])
 {
@@ -33,19 +34,25 @@ int main(int argc, char *argv[])
 #endif
 
 	QApplication app(argc, argv);
-	// Load language file
-	QTranslator translator; 
-	if (translator.load("Language\\PELanguage.qm")) {
-		app.installTranslator(&translator); 
-	}
 	// workaround for a bug in Qt (not setting default font properly)
 	QApplication::setFont(QApplication::font("QMessageBox"));
+
+	// Load the settings
+	MainSettings mainSettings;
+	mainSettings.readPersistent();
+
+	// Load language file
+	QTranslator translator;
+	QString trPath = mainSettings.userDataDir() + QDir::separator() + "Language" + QDir::separator() + mainSettings.language + QDir::separator() + "PELanguage.qm";
+	if (translator.load(trPath)) {
+		app.installTranslator(&translator); 
+	}
 
 	app.setApplicationName(TITLE);
 	app.setWindowIcon(QIcon(":/main_ico.ico"));
 	app.setQuitOnLastWindowClosed(true);
-
-	MainWindow mainWin;
+    
+	MainWindow mainWin(mainSettings);
 	mainWin.setIconSize(QSize(48, 48));
 	mainWin.resize(950, 650);
 

@@ -26,15 +26,26 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	setMinimumWidth(270);
 	setLayout(&topLayout);
 
-	dirButton.setText(tr("Open"));
+	dirButton.setText("...");
+	dirButton.setToolTip(tr("Open"));
 	connect(&dirButton, SIGNAL(clicked()), this, SLOT(onDirChose()));
 	
 	QHBoxLayout *fLayout1 = new QHBoxLayout();
+	QHBoxLayout *fLayout1A = new QHBoxLayout();
 	QHBoxLayout *fLayout2 = new QHBoxLayout();
+	QHBoxLayout *fLayout3 = new QHBoxLayout();
 	uddDirLabel.setText(tr("User Data Directory: "));
-	topLayout.addWidget(&uddDirLabel);
-	fLayout1->addWidget(&uddDirEdit);
-	fLayout1->addWidget(&dirButton);
+	languageLabel.setText(tr("Language"));
+
+	fLayout1->addWidget(&uddDirLabel);
+	fLayout1->addLayout(fLayout1A);
+	fLayout1A->addWidget(&uddDirEdit);
+	fLayout1A->addWidget(&dirButton);
+	fLayout3->addWidget(&languageLabel);
+	fLayout3->addWidget(&languageEdit);
+	languageEdit.insertItem(0, tr("(default)"));
+	languageEdit.insertItem(1, "zh_cn");
+	languageEdit.setToolTip(tr("Changing the language version requires application restart"));
 
 	reloadFileLabel.setText(tr("Reload file on change? "));
 	reloadFileStates.addItem(tr("Ignore  "), RELOAD_IGNORE);
@@ -57,10 +68,12 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	buttonLayout->addWidget(&okButton);
 	//buttonLayout->addStretch();
 	buttonLayout->addWidget(&cancelButton);
-
+    
 	topLayout.addLayout(fLayout1);
+	topLayout.addLayout(fLayout3);
 	topLayout.addWidget(&autoSaveTagsCBox);
 	topLayout.addLayout(fLayout2);
+
 	topLayout.addStretch();
 	topLayout.addLayout(buttonLayout);
 
@@ -101,6 +114,12 @@ void UserConfigWindow::refrehSettingsView()
 {
 	if (settings == NULL) return;
 	uddDirEdit.setText(settings->userDataDir());
+	int index = languageEdit.findText(settings->language);
+	if ( index != -1 ) { // -1 for not found
+		languageEdit.setCurrentIndex(index);
+	} else {
+		languageEdit.setCurrentIndex(0); // default
+	}
 	autoSaveTagsCBox.setChecked(settings->isAutoSaveTags());
 	
 	setReloadMode(settings->isReloadOnFileChange());
@@ -109,6 +128,7 @@ void UserConfigWindow::refrehSettingsView()
 void UserConfigWindow::onOkClicked()
 {
 	QString fName = uddDirEdit.text();
+	this->settings->language = languageEdit.currentText();
 	this->settings->setUserDataDir(fName);
 	this->settings->setAutoSaveTags(autoSaveTagsCBox.isChecked());
 
