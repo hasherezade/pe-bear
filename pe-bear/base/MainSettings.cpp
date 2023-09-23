@@ -52,6 +52,8 @@ t_reload_mode intToReloadMode(int val)
 
 ////
 
+const QString MainSettings::languageDir = "Language";
+
 bool MainSettings::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);

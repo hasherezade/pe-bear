@@ -44,7 +44,6 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	fLayout3->addWidget(&languageLabel);
 	fLayout3->addWidget(&languageEdit);
 	languageEdit.insertItem(0, tr("en_US (default)"));
-	
 	languageEdit.setToolTip(tr("Changing the language version requires application restart"));
 
 	reloadFileLabel.setText(tr("Reload file on change? "));
@@ -81,12 +80,14 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	setAutoFillBackground(true);
 }
 
-int UserConfigWindow::loadAvailableTranslations()
+int UserConfigWindow::loadAvailableTranslations(const QString &rootDir)
 {
-	if (!settings) return 0;
+	languageEdit.clear();
+	languageEdit.insertItem(0, tr("en_US (default)"));
+
 	int cntr = 0;
-	QString rootDir = settings->userDataDir() + QDir::separator() + settings->languageDir;
-	QDirIterator iter(rootDir, QDir::Dirs | QDir::NoDotAndDotDot);
+	QString dir = rootDir + QDir::separator() + MainSettings::languageDir;
+	QDirIterator iter(dir, QDir::Dirs | QDir::NoDotAndDotDot);
 	while(iter.hasNext()) {
 		cntr++;
 		QString item = iter.next();
@@ -99,7 +100,11 @@ int UserConfigWindow::loadAvailableTranslations()
 void UserConfigWindow::setMainSettings(MainSettings *settings)
 {
 	this->settings = settings;
-	loadAvailableTranslations();
+	if (this->settings) {
+		if (!loadAvailableTranslations(QCoreApplication::applicationDirPath())) {
+			loadAvailableTranslations(this->settings->userDataDir());
+		}
+	}
 	if (this->isVisible()) {
 		refrehSettingsView();
 	}
@@ -165,6 +170,9 @@ void UserConfigWindow::onDirChose()
 		QString fName = dir.absolutePath();
 		if (fName.length() > 0) {
 			uddDirEdit.setText(fName);
+			if (!loadAvailableTranslations(QCoreApplication::applicationDirPath())) {
+				loadAvailableTranslations(fName);
+			}
 		}
 	}
 }

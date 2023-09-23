@@ -403,10 +403,11 @@ signals:
 	void settingsChanged();
 
 public:
+	static const QString languageDir;
+	
 	MainSettings(): 
 		QObject(), followOnClick(false), autoSaveTags(true), autoReloadOnFileChange(RELOAD_ASK),
-		uDataDir(""), 
-		languageDir("Language")
+		uDataDir("")
     {
     }
 
@@ -430,7 +431,6 @@ public:
 
 	QString dirDump;
 	QString language;
-	const QString languageDir;
 
 protected:
 	bool followOnClick;
