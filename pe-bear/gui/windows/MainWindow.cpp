@@ -250,7 +250,7 @@ void MainWindow::setupWidgets()
 	sectionsTree.setSelectionMode(QAbstractItemView::SingleSelection);
 	sectionsTree.setSelectionBehavior( QAbstractItemView::SelectRows);
 	urlLabel.setProperty("hasUrl",true);
-	urlLabel.setText("<a href=\"" + QString(PEBEAR_LINK) + tr("\">Check for updates</a>"));
+	urlLabel.setText("<a href=\"" + QString(PEBEAR_LINK) + "\">" + tr("Check for updates") + "</a>");
 	urlLabel.setTextFormat(Qt::RichText);
 	urlLabel.setTextInteractionFlags(Qt::TextBrowserInteraction);
 	urlLabel.setOpenExternalLinks(true);
@@ -533,7 +533,7 @@ void MainWindow::dropEvent(QDropEvent* ev)
 	this->setCursor(cur);
 	
 	if (cntr > 1) {
-		this->statusBar.showMessage(tr("Loaded :")+ QString::number(cntr));
+		this->statusBar.showMessage(tr("Loaded") + ": "  + QString::number(cntr));
 		QString loadedStr = tr("Loaded ")+ QString::number(cntr);
 		QString failedStr = "\n"+ tr("Failed to load: ") + QString::number(failed);
 		if (failed) loadedStr += failedStr;
@@ -547,9 +547,9 @@ void MainWindow::setRegistryKey(bool enable)
 	for (int i = 0; i < path.size(); i++) {
 		if (path[i] == '/') path[i] = '\\';
 	}
-	path = "\""+ path + "\"";
+	path = "\"" + path + "\"";
 	
-	QString accessErrInfo = tr("In order to do it you must run ") + QString(TITLE) + tr(" as administrator");
+	QString accessErrInfo = tr("In order to do it you must run ") + QString(TITLE) + " " + tr("as administrator");
 
 	bool isSet = false;
 	const size_t extensionsCount = 4;
@@ -754,7 +754,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::info()
 {
 	QPixmap p(":/main_ico.ico");
-	QString msg = "<b>" + QString::fromLatin1(TITLE) +tr( " - Portable Executable reversing tool</b>");
+	QString msg = "<b>" + QString::fromLatin1(TITLE) + " - " + tr( "Portable Executable reversing tool") + "</b>";
 	msg += "<br/>";
 	msg +=tr( "version: ") + currentVer.toString() + "\n";
 	msg += "<br/>";
@@ -766,10 +766,10 @@ void MainWindow::info()
 		msg += tr("commit hash: ") + QString(COMMIT_HASH) + "<br/>";
 	}
 #endif
-	msg += tr("author: Hasherezade (<a href='") + QString(MY_SITE_LINK) + tr("'>homepage</a>)<br/>");
-	msg += tr("Source code & more info: <a href='") + QString(SOURCE_LINK) +tr( "'>here</a><br/>");
+	msg += tr("author: Hasherezade") + "(<a href='" + QString(MY_SITE_LINK) + "'>" + tr("homepage") +"</a>)<br/>";
+	msg += tr("Source code & more info:") + "<a href='" + QString(SOURCE_LINK) + "'>" + tr("here") +"</a><br/>";
 	msg += "<br/>";
-	msg += tr("<i>using:</i><br/>");
+	msg += "<i>" + tr("using:") + "</i><br/>";
 #if QT_VERSION < 0x050000
 	msg += "Qt 4";
 #else
@@ -777,13 +777,13 @@ void MainWindow::info()
 #endif
 	msg += "<br/>";
 	msg += tr("bearparser");
-	msg += " (<a href='" + QString(BEARPARSER_LICENSE) + tr("'>LICENSE</a>)<br/>");
+	msg += " (<a href='" + QString(BEARPARSER_LICENSE) + "'>" + tr("LICENSE")+ "</a>)<br/>";
 
 #ifdef BUILD_WITH_UDIS86
 	msg += "Udis86\n";
 #else
 	msg += tr("Capstone Engine");
-	msg += " (<a href='" + QString(CAPSTONE_LICENSE) + tr("'>LICENSE</a>)");
+	msg += " (<a href='" + QString(CAPSTONE_LICENSE) + "'>" + tr("LICENSE")+ "</a>)";
 
 	msg += "<br/><br/>";
 #endif
@@ -791,7 +791,7 @@ void MainWindow::info()
 	msg += "<br/>";
 
 #if QT_VERSION < 0x050000
-	msg += "\n" +tr("WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.");
+	msg += "\n" + tr("WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.");
 #endif
 
 	QMessageBox msgBox(this);
@@ -872,7 +872,8 @@ void MainWindow::runNewInstance()
 
 void MainWindow::open()
 {
-	QString filter = (tr("All Files (*);;Applications (*.exe);;Libraries (*.dll);;Drivers (*.sys);;Screensavers (*.scr)"));
+	QString filter = tr("All Files ") + "(*);;" + tr("Applications") +" (*.exe);;" 
+		+ tr("Libraries") + " (*.dll);;"+ tr("Drivers") + " (*.sys);;" + tr("Screensavers") + " (*.scr)";
 	QFileDialog dialog(NULL, tr("Open"), QDir::homePath(), filter);
 	dialog.setFileMode(QFileDialog::ExistingFiles);
 	QStringList fNames = dialog.getOpenFileNames(NULL, tr("Open"), this->mainSettings.lastExePath(), filter);
@@ -955,7 +956,7 @@ ExeFactory::exe_type MainWindow::recognizeFileType(QString fName, const bool sho
 		fileView = NULL;
 	}
 	if (!fileView) {
-		if (showAlert) QMessageBox::warning(this, tr("Open error!"),  tr("Failed loading the file:")+"\n" + fName + "\n" + msg);
+		if (showAlert) QMessageBox::warning(this, tr("Open error!"),  tr("Failed loading the file:") + "\n" + fName + "\n" + msg);
 		return ExeFactory::NONE;
 	}
 
@@ -982,7 +983,7 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 	if (link.length() > 0) fName = link;
 
 	if (this->m_PEHandlers.getByName(fName)) {
-		this->statusBar.showMessage(tr("File: [") + fName + tr("] is already loaded!"));
+		this->statusBar.showMessage(tr("File:")  + " ["  + fName + "] " + tr("is already loaded!"));
 		if (showAlert) QMessageBox::warning(this, tr(TITLE), tr("This file is already loaded!"), QMessageBox::Ok);
 		return NULL;
 	}
@@ -1012,7 +1013,7 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 		return NULL;
 	}
 	if (hndl->getPe()->isTruncated()) {
-		QString alert = tr("The file:  ")+"\n" + fName +"\n"+ tr( " is too big and was loaded truncated!");
+		QString alert = tr("The file:") + " \n" + fName + "\n "+ tr( "is too big and was loaded truncated!");
 		QMessageBox::StandardButton res = QMessageBox::warning(this, tr("Too big file!"), alert, QMessageBox::Ok);
 	}
 	// show warnings:
@@ -1026,7 +1027,7 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 
 void MainWindow::openSignatures()
 {
-	QString filter = tr("Text Files (*.txt);;All Files (*)");
+	QString filter = tr("Text Files")+ " (*.txt);;" + tr("All Files") + " (*)";
 	QString fName= QFileDialog::getOpenFileName(NULL, tr("Open file with signatures"), NULL, filter);
 	std::string filename = fName.toStdString();
 
@@ -1048,15 +1049,16 @@ void MainWindow::savePE(PeHandler* selectedPeHndl)
 	PEFile *pe = selectedPeHndl->getPe();
 	if (!pe) return;
 
-	QString filter = tr("All Files (*);;Applications (*.exe);;Libraries (*.dll);;Drivers (*.sys);;Screensavers (*.scr)");
-	QString filename = QFileDialog::getSaveFileName(NULL, "Save as...", selectedPeHndl->getDirPath(), filter);
+	const QString filter = tr("All Files") + " (*);;" + tr("Applications") + " (*.exe);;" 
+		+ tr("Libraries") + " (*.dll);;" + tr("Drivers") +" (*.sys);;"+ tr("Screensavers") +" (*.scr)";
+	QString filename = QFileDialog::getSaveFileName(NULL, tr("Save as..."), selectedPeHndl->getDirPath(), filter);
 	if (filename.size() == 0) return;
 
 	bufsize_t dSize = FileBuffer::dump(filename, *pe);
 	if (dSize) {
-		QMessageBox::information(this,tr("Success"),tr("Dumped PE to: ") + filename);
+		QMessageBox::information(this, tr("Success"),tr("Dumped PE to: ") + filename);
 	} else {
-		QMessageBox::warning(this,tr("Failed"), tr("Dumping failed!"));
+		QMessageBox::warning(this, tr("Failed"), tr("Dumping failed!"));
 	}
 }
 
@@ -1117,10 +1119,10 @@ void MainWindow::dumpAllSections(PeHandler* selectedPeHndl)
 	const size_t dumped = dumpAllPeSections(pe, dirPath, selectedPeHndl->getShortName());
 	if (dumped > 0) {
 		QMessageBox::information(this, tr("Done!"), tr("Dumped: ") + QString::number(dumped)
-			+ tr(" sections into:") +"\n"+ dirPath);
+			+ " " + tr("sections into:") + "\n" + dirPath);
 	}
 	else {
-		QMessageBox::warning(this, tr("Error"),tr( "Dumping sections failed!"));
+		QMessageBox::warning(this, tr("Error"), tr("Dumping sections failed!"));
 	}
 }
 
