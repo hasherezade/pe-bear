@@ -47,10 +47,14 @@ int main(int argc, char *argv[])
 	if (currLanguage.length() == 0) {
 		currLanguage = QLocale::system().name();
 	}
-	QString trPath = mainSettings.userDataDir() + QDir::separator() + mainSettings.languageDir + QDir::separator() + currLanguage + QDir::separator() + "PELanguage.qm";
-	if (translator.load(trPath)) {
+	QString trPath = QDir::separator() + MainSettings::languageDir + QDir::separator() + currLanguage + QDir::separator() + "PELanguage.qm";
+	if (translator.load(QCoreApplication::applicationDirPath() + trPath) 
+		|| translator.load(mainSettings.userDataDir() + trPath))
+	{
 		app.installTranslator(&translator);
 		mainSettings.language = currLanguage;
+	} else {
+		mainSettings.language = ""; //reset to default
 	}
 
 	app.setApplicationName(TITLE);
