@@ -408,8 +408,8 @@ public:
 	MainSettings(): 
 		QObject(), followOnClick(false), autoSaveTags(true), autoReloadOnFileChange(RELOAD_ASK),
 		uDataDir("")
-    {
-    }
+	{
+	}
 
 	void setFollowOnClick(bool enable) {  this->followOnClick = enable; emit settingsChanged(); }
 	bool isFollowOnClick() const { return this->followOnClick; }

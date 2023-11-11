@@ -119,12 +119,12 @@ QFont readFontProperties(QSettings &settings, QString propertyName, QFont defaul
 bool GuiSettings::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	
-	QFont gFont = readFontProperties(settings, tr("globalFont"), this->defaultGlobalFont);
-	QFont hFont =  readFontProperties(settings, tr("hexFont"), HexViewSettings::defaultFont());
-	QFont dFont = readFontProperties(settings, tr("disasmFont"), DisasmViewSettings::defaultFont());
-	QString styleName = settings.value(tr("style"), "").toString();
-	
+
+	QFont gFont = readFontProperties(settings, "globalFont", this->defaultGlobalFont);
+	QFont hFont =  readFontProperties(settings, "hexFont", HexViewSettings::defaultFont());
+	QFont dFont = readFontProperties(settings, "disasmFont", DisasmViewSettings::defaultFont());
+	QString styleName = settings.value("style", "").toString();
+
 	this->_setGlobalFont(gFont);
 	this->_setDisasmViewFont(dFont);
 	this->_setHexViewFont(hFont);
@@ -134,7 +134,7 @@ bool GuiSettings::readPersistent()
 	emit globalFontChanged();
 	emit hexViewSettingsChanged(hexVSettings);
 	emit disasmViewSettingsChanged(disasmVSettings);
-	
+
 	if (settings.status() != QSettings::NoError ) {
 		return false;
 	}
@@ -146,12 +146,12 @@ bool GuiSettings::writePersistent()
 	QSettings settings(COMPANY_NAME, APP_NAME);
 	
 	QFont currFont = QApplication::font();
-	writeFontProperties(settings, currFont, tr("globalFont"));
-	writeFontProperties(settings, this->hexVSettings.myFont, tr("hexFont"));
-	writeFontProperties(settings, this->disasmVSettings.myFont, tr("disasmFont"));
+	writeFontProperties(settings, currFont, "globalFont");
+	writeFontProperties(settings, this->hexVSettings.myFont, "hexFont");
+	writeFontProperties(settings, this->disasmVSettings.myFont, "disasmFont");
 	
 	// save the style:
-	settings.setValue(tr("style"), this->currentStyle);
+	settings.setValue("style", this->currentStyle);
 	
 	if ( settings.status() == QSettings::NoError ) {
 		return true;
@@ -165,5 +165,5 @@ void GuiSettings::initStyles()
 	this->defaultStyleName = tr("*System Default*");
 
 	nameToStyle[this->defaultStyleName] = this->defaultStylesheet;
-	nameToStyle[tr("Dark")] = g_DarkStyle;
+	nameToStyle["Dark"] = g_DarkStyle;
 }
