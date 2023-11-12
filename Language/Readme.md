@@ -1,6 +1,6 @@
 # How to load a language file
 
-1. The directory with languages (named `Language`) must be in the User Data Directory (`Settings` -> `Configure...` -> `User Data Directory`).
+1. The directory with languages (named `Language`) must be in same directory as PE-bear executable, or in User Data Directory (`Settings` -> `Configure...` -> `User Data Directory`).
 2. Create a subdirectory with the name of the language version that you want to add (i.e. `zh_CN`)
 3. Rename the Language file to `PELanguage.qm` and put it into the created folder
 4. Restart PE-bear. Now, you should see the added language under `Settings` -> `Configure...` -> `Language`.
