@@ -47,10 +47,10 @@ HexDiffModel::HexDiffModel(ContentIndx indx, QObject *parent)
 {
 	clearContent(CNTR);
 
-	diffColor = QColor(tr("red"));
+	diffColor = QColor("red");
 	diffColor.setAlpha(150);
 
-	limitColor = QColor(tr("yellow"));
+	limitColor = QColor("yellow");
 	limitColor.setAlpha(150);
 }
 
