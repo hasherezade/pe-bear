@@ -27,7 +27,11 @@ QString CalcThread::makeImpHash()
 	ImportDirWrapper* imports = m_PE->getImports();
 	if (!imports) return QString();
 
-	QStringList exts = {".ocx", ".sys", ".dll"};
+	QStringList exts;
+	exts.append(".ocx");
+	exts.append(".sys");
+	exts.append(".dll");
+
 	const size_t librariesCount = imports->getEntriesCount();
 
 	QList<offset_t> thunks = imports->getThunksList();
