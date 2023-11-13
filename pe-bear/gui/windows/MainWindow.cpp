@@ -938,18 +938,16 @@ bool MainWindow::autoSaveTags(PeHandler *hndl)
 	return true;
 }
 
-ExeFactory::exe_type MainWindow::recognizeFileType(QString fName, const bool showAlert)
+ExeFactory::exe_type MainWindow::recognizeFileType(QString &fName, const bool showAlert)
 {
 	if (!QFile::exists(fName)) {
 		if (showAlert) QMessageBox::warning(this, tr("Open error!"), tr("File does not exist:") + "\n" + fName);
 		return ExeFactory::NONE;
 	}
-
-	const bufsize_t mapSize = 0x1000; // no need to map full, first page is enough to recognize the type
 	FileView* fileView = NULL;
 	QString msg;
 	try {
-		fileView = new FileView(fName, mapSize);
+		fileView = new FileView(fName);
 	}
 	catch (BufferException &e1) {
 		msg = e1.getInfo();

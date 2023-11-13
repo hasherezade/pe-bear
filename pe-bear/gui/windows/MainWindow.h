@@ -138,7 +138,7 @@ protected:
 
 private:
 	size_t dumpAllPeSections(PEFile *pe, const QString &dirPath, const QString &peName);
-	ExeFactory::exe_type recognizeFileType(QString name, const bool showAlert);
+	ExeFactory::exe_type recognizeFileType(QString &name, const bool showAlert);
 	bool readPersistent();
 	bool writePersistent();
 
