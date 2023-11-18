@@ -149,8 +149,6 @@ void UserConfigWindow::refreshSettingsView()
 	setReloadMode(settings->isReloadOnFileChange());
 }
 
-#include <iostream>
-
 void UserConfigWindow::onOkClicked()
 {
 	QString fName = uddDirEdit.text();
