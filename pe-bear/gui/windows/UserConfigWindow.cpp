@@ -106,7 +106,7 @@ void UserConfigWindow::setMainSettings(MainSettings *settings)
 		}
 	}
 	if (this->isVisible()) {
-		refrehSettingsView();
+		refreshSettingsView();
 	}
 }
 
@@ -131,24 +131,35 @@ t_reload_mode UserConfigWindow::getReloadMode()
 	return rMode;
 }
 
-void UserConfigWindow::refrehSettingsView()
+int UserConfigWindow::getLanguageIndex(const QString &lang)
+{
+	int index = languageEdit.findText(lang);
+	if (index != -1) { // -1 for not found
+		return index;
+	}
+	return 0; // default
+}
+
+void UserConfigWindow::refreshSettingsView()
 {
 	if (settings == NULL) return;
 	uddDirEdit.setText(settings->userDataDir());
-	int index = languageEdit.findText(settings->language);
-	if ( index != -1 ) { // -1 for not found
-		languageEdit.setCurrentIndex(index);
-	} else {
-		languageEdit.setCurrentIndex(0); // default
-	}
+	languageEdit.setCurrentIndex(getLanguageIndex(settings->language));
 	autoSaveTagsCBox.setChecked(settings->isAutoSaveTags());
-	
 	setReloadMode(settings->isReloadOnFileChange());
 }
+
+#include <iostream>
 
 void UserConfigWindow::onOkClicked()
 {
 	QString fName = uddDirEdit.text();
+	bool langChanged = false;
+	const int prevLangIndx = getLanguageIndex(settings->language);
+	const int currLangIndx = getLanguageIndex(languageEdit.currentText());
+	if (prevLangIndx != currLangIndx) {
+		langChanged = true;
+	}
 	this->settings->language = languageEdit.currentText();
 	this->settings->setUserDataDir(fName);
 	this->settings->setAutoSaveTags(autoSaveTagsCBox.isChecked());
@@ -157,6 +168,12 @@ void UserConfigWindow::onOkClicked()
 	this->settings->setReloadOnFileChange(rMode);
 	this->settings->writePersistent();
 	this->hide();
+	if (langChanged) {
+		QMessageBox::information(this, tr("Language Changed"),
+			tr("The language of the interface has changed.\n"
+			"The changes will be applied on application restart"),
+			QMessageBox::Ok);
+	}
 }
 
 void UserConfigWindow::onDirChose()

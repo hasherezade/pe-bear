@@ -35,16 +35,17 @@ public:
 	void setReloadMode(const t_reload_mode rMode);
 
 protected slots:
-	void refrehSettingsView();
+	void refreshSettingsView();
 	void onDirChose();
 
 private slots:
 	void onOkClicked();
 
 protected:
-	void showEvent(QShowEvent * ev) { refrehSettingsView(); QDialog::showEvent(ev); }
+	void showEvent(QShowEvent * ev) { refreshSettingsView(); QDialog::showEvent(ev); }
 
 private:
+	int getLanguageIndex(const QString &lang);
 	int loadAvailableTranslations(const QString &rootDir);
 
 	QVBoxLayout topLayout;
