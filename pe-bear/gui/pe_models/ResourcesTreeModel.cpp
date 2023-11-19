@@ -139,6 +139,29 @@ QVariant ResourcesTreeModel::subdirsData(const QModelIndex &index, int role) con
 	return QVariant();
 }
 
+QString getDosDateString(const unsigned long timestamp, const QString &format)
+{
+	if (timestamp == 0) {
+		return "";
+	}
+	unsigned int d = (timestamp >> 16);
+	unsigned short t = (unsigned short)(timestamp & 0xFFFF);
+	unsigned char s = ((t & 0x1F) << 1);
+	if (s == 60){
+		s--;
+	}
+
+	QString timeStr;
+#if QT_VERSION >= 0x050000
+	timeStr = QString().asprintf("%04d-%02d-%02d %02d:%02d:%02d", ((d & 0xFE00) >> 9) + 1980, (d & 0x1E0) >> 5, d & 0x1F, (t & 0xF800) >> 11, (t & 0x7E0) >> 5, s);
+#else
+	timeStr = QString().sprintf("%04d-%02d-%02d %02d:%02d:%02d", ((d & 0xFE00) >> 9) + 1980, (d & 0x1E0) >> 5, d & 0x1F, (t & 0xF800) >> 11, (t & 0x7E0) >> 5, s);
+#endif
+
+	QDateTime datetime = QDateTime::fromString(timeStr,"yyyy-MM-dd HH:mm:ss");
+	return datetime.toString(format) + " (DOS)";
+}
+
 QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
 {
 	ExeNodeWrapper *wrap = dynamic_cast<ExeNodeWrapper*>(wrapper());
@@ -175,7 +198,7 @@ QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
 			if (row == ResourceDirWrapper::TIMESTAMP && !m_PE->isReproBuild()) {
 				bool isOk = false;
 				int val = wrap->getNumValue(fId, &isOk);
-				return (isOk) ? getDateString(val) : QVariant();
+				return (isOk) ? getDosDateString(val, "dddd, dd.MM.yyyy hh:mm:ss") : QVariant();
 			}
 		}
 	}
