@@ -159,7 +159,7 @@ QString getDosDateString(const unsigned long timestamp, const QString &format)
 #endif
 
 	QDateTime datetime = QDateTime::fromString(timeStr,"yyyy-MM-dd HH:mm:ss");
-	return datetime.toString(format) + " (Local)";
+	return datetime.toString(format) + " (Compiler Local Time)";
 }
 
 QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
@@ -183,11 +183,14 @@ QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
 	}
 	
 	if (role == Qt::ToolTipRole) {
-		if ((column == VALUE || column == MEANING) && row == ResourceDirWrapper::TIMESTAMP && !m_PE->isReproBuild()) {
+		if (row == ResourceDirWrapper::TIMESTAMP && (column == VALUE || column == MEANING) && !m_PE->isReproBuild()) {
 			bool isOk = false;
 			int val = wrap->getNumValue(fId, &isOk);
 			if (isOk) {
-				return QString("DOS Timestamp");
+				if (column == MEANING) {
+					return getDosDateString(val, "dddd, dd.MM.yyyy hh:mm:ss");
+				}
+				return QString("DOS Timestamp");;
 			}
 		}
 		return toolTip(index);
