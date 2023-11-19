@@ -159,7 +159,7 @@ QString getDosDateString(const unsigned long timestamp, const QString &format)
 #endif
 
 	QDateTime datetime = QDateTime::fromString(timeStr,"yyyy-MM-dd HH:mm:ss");
-	return datetime.toString(format) + " (DOS)";
+	return datetime.toString(format) + " (Local)";
 }
 
 QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
@@ -182,7 +182,16 @@ QVariant ResourcesTreeModel::data(const QModelIndex &index, int role) const
 		if (role == Qt::ToolTipRole) return tr("List");
 	}
 	
-	if (role == Qt::ToolTipRole) return toolTip(index);
+	if (role == Qt::ToolTipRole) {
+		if ((column == VALUE || column == MEANING) && row == ResourceDirWrapper::TIMESTAMP && !m_PE->isReproBuild()) {
+			bool isOk = false;
+			int val = wrap->getNumValue(fId, &isOk);
+			if (isOk) {
+				return QString("DOS Timestamp");
+			}
+		}
+		return toolTip(index);
+	}
 
 	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
 	if (row >= getWrapperFieldsCount()) {
