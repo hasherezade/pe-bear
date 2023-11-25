@@ -232,6 +232,18 @@ void DetailsTab::onAddSection()
 	this->winAddSec.onAddSectionToPe(myPeHndl);
 }
 
+void DetailsTab::onCopyVirtualToRaw()
+{
+	if (!this->myPeHndl->isVirtualFormat()) {
+		QString warningText = tr("The PE does not seem to be in the mapped (virtual) format.") + "\n"
+			+ tr("Changing the layout may corrupt the file.") + "\n"
+			+ tr("Do you really want copy virtual sections layout as raw?");
+		QMessageBox::StandardButton reply = QMessageBox::question(NULL, tr("Copy virtual to raw"), warningText,  QMessageBox::Yes|QMessageBox::No);                     
+		if (reply != QMessageBox::Yes) return;  
+	}
+	this->myPeHndl->copyVirtualSizesToRaw();
+}
+
 void DetailsTab::onFitSections()
 {
 	const offset_t fileSize = m_PE->getRawSize();
@@ -363,6 +375,7 @@ void DetailsTab::setScaledIcons()
 
 	QIcon magicAddIco = ViewSettings::makeScaledIcon(":/icons/magic_wand.ico", iconDim, iconDim);
 	this->autoAddImports->setIcon(magicAddIco);
+	this->copyVirtualToRaw->setIcon(magicAddIco);
 	
 	sectionsToolBar->setFont(QApplication::font());
 	sectionsToolBar->setMaximumHeight(iconDim * 2);
@@ -390,10 +403,14 @@ void DetailsTab::setupSectionsToolbar(QSplitter *owner)
 	this->addSection = new QAction(QString(tr("&Add a section")), this);
 	connect(addSection, SIGNAL(triggered()), this, SLOT(onAddSection()) );
 
+	this->copyVirtualToRaw = new QAction(QString(tr("Copy &virtual offsets/sizes as raw")), this);
+	connect(copyVirtualToRaw, SIGNAL(triggered()), this, SLOT(onCopyVirtualToRaw()) );
+	
 	this->fitSections = new QAction(QString(tr("&Resize to fit sections")), this);
 	connect(fitSections, SIGNAL(triggered()), this, SLOT(onFitSections()) );
 
 	sectionsToolBar->addAction(addSection);
+	sectionsToolBar->addAction(copyVirtualToRaw);
 	sectionsToolBar->addAction(fitSections);
 }
 

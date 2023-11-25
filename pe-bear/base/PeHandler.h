@@ -183,6 +183,9 @@ public:
 	bool resize(bufsize_t newSize, bool continueLastOperation = false);
 	bool resizeImage(bufsize_t newSize);
 
+	bool isVirtualFormat();
+	bool copyVirtualSizesToRaw();
+
 	SectionHdrWrapper* addSection(QString name,  bufsize_t rSize, bufsize_t vSize); //throws exception
 	offset_t loadSectionContent(SectionHdrWrapper* sec, QFile &fIn, bool continueLastOperation = false);
 

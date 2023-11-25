@@ -17,7 +17,7 @@ enum SecFieldId {
 
 
 SecTreeItem::SecTreeItem(PeHandler* peHndl, int secIndx, int level, SecTreeItem *parent)
-    : PeTreeItem(peHndl, secIndx, FIELD_NONE, parent)
+	: PeTreeItem(peHndl, secIndx, FIELD_NONE, parent)
 {
 	this->secIndx = secIndx;
 	this->level = level;

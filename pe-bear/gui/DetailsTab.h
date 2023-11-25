@@ -40,6 +40,7 @@ public slots:
 protected slots:
 	void onAddSection();
 	void onFitSections();
+	void onCopyVirtualToRaw();
 	void onAddImportLib();
 	void onAddImportFunc();
 	void onAutoAddImports();
@@ -121,7 +122,8 @@ protected:
 	QDockWidget* dockedRDiagram, *dockedVDiagram;
 	
 	QToolBar *sectionsToolBar;
-	QAction *addSection, 
+	QAction *addSection,
+		*copyVirtualToRaw,
 		*fitSections, 
 		*addImportLib, 
 		*addImportFunc,

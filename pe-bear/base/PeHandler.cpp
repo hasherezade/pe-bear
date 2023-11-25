@@ -575,6 +575,42 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 	return true;
 }
 
+bool PeHandler::isVirtualFormat()
+{
+	const size_t count = this->m_PE->getSectionsCount();
+	if (!count) return false;
+	
+	SectionHdrWrapper *sec = this->m_PE->getSecHdr(0);
+	offset_t v = sec->getVirtualPtr();
+	offset_t r = sec->getRawPtr();
+	if (r > v) return false; //this is an anomaly...
+	if (v == r) return false;
+	offset_t diff = v - r;
+	if (m_PE->isAreaEmpty(r, diff)) {
+		return true;
+	}
+	return false;
+}
+
+bool PeHandler::copyVirtualSizesToRaw()
+{
+	const size_t count = this->m_PE->getSectionsCount();
+	const offset_t modOffset = m_PE->secHdrsOffset();
+	if (!count || modOffset == INVALID_ADDR) return false;
+	
+	size_t secHdrsSize = m_PE->secHdrsEndOffset() - modOffset;
+	this->modifHndl.backupModification(modOffset, secHdrsSize, false);
+	for (size_t i = 0; i < count; i++) {
+		SectionHdrWrapper *sec = this->m_PE->getSecHdr(i);
+		if (!sec) break;
+		sec->setNumValue(SectionHdrWrapper::RPTR, sec->getVirtualPtr());
+		sec->setNumValue(SectionHdrWrapper::RSIZE, sec->getContentSize(Executable::RVA, false));
+	}
+	emit modified();
+	emit secHeadersModified();
+	return true;
+}
+
 SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_t vSize) //throws exception
 {
 	offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
