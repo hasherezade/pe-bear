@@ -622,6 +622,17 @@ bool PeHandler::copyVirtualSizesToRaw()
 		sec->setNumValue(SectionHdrWrapper::RPTR, sec->getVirtualPtr());
 		sec->setNumValue(SectionHdrWrapper::RSIZE, sec->getContentSize(Executable::RVA, false));
 	}
+
+	bool isOk = false;
+	uint64_t val = this->optHdrWrapper.getNumValue(OptHdrWrapper::SEC_ALIGN, &isOk);
+	if (isOk) {
+		this->modifHndl.backupModification(
+			this->optHdrWrapper.getFieldOffset(OptHdrWrapper::FILE_ALIGN), 
+			this->optHdrWrapper.getFieldSize(OptHdrWrapper::FILE_ALIGN),
+			true
+		);
+		this->optHdrWrapper.setNumValue(OptHdrWrapper::FILE_ALIGN, val);
+	}
 	rewrapDataDirs();
 	emit modified();
 	emit secHeadersModified();
