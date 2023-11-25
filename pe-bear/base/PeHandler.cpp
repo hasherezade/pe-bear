@@ -606,6 +606,7 @@ bool PeHandler::copyVirtualSizesToRaw()
 		sec->setNumValue(SectionHdrWrapper::RPTR, sec->getVirtualPtr());
 		sec->setNumValue(SectionHdrWrapper::RSIZE, sec->getContentSize(Executable::RVA, false));
 	}
+	rewrapDataDirs();
 	emit modified();
 	emit secHeadersModified();
 	return true;
