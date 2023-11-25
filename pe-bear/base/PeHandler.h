@@ -83,6 +83,10 @@ public:
 			isAtypical = true;
 			if (warnings) (*warnings) << "The PE has no sections";
 		}
+		if (isVirtualFormat()) {
+			isAtypical = true;
+			if (warnings) (*warnings) << "The PE is a memory dump in a virtual format (may require unmapping)";
+		}
 		bool isOk = false;
 		const uint64_t machineID = fileHdrWrapper.getNumValue(FileHdrWrapper::MACHINE, &isOk);
 		if (isOk && machineID == 0) {
