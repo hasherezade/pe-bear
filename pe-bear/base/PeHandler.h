@@ -184,6 +184,7 @@ public:
 	bool resizeImage(bufsize_t newSize);
 
 	bool isVirtualFormat();
+	bool isVirtualEqualRaw();
 	bool copyVirtualSizesToRaw();
 
 	SectionHdrWrapper* addSection(QString name,  bufsize_t rSize, bufsize_t vSize); //throws exception

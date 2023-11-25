@@ -234,6 +234,10 @@ void DetailsTab::onAddSection()
 
 void DetailsTab::onCopyVirtualToRaw()
 {
+	if (this->myPeHndl->isVirtualEqualRaw()) {
+		QMessageBox::information(NULL, tr("No changes required"), tr("Virtual section layout is already the same as raw, no changes required!"));
+		return;
+	}
 	if (!this->myPeHndl->isVirtualFormat()) {
 		QString warningText = tr("The PE does not seem to be in the mapped (virtual) format.") + "\n"
 			+ tr("Changing the layout may corrupt the file.") + "\n"
@@ -375,8 +379,10 @@ void DetailsTab::setScaledIcons()
 
 	QIcon magicAddIco = ViewSettings::makeScaledIcon(":/icons/magic_wand.ico", iconDim, iconDim);
 	this->autoAddImports->setIcon(magicAddIco);
-	this->copyVirtualToRaw->setIcon(magicAddIco);
-	
+
+	QIcon transformIco = ViewSettings::makeScaledIcon(":/icons/transform.ico", iconDim, iconDim);
+	this->copyVirtualToRaw->setIcon(transformIco);
+
 	sectionsToolBar->setFont(QApplication::font());
 	sectionsToolBar->setMaximumHeight(iconDim * 2);
 	sectionsToolBar->layout()->setSpacing(iconDim);

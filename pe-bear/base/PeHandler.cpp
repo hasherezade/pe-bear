@@ -592,6 +592,22 @@ bool PeHandler::isVirtualFormat()
 	return false;
 }
 
+bool PeHandler::isVirtualEqualRaw()
+{
+	const size_t count = this->m_PE->getSectionsCount();
+	const offset_t modOffset = m_PE->secHdrsOffset();
+	if (!count || modOffset == INVALID_ADDR) return true;
+	
+	for (size_t i = 0; i < count; i++) {
+		SectionHdrWrapper *sec = this->m_PE->getSecHdr(i);
+		if (!sec) break;
+		if (sec->getVirtualPtr() != sec->getRawPtr()) {
+			return false;
+		}
+	}
+	return true;
+}
+
 bool PeHandler::copyVirtualSizesToRaw()
 {
 	const size_t count = this->m_PE->getSectionsCount();
