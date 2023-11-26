@@ -73,41 +73,41 @@ public:
 		bool isAtypical = false;
 		if (!isPeValid()) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The executable may not run: the ImageSize size doesn't fit sections";
+			if (warnings) (*warnings) << tr("The executable may not run: the ImageSize size doesn't fit sections");
 		}
 		if (m_PE->getImageBase(false) != m_PE->getImageBase(true)) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The executable has atypical ImageBase. It may be mapped at a default base: 0x" + QString::number(m_PE->getImageBase(true), 16);
+			if (warnings) (*warnings) << tr("The executable has atypical ImageBase. It may be mapped at a default base:") + "0x" + QString::number(m_PE->getImageBase(true), 16);
 		}
 		if (m_PE->getSectionsCount() == 0) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The PE has no sections";
+			if (warnings) (*warnings) << tr("The PE has no sections");
 		}
 		if (isVirtualFormat()) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The PE is a memory dump in a virtual format (may require unmapping)";
+			if (warnings) (*warnings) << tr("The PE is a memory dump in a virtual format (may require unmapping)");
 		}
 		bool isOk = false;
 		const uint64_t machineID = fileHdrWrapper.getNumValue(FileHdrWrapper::MACHINE, &isOk);
 		if (isOk && machineID == 0) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The executable won't run: Machine ID not set";
+			if (warnings) (*warnings) << tr("The executable won't run: Machine ID not set");
 		}
 		const uint64_t subsys = this->optHdrWrapper.getNumValue(OptHdrWrapper::SUBSYS, &isOk);
 		if (isOk && subsys == 0) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The executable won't run: Subsystem not set";
+			if (warnings) (*warnings) << tr("The executable won't run: Subsystem not set");
 		}
 		const uint64_t optHdrMagic = this->optHdrWrapper.getNumValue(OptHdrWrapper::MAGIC, &isOk);
 		if (isOk && optHdrMagic == 0) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "The executable won't run: OptHdr Magic not set";
+			if (warnings) (*warnings) << tr("The executable won't run: OptHdr Magic not set");
 		}
 		const size_t mappedSecCount = m_PE->getSectionsCount(true);
 		// check for unaligned sections:
 		if (mappedSecCount != m_PE->getSectionsCount(false)) {
 			isAtypical = true;
-			if (warnings) (*warnings) << "Not all sections are mapped";
+			if (warnings) (*warnings) << tr("Not all sections are mapped");
 		}
 		for (size_t i = 0; i < mappedSecCount; i++) {
 			SectionHdrWrapper *sec = m_PE->getSecHdr(i);
@@ -115,12 +115,12 @@ public:
 			const offset_t mappedOffset = sec->getContentOffset(Executable::RAW, true);
 			if (mappedOffset == INVALID_ADDR) {
 				isAtypical = true;
-				if (warnings) (*warnings) << "The PE may be truncated. Some sections are outside the file scope.";
+				if (warnings) (*warnings) << tr("The PE may be truncated. Some sections are outside the file scope.");
 				break;
 			}
 			else if (hdrOffset != mappedOffset) {
 				isAtypical = true;
-				if (warnings) (*warnings) << "Contains sections misaligned to FileAlignment";
+				if (warnings) (*warnings) << tr("Contains sections misaligned to FileAlignment");
 				break;
 			}
 		}
@@ -129,7 +129,7 @@ public:
 			uint64_t flags = this->clrDirWrapper.getNumValue(ClrDirWrapper::FLAGS, &isOk);
 			if (isOk && (flags & pe::COMIMAGE_FLAGS_ILONLY) == 0) {
 				isAtypical = true;
-				if (warnings) (*warnings) << "This .NET file may contain native code.";
+				if (warnings) (*warnings) << tr("This .NET file may contain native code.");
 			}
 		}
 		return isAtypical;
