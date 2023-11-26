@@ -168,8 +168,8 @@ void UserConfigWindow::onOkClicked()
 	this->hide();
 	if (langChanged) {
 		QMessageBox::information(this, tr("Language Changed"),
-			tr("The language of the interface has changed.\n"
-			"The changes will be applied on application restart"),
+			tr("The language of the interface has changed.") + "\n"
+			+ tr("The changes will be applied on application restart"),
 			QMessageBox::Ok);
 	}
 }
