@@ -4,3 +4,6 @@
 [submodule "bearparser"]
 	path = bearparser
 	url = https://github.com/hasherezade/bearparser
+[submodule "sig_finder"]
+	path = sig_finder
+	url = https://github.com/hasherezade/sig_finder.git
