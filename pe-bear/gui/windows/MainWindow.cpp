@@ -76,10 +76,10 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 
 	// try to load from alternative files:
 	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
-	vSign.loadSignatures(sigFile1.toStdString());
+	vSign.loadSignaturesFromFile(sigFile1.toStdString());
 
 	const QString sigFile2 = QDir::currentPath() + QDir::separator() + SIG_FILE;
-	vSign.loadSignatures(sigFile2.toStdString());
+	vSign.loadSignaturesFromFile(sigFile2.toStdString());
 
 	signWindow.onSigListUpdated();
 }
@@ -269,6 +269,9 @@ void MainWindow::createTreeActions()
 	QIcon saveIco(":/icons/Save.ico");
 	this->saveAction = new ExeDependentAction(saveIco, tr("&Save the executable as..."), this);
 	connect(this->saveAction, SIGNAL(triggered(PeHandler*)), this, SLOT(savePE(PeHandler*)));
+	
+	this->searchSignature = new ExeDependentAction(QIcon(":/icons/List.ico"), tr("Search signature"), this);
+	connect(this->searchSignature, SIGNAL(triggered(PeHandler*)), this, SLOT(searchPattern(PeHandler*)));
 
 	reloadAction = new ExeDependentAction(QIcon(":/icons/reload.ico"), tr("&Reload"), this);
 	connect(reloadAction, SIGNAL(triggered(PeHandler*)), this, SLOT(reload(PeHandler*)) );
@@ -288,6 +291,8 @@ void MainWindow::createTreeActions()
 	sectionsTreeMenu.addAction(this->addSecAction);
 	sectionsTreeMenu.addAction(this->dumpAllSecAction);
 	sectionsTreeMenu.addAction(this->saveAction);
+	sectionsTreeMenu.addSeparator();
+	sectionsTreeMenu.addAction(this->searchSignature);
 	sectionsTreeMenu.addSeparator();
 	sectionsTreeMenu.addAction(this->reloadAction);
 	sectionsTreeMenu.addAction(this->unloadAction);
@@ -1030,7 +1035,7 @@ void MainWindow::openSignatures()
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
-		int i = vSign.loadSignatures(filename);
+		int i = vSign.loadSignaturesFromFile(filename);
 		signWindow.onSigListUpdated();
 		QMessageBox msgBox;
 		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
@@ -1148,4 +1153,35 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 	}
 	size = size - (offset - secBgn);
 	selectedPeHndl->findPackerInArea(offset, size, sig_ma::FRONT_TO_BACK);
+}
+
+void MainWindow::searchPattern(PeHandler* selectedPeHndl)
+{
+	if (!selectedPeHndl) return;
+
+	offset_t offset = selectedPeHndl->getDisplayedOffset();
+	bool ok;
+	QString text = QInputDialog::getText(0, "Input dialog",
+		tr("Search starting from the offset:" ) + " 0x" + QString::number(offset, 16) + "\n" + 
+		tr("Signature to search:"), QLineEdit::Normal, 
+		"", &ok);
+	size_t fullSize = selectedPeHndl->getPe()->getContentSize();
+	if (offset > fullSize) return;
+	
+	size_t areaSize = fullSize - offset;
+	sig_ma::SigFinder localSignFinder;
+	if (!localSignFinder.loadSignature("Searched", text.toStdString())) {
+		QMessageBox::information(0, "Info", "Could not parse the signature!", QMessageBox::Ok);
+		return;
+	}
+	std::vector<sig_ma::FoundPacker> signAtOffset;
+	selectedPeHndl->findSignatureInArea(offset, areaSize, localSignFinder, signAtOffset, false);
+	if (signAtOffset.size()) {
+		sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
+		selectedPeHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
+		selectedPeHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
+		QMessageBox::information(this, "Info", "Signature found at: 0x" + QString::number(pckr.offset, 16) , QMessageBox::Ok);
+	} else {
+		QMessageBox::information(this, "Info", "Signature not found!", QMessageBox::Ok);
+	}
 }

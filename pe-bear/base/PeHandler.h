@@ -176,6 +176,7 @@ public:
 	bool isPacked();
 	sig_ma::PckrSign* findPackerSign(offset_t startOff, Executable::addr_type addrType, sig_ma::match_direction md = sig_ma::FIXED);
 	sig_ma::PckrSign* findPackerInArea(offset_t rawOff, size_t size, sig_ma::match_direction md);
+	size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
 
 	void calculateHash(CalcThread::hash_type type);
 

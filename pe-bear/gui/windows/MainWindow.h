@@ -47,6 +47,7 @@ public slots:
 	void onSigSearchResult(int foundCount, int reqType);
 	void runNewInstance();
 	void unloadAllPEs();
+
 	void dumpSectionsFromAllPEs();
 	void exportDisasmFromAllPEs();
 	void open();
@@ -56,6 +57,7 @@ public slots:
 	void dumpAllSections(PeHandler* );
 	void addSection(PeHandler* );
 	void sigSearch(PeHandler* );
+	void searchPattern(PeHandler*);
 
 	void openSignatures();
 
@@ -207,6 +209,7 @@ private:
 		*zoomInAction, *zoomOutAction, *zoomDefault,
 		*darkStyle, *defaultStyle,
 		*dumpAllPEsSecAction,
+		*searchSignature,
 		*exportAllPEsDisasmAction;
 
 	ExeDependentAction *dumpAllSecAction,
