@@ -270,7 +270,7 @@ void MainWindow::createTreeActions()
 	this->saveAction = new ExeDependentAction(saveIco, tr("&Save the executable as..."), this);
 	connect(this->saveAction, SIGNAL(triggered(PeHandler*)), this, SLOT(savePE(PeHandler*)));
 	
-	this->searchSignature = new ExeDependentAction(QIcon(":/icons/List.ico"), tr("Search signature"), this);
+	this->searchSignature = new ExeDependentAction(QIcon(":/icons/Preview.ico"), tr("Find signature"), this);
 	connect(this->searchSignature, SIGNAL(triggered(PeHandler*)), this, SLOT(searchPattern(PeHandler*)));
 
 	reloadAction = new ExeDependentAction(QIcon(":/icons/reload.ico"), tr("&Reload"), this);
@@ -1160,28 +1160,39 @@ void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 	if (!selectedPeHndl) return;
 
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
-	bool ok;
-	QString text = QInputDialog::getText(0, "Input dialog",
+	bool ok = false;
+	QString text = QInputDialog::getText(this, tr("Define search"),
 		tr("Search starting from the offset:" ) + " 0x" + QString::number(offset, 16) + "\n" + 
 		tr("Signature to search:"), QLineEdit::Normal, 
 		"", &ok);
-	size_t fullSize = selectedPeHndl->getPe()->getContentSize();
-	if (offset > fullSize) return;
+	if (!ok || !text.length()) return;
 	
-	size_t areaSize = fullSize - offset;
+	size_t fullSize = selectedPeHndl->getPe()->getContentSize();
+	if (offset >= fullSize) return;
+
 	sig_ma::SigFinder localSignFinder;
 	if (!localSignFinder.loadSignature("Searched", text.toStdString())) {
-		QMessageBox::information(0, "Info", "Could not parse the signature!", QMessageBox::Ok);
+		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
 		return;
 	}
-	std::vector<sig_ma::FoundPacker> signAtOffset;
-	selectedPeHndl->findSignatureInArea(offset, areaSize, localSignFinder, signAtOffset, false);
-	if (signAtOffset.size()) {
-		sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
-		selectedPeHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
-		selectedPeHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
-		QMessageBox::information(this, "Info", "Signature found at: 0x" + QString::number(pckr.offset, 16) , QMessageBox::Ok);
-	} else {
-		QMessageBox::information(this, "Info", "Signature not found!", QMessageBox::Ok);
+
+	while (offset < fullSize){
+		std::vector<sig_ma::FoundPacker> signAtOffset;
+		size_t areaSize = fullSize - offset;
+		selectedPeHndl->findSignatureInArea(offset, areaSize, localSignFinder, signAtOffset, false);
+		if (signAtOffset.size()) {
+			sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
+			selectedPeHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
+			selectedPeHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
+			if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
+					tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+			{
+				break;
+			}
+			offset = pckr.offset + 1;
+		} else {
+			QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
+			break;
+		}
 	}
 }
