@@ -48,6 +48,38 @@ private:
 };
 
 //---
+
+class StringExtThread : public QThread
+{
+	Q_OBJECT
+
+public:
+	StringExtThread(PEFile* pe)
+		: m_PE(pe), mapToFill(nullptr)
+	{
+		this->mapToFill = new QMap<offset_t, QString>();
+	}
+	
+	~StringExtThread()
+	{
+		delete this->mapToFill;
+	}
+
+	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
+
+signals:
+	void gotStrings(QMap<offset_t, QString>* mapToFill);
+
+private:
+	void run();
+	size_t extractStrings(QMap<offset_t, QString> &mapToFill);
+
+	QMap<offset_t, QString> *mapToFill;
+	PEFile* m_PE;
+	QMutex m_arrMutex;
+};
+
+//---
 class PeHandler : public QObject, public Releasable
 {
 	Q_OBJECT
@@ -309,9 +341,15 @@ signals:
 	void hashChanged();
 
 protected slots:
+	// hashes:
 	void onHashReady(QString hash, int hType);
 	void onCalcThreadFinished();
 	void runHashesCalculation();
+	
+	// strings extraction:
+	bool runStringsExtraction();
+	void onStringsReady(QMap<offset_t, QString> *mapToFill);
+	void stringExtractionFinished();
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException
@@ -356,6 +394,9 @@ protected:
 	QString hash[CalcThread::HASHES_NUM];
 	QMutex m_hashMutex[CalcThread::HASHES_NUM];
 	bool calcQueued[CalcThread::HASHES_NUM];
+	
+	StringExtThread *stringThread;
+	QMutex m_StringMutex;
 
 	sig_ma::SigFinder *signFinder;
 };

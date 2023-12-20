@@ -136,6 +136,29 @@ void CalcThread::run()
 }
 
 //-------------------------------------------------
+
+size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill)
+{
+	mapToFill[0] = "Test";
+	return 1;
+}
+
+void StringExtThread::run()
+{
+	QMutexLocker lock(&m_arrMutex);
+	this->mapToFill->clear();
+	
+	if (!isByteArrInit()) {
+		emit gotStrings(nullptr);
+		return;
+	}
+
+	extractStrings(*mapToFill);
+	emit gotStrings(mapToFill);
+}
+
+//-------------------------------------------------
+
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	: QObject(), 
 	m_fileModDate(QDateTime()), // init with empty
@@ -148,7 +171,8 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	resourcesAlbum(pe),
 	resourcesDirWrapper(pe, &resourcesAlbum),
 	signFinder(NULL), 
-	modifHndl(pe->getFileBuffer(), this)
+	modifHndl(pe->getFileBuffer(), this),
+	stringThread(NULL)
 {
 	if (!pe) return;
 
@@ -181,6 +205,9 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	//---
 	this->runHashesCalculation();
 	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
+	
+	this->runStringsExtraction();
+	connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
 }
 
 void PeHandler::associateWrappers()
@@ -256,6 +283,42 @@ void PeHandler::deleteThreads()
 			calcThread[hType] = NULL;
 		}
 	}
+	// delete strign extraction threads
+	if (this->stringThread != NULL) {
+		while (stringThread->isFinished() == false) {
+			stringThread->wait();
+		}
+		delete stringThread;
+		stringThread = NULL;
+	}
+}
+
+bool PeHandler::runStringsExtraction()
+{
+	if (stringThread != NULL) {
+		return false; //previous thread didn't finished
+	}
+	this->stringThread = new StringExtThread(m_PE);
+	QObject::connect(stringThread, SIGNAL(gotStrings(QMap<offset_t, QString>* )), this, SLOT(onStringsReady(QMap<offset_t, QString>* )));
+	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
+	stringThread->start();
+	return true;
+}
+
+void PeHandler::onStringsReady(QMap<offset_t, QString>* mapToFill)
+{
+	if (!mapToFill) return;
+    for (auto itr = mapToFill->begin(); itr != mapToFill->end(); ++itr) {
+        qDebug() << itr.key() << ":" << itr.value();
+    }
+}
+
+void PeHandler::stringExtractionFinished()
+{
+	if (stringThread != NULL && stringThread->isFinished()) {
+		delete stringThread;
+		stringThread = NULL;
+	}
 }
 
 void PeHandler::calculateHash(CalcThread::hash_type type)
@@ -272,15 +335,15 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 
 	if (!content || !size || !isSizeAcceptable) {
 		hash[type] = "Cannot calculate!";
-	} else {
-		hash[type] = "Calculating...";
-		offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
-		QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
-		QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
-		calcThread[type]->start();
-		calcQueued[type] = false;
+		return;
 	}
+	hash[type] = "Calculating...";
+	offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
+	this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
+	QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
+	QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
+	calcThread[type]->start();
+	calcQueued[type] = false;
 }
 
 void PeHandler::setPackerSignFinder(SigFinder *sFinder)
@@ -611,11 +674,17 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 	return true;
 }
 
+#include <iostream>
 bool PeHandler::isVirtualFormat()
 {
+	ImportDirWrapper* imp = m_PE->getImports();
+	if (imp && imp->isValid()) {
+		return false;
+	}
 	const size_t count = this->m_PE->getSectionsCount();
 	if (!count) return false;
 	
+	bool isDump = false;
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(0);
 	offset_t v = sec->getVirtualPtr();
 	offset_t r = sec->getRawPtr();
@@ -623,9 +692,9 @@ bool PeHandler::isVirtualFormat()
 	if (v == r) return false;
 	offset_t diff = v - r;
 	if (m_PE->isAreaEmpty(r, diff)) {
-		return true;
+		isDump = true;
 	}
-	return false;
+	return isDump;
 }
 
 bool PeHandler::isVirtualEqualRaw()
