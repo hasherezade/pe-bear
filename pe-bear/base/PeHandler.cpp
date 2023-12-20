@@ -136,11 +136,22 @@ void CalcThread::run()
 }
 
 //-------------------------------------------------
-
 size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill)
 {
-	mapToFill[0] = "Test";
-	return 1;
+	if (!m_PE) return 0;
+	offset_t step = 0;
+	size_t maxSize = m_PE->getContentSize();
+	for (step = 0; step < maxSize; step++) {
+		char *ptr = (char*) m_PE->getContentAt(step, 1);
+		if (!IS_PRINTABLE(*ptr) && !IS_ENDLINE(*ptr)) continue;
+		QString str = m_PE->getStringValue(step, 150);
+		if (str.length() < 3) {
+			continue;
+		}
+		mapToFill[step] = str;
+		step += str.length();
+	}
+	return mapToFill.size();
 }
 
 void StringExtThread::run()
@@ -207,7 +218,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
 	
 	this->runStringsExtraction();
-	connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
+	//connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
 }
 
 void PeHandler::associateWrappers()
@@ -307,10 +318,17 @@ bool PeHandler::runStringsExtraction()
 
 void PeHandler::onStringsReady(QMap<offset_t, QString>* mapToFill)
 {
-	if (!mapToFill) return;
+	if (!mapToFill) {
+		qDebug() << "Extracted map is empty";
+		return;
+	}
+	stringsMap.clear();
     for (auto itr = mapToFill->begin(); itr != mapToFill->end(); ++itr) {
-        qDebug() << itr.key() << ":" << itr.value();
-    }
+		stringsMap.insert( itr.key(), itr.value() );
+		//qDebug() << itr.key() << ":" << itr.value();
+	}
+	qDebug() << "Extracted map: " << stringsMap.size();
+	stringsUpdated();
 }
 
 void PeHandler::stringExtractionFinished()

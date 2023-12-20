@@ -51,12 +51,13 @@ protected:
 	void init();
 	void connectSignals();
 	
-	QDockWidget *packersDock;
+	QDockWidget *packersDock, *stringsDock;
 	QTextEdit md5Text;
 	QTextEdit pathText;
 
 	ExtTableView generalInfo;
 	InfoTableModel generalInfoModel;
 	FollowablePeTreeView packersTree;
+	QTableWidget stringsTable;
 	PackersTableModel packersModel;
 };

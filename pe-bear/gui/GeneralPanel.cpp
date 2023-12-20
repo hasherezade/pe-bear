@@ -221,6 +221,13 @@ void GeneralPanel::init()
 	packersDock->setWindowTitle(tr("Found signatures"));
 	this->addWidget(packersDock);
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
+
+	stringsDock = new QDockWidget(this);
+	stringsDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+	stringsDock->setWidget(&stringsTable);
+	stringsDock->setWindowTitle(tr("Extracted Strings"));
+	this->addWidget(stringsDock);
+	this->stringsDock->setVisible(true);
 }
 
 void GeneralPanel::connectSignals()
@@ -230,6 +237,8 @@ void GeneralPanel::connectSignals()
 	connect(myPeHndl, SIGNAL(modified()), this, SLOT(refreshView()));
 	connect(myPeHndl, SIGNAL(foundSignatures(int, int)), this, SLOT(refreshView()));
 	connect(myPeHndl, SIGNAL(hashChanged()), &generalInfoModel, SLOT(onNeedReset()));
+	
+	connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
 }
 
 void GeneralPanel::refreshView()

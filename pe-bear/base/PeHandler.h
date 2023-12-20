@@ -339,6 +339,7 @@ signals:
 
 	void foundSignatures(int count, int requestType);
 	void hashChanged();
+	void stringsUpdated();
 
 protected slots:
 	// hashes:
@@ -397,6 +398,7 @@ protected:
 	
 	StringExtThread *stringThread;
 	QMutex m_StringMutex;
+	QMap<offset_t, QString> stringsMap;
 
 	sig_ma::SigFinder *signFinder;
 };
