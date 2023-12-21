@@ -80,6 +80,51 @@ private:
 };
 
 //---
+
+class StringsCollection : public QObject
+{
+	Q_OBJECT
+
+public:
+	StringsCollection() {}
+
+	bool fillStrings(QMap<offset_t, QString> *mapToFill)
+	{
+		if (!mapToFill) return false;
+		
+		QMutexLocker lock(&myMutex);
+		stringsMap.clear();
+		for (auto itr = mapToFill->begin(); itr != mapToFill->end(); ++itr) {
+			stringsMap.insert( itr.key(), itr.value() );
+		}
+		//qDebug() << "Extracted map: " << stringsMap.size();
+		return true;
+	}
+	
+	QString getString(offset_t offset)
+	{
+		QMutexLocker lock(&myMutex);
+		auto itr = stringsMap.find(offset);
+		if (itr == stringsMap.end()) return "";
+		return itr.value();
+	}
+
+	QList<offset_t> getOffsets() const
+	{
+		return stringsMap.keys();
+	}
+	
+	size_t size() const
+	{
+		return stringsMap.size();
+	}
+	
+protected:
+	QMap<offset_t, QString> stringsMap;
+	QMutex myMutex;
+};
+
+//---
 class PeHandler : public QObject, public Releasable
 {
 	Q_OBJECT
@@ -328,7 +373,7 @@ public:
 	bufsize_t pageSize;
 	std::stack<offset_t> prevOffsets;
 	std::vector<sig_ma::FoundPacker> packerAtOffset;
-	QMap<offset_t, QString> stringsMap;
+	StringsCollection stringsMap;
 	
 signals:
 	void pageOffsetModified(offset_t pageStart, bufsize_t pageSize);

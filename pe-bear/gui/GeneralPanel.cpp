@@ -227,8 +227,8 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	
 	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole) return QVariant();
 
-	const QMap<offset_t, QString> &stringsMap = m_PE->stringsMap;
-	QList<offset_t> stringsOffsets = stringsMap.keys();
+	StringsCollection &stringsMap = m_PE->stringsMap;
+	QList<offset_t> stringsOffsets = stringsMap.getOffsets();
 
 	if ((size_t)row >= stringsOffsets.size()) return QVariant();
 	
@@ -237,7 +237,7 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 		case COL_OFFSET:
 			return QString::number(strOffset,16);
 		case COL_STRING : 
-			return stringsMap[strOffset];
+			return stringsMap.getString(strOffset);
 	}
 	return QVariant();
 }
