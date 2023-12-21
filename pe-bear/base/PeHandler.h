@@ -328,7 +328,8 @@ public:
 	bufsize_t pageSize;
 	std::stack<offset_t> prevOffsets;
 	std::vector<sig_ma::FoundPacker> packerAtOffset;
-
+	QMap<offset_t, QString> stringsMap;
+	
 signals:
 	void pageOffsetModified(offset_t pageStart, bufsize_t pageSize);
 
@@ -398,7 +399,6 @@ protected:
 	
 	StringExtThread *stringThread;
 	QMutex m_StringMutex;
-	QMap<offset_t, QString> stringsMap;
 
 	sig_ma::SigFinder *signFinder;
 };

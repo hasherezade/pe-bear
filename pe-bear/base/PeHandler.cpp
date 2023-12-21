@@ -145,6 +145,9 @@ size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill)
 		char *ptr = (char*) m_PE->getContentAt(step, 1);
 		if (!IS_PRINTABLE(*ptr) && !IS_ENDLINE(*ptr)) continue;
 		QString str = m_PE->getStringValue(step, 150);
+		if (str.length() == 1) {
+			str = m_PE->getWAsciiStringValue(step, 150);
+		}
 		if (str.length() < 3) {
 			continue;
 		}
@@ -218,7 +221,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
 	
 	this->runStringsExtraction();
-	//connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
+	connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
 }
 
 void PeHandler::associateWrappers()
