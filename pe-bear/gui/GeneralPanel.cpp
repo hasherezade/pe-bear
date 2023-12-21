@@ -272,7 +272,9 @@ void GeneralPanel::init()
 	packersTree.setModel(&this->packersModel);
 	
 	stringsTable.setModel(&this->stringsModel);
-
+	hdr = stringsTable.horizontalHeader();
+	if (hdr) hdr->setStretchLastSection(true);
+	
 	packersDock = new QDockWidget(this);
 	packersDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	packersDock->setWidget(&packersTree);
