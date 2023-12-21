@@ -144,7 +144,7 @@ size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill)
 	for (step = 0; step < maxSize; step++) {
 		bool isWide = false;
 		char *ptr = (char*) m_PE->getContentAt(step, 1);
-		if (!IS_PRINTABLE(*ptr) && !IS_ENDLINE(*ptr)) continue;
+		if (!IS_PRINTABLE(*ptr)) continue;
 		QString str = m_PE->getStringValue(step, 150);
 		if (str.length() == 1) {
 			isWide = true;
