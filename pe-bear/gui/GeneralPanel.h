@@ -97,6 +97,7 @@ protected slots:
 protected:
 	void init();
 	void connectSignals();
+	void showExtractedStrCount();
 	
 	QDockWidget *packersDock, *stringsDock;
 	QTextEdit md5Text;

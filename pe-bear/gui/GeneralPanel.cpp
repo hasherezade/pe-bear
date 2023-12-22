@@ -289,9 +289,17 @@ void GeneralPanel::init()
 	stringsDock = new QDockWidget(this);
 	stringsDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	stringsDock->setWidget(&stringsTable);
-	stringsDock->setWindowTitle(tr("Extracted Strings"));
+	showExtractedStrCount();
+	
 	this->addWidget(stringsDock);
 	this->stringsDock->setVisible(true);
+}
+
+void GeneralPanel::showExtractedStrCount()
+{
+	if (this->myPeHndl) {
+		stringsDock->setWindowTitle(tr("Extracted Strings: ") + QString::number(this->myPeHndl->stringsMap.size()));
+	}
 }
 
 void GeneralPanel::connectSignals()
@@ -312,7 +320,8 @@ void GeneralPanel::refreshView()
 	this->generalInfo.reset();
 	this->packersTree.reset();
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
-	
+
 	this->stringsModel.reset();
 	this->stringsTable.reset();
+	showExtractedStrCount();
 }
