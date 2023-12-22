@@ -79,7 +79,7 @@ signals:
 
 private:
 	void run();
-	size_t extractStrings(StringsCollection &mapToFill, const size_t minStr = 3);
+	size_t extractStrings(StringsCollection &mapToFill, const size_t minStr = 3, const size_t maxStr = 0);
 
 	StringsCollection *mapToFill;
 };

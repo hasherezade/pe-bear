@@ -122,22 +122,24 @@ void CalcThread::run()
 
 //-------------------------------------------------
 
-size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_t minStr)
+size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_t minStr, const size_t maxStr)
 {
 	if (!m_PE) return 0;
 
 	offset_t step = 0;
 	size_t maxSize = m_PE->getContentSize();
+	
 	for (step = 0; step < maxSize; step++) {
 		bool isWide = false;
 		char *ptr = (char*) m_PE->getContentAt(step, 1);
-		if (!IS_PRINTABLE(*ptr)) {
+		if (!IS_PRINTABLE(*ptr) || isspace(*ptr) ) {
 			continue;
 		}
-		QString str = m_PE->getStringValue(step, 150);
+		const size_t maxLen = (maxStr != 0) ? maxStr :  (maxSize - step);
+		QString str = m_PE->getStringValue(step, maxLen);
 		if (str.length() == 1) {
 			isWide = true;
-			str = m_PE->getWAsciiStringValue(step, 150);
+			str = m_PE->getWAsciiStringValue(step, maxLen);
 		}
 		if (!str.length() || str.length() < minStr) {
 			continue;
@@ -145,6 +147,7 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 		mapToFill.insert(step, str, isWide);
 		const int multiplier = isWide ? 2 : 1;
 		step += multiplier * str.length();
+		step--;
 	}
 	return mapToFill.size();
 }
