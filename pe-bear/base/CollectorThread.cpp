@@ -6,10 +6,6 @@ inline QString stripExtension(const QString & fileName)
     return fileName.left(fileName.lastIndexOf("."));
 }
 
-enum operation_ids { SIMPLE = 0, OP_ADD_SECTION = 1 };
-
-
-
 QString CalcThread::makeImpHash()
 {
 	static CommonOrdinalsLookup lookup;
