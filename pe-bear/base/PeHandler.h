@@ -12,75 +12,10 @@
 #include "CommentHandler.h"
 #include "ImportsAutoadderSettings.h"
 #include "StringsCollection.h"
+#include "CollectorThread.h"
 
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
-
-class CalcThread : public QThread
-{
-	Q_OBJECT
-public:
-	enum hash_type {
-		MD5 = 0,
-		SHA1 = 1,
-		SHA256,
-		CHECKSUM,
-		RICH_HDR_MD5,
-		IMP_MD5,
-		HASHES_NUM
-	};
-
-	CalcThread(hash_type hType, PEFile* pe, offset_t checksumOffset = 0);
-	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
-
-signals:
-	void gotHash(QString hash, int type);
-
-private:
-	void run();
-	QString makeImpHash();
-	QString makeRichHdrHash();
-
-	PEFile* m_PE;
-	QMutex m_arrMutex;
-
-	hash_type hashType;
-	offset_t checksumOff;
-};
-
-//---
-
-class StringExtThread : public QThread
-{
-	Q_OBJECT
-
-public:
-	StringExtThread(PEFile* pe)
-		: m_PE(pe), mapToFill(nullptr)
-	{
-		this->mapToFill = new QMap<offset_t, QString>();
-	}
-	
-	~StringExtThread()
-	{
-		delete this->mapToFill;
-	}
-
-	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
-
-signals:
-	void gotStrings(QMap<offset_t, QString>* mapToFill);
-
-private:
-	void run();
-	size_t extractStrings(QMap<offset_t, QString> &mapToFill);
-
-	QMap<offset_t, QString> *mapToFill;
-	PEFile* m_PE;
-	QMutex m_arrMutex;
-};
-
-//---
 
 class PeHandler : public QObject, public Releasable
 {
