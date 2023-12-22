@@ -78,7 +78,7 @@ signals:
 
 private:
 	void run();
-	size_t extractStrings(QMap<offset_t, QString> &mapToFill);
+	size_t extractStrings(QMap<offset_t, QString> &mapToFill, const size_t minStr = 3);
 
 	QMap<offset_t, QString> *mapToFill;
 };

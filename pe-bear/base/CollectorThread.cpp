@@ -122,7 +122,7 @@ void CalcThread::run()
 
 //-------------------------------------------------
 
-size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill)
+size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill, const size_t minStr)
 {
 	if (!m_PE) return 0;
 
@@ -139,9 +139,10 @@ size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill)
 			isWide = true;
 			str = m_PE->getWAsciiStringValue(step, 150);
 		}
-		if (str.length() >= 3) {
-			mapToFill[step] = str;
+		if (!str.length() || str.length() < minStr) {
+			continue;
 		}
+		mapToFill[step] = str;
 		const int multiplier = isWide ? 2 : 1;
 		step += multiplier * str.length();
 	}
