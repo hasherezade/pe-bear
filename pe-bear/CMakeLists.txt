@@ -53,6 +53,7 @@ set (pebear_base_hdrs
 	base/PeHandler.h
 	base/PeHandlerFactory.h
 	base/PeHandlersManager.h
+	base/StringsCollection.h
 	base/RegKeyManager.h
 	base/ImportsAutoadderSettings.h
 )
