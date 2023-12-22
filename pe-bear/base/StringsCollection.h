@@ -11,7 +11,7 @@ class StringsCollection : public QObject, public Releasable
 public:
 	StringsCollection() {}
 
-	bool insert(offset_t offset, const QString &str, bool isWide)
+	void insert(offset_t offset, const QString &str, bool isWide)
 	{
 		QMutexLocker lock(&myMutex);
 		stringsMap.insert(offset, str);
