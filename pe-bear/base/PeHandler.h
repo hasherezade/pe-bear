@@ -287,7 +287,7 @@ protected slots:
 	
 	// strings extraction:
 	bool runStringsExtraction();
-	void onStringsReady(QMap<offset_t, QString> *mapToFill);
+	void onStringsReady(StringsCollection *mapToFill);
 	void stringExtractionFinished();
 
 protected:

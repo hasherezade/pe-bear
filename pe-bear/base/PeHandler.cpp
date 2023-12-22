@@ -151,17 +151,18 @@ bool PeHandler::runStringsExtraction()
 		return false; //previous thread didn't finished
 	}
 	this->stringThread = new StringExtThread(m_PE);
-	QObject::connect(stringThread, SIGNAL(gotStrings(QMap<offset_t, QString>* )), this, SLOT(onStringsReady(QMap<offset_t, QString>* )));
+	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
 	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
 	stringThread->start();
 	return true;
 }
 
-void PeHandler::onStringsReady(QMap<offset_t, QString>* mapToFill)
+void PeHandler::onStringsReady(StringsCollection* mapToFill)
 {
-	if (!this->stringsMap.fillStrings(mapToFill)) {
+	if (!mapToFill) {
 		return;
 	}
+	this->stringsMap.fill(*mapToFill);
 	stringsUpdated();
 }
 

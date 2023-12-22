@@ -2,6 +2,7 @@
 
 #include <QtCore>
 #include <bearparser/bearparser.h>
+#include "StringsCollection.h"
 
 ///----
 
@@ -65,7 +66,7 @@ public:
 	StringExtThread(PEFile* pe)
 		: CollectorThread(pe), mapToFill(nullptr)
 	{
-		this->mapToFill = new QMap<offset_t, QString>();
+		mapToFill = new StringsCollection();
 	}
 
 	~StringExtThread()
@@ -74,11 +75,11 @@ public:
 	}
 	
 signals:
-	void gotStrings(QMap<offset_t, QString>* mapToFill);
+	void gotStrings(StringsCollection* mapToFill);
 
 private:
 	void run();
-	size_t extractStrings(QMap<offset_t, QString> &mapToFill, const size_t minStr = 3);
+	size_t extractStrings(StringsCollection &mapToFill, const size_t minStr = 3);
 
-	QMap<offset_t, QString> *mapToFill;
+	StringsCollection *mapToFill;
 };

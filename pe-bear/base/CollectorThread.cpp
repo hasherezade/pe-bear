@@ -122,7 +122,7 @@ void CalcThread::run()
 
 //-------------------------------------------------
 
-size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill, const size_t minStr)
+size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_t minStr)
 {
 	if (!m_PE) return 0;
 
@@ -142,7 +142,7 @@ size_t StringExtThread::extractStrings(QMap<offset_t, QString> &mapToFill, const
 		if (!str.length() || str.length() < minStr) {
 			continue;
 		}
-		mapToFill[step] = str;
+		mapToFill.insert(step, str, isWide);
 		const int multiplier = isWide ? 2 : 1;
 		step += multiplier * str.length();
 	}

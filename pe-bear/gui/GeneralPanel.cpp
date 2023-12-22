@@ -201,6 +201,7 @@ QVariant StringsTableModel::headerData(int section, Qt::Orientation orientation,
 	if (orientation == Qt::Horizontal) {
 		switch (section) {
 			case COL_OFFSET: return "Offset";
+			case COL_TYPE: return "Type";
 			case COL_STRING : return tr("String");
 		}
 	}
@@ -235,7 +236,9 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	offset_t strOffset = stringsOffsets[row];
 	switch (column) {
 		case COL_OFFSET:
-			return QString::number(strOffset,16);
+			return QString::number(strOffset, 16);
+		case COL_TYPE:
+			return stringsMap.isWide(strOffset) ? "W" : "A";
 		case COL_STRING : 
 			return stringsMap.getString(strOffset);
 	}
