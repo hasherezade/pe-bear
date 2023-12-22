@@ -71,7 +71,7 @@ public:
 
 	~StringExtThread()
 	{
-		delete this->mapToFill;
+		this->mapToFill->release();
 	}
 	
 signals:

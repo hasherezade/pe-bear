@@ -2,8 +2,9 @@
 
 #include <QtCore>
 #include <bearparser/bearparser.h>
+#include "Releasable.h"
 
-class StringsCollection : public QObject
+class StringsCollection : public QObject, public Releasable
 {
 	Q_OBJECT
 

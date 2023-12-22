@@ -162,7 +162,9 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 	if (!mapToFill) {
 		return;
 	}
+	mapToFill->incRefCntr();
 	this->stringsMap.fill(*mapToFill);
+	mapToFill->release();
 	stringsUpdated();
 }
 
