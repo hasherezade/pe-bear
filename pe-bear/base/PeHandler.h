@@ -11,43 +11,12 @@
 #include "Modification.h"
 #include "CommentHandler.h"
 #include "ImportsAutoadderSettings.h"
+#include "StringsCollection.h"
+#include "CollectorThread.h"
 
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
 
-class CalcThread : public QThread
-{
-	Q_OBJECT
-public:
-	enum hash_type {
-		MD5 = 0,
-		SHA1 = 1,
-		SHA256,
-		CHECKSUM,
-		RICH_HDR_MD5,
-		IMP_MD5,
-		HASHES_NUM
-	};
-
-	CalcThread(hash_type hType, PEFile* pe, offset_t checksumOffset = 0);
-	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
-
-signals:
-	void gotHash(QString hash, int type);
-
-private:
-	void run();
-	QString makeImpHash();
-	QString makeRichHdrHash();
-
-	PEFile* m_PE;
-	QMutex m_arrMutex;
-
-	hash_type hashType;
-	offset_t checksumOff;
-};
-
-//---
 class PeHandler : public QObject, public Releasable
 {
 	Q_OBJECT
@@ -296,7 +265,8 @@ public:
 	bufsize_t pageSize;
 	std::stack<offset_t> prevOffsets;
 	std::vector<sig_ma::FoundPacker> packerAtOffset;
-
+	StringsCollection stringsMap;
+	
 signals:
 	void pageOffsetModified(offset_t pageStart, bufsize_t pageSize);
 
@@ -307,11 +277,18 @@ signals:
 
 	void foundSignatures(int count, int requestType);
 	void hashChanged();
+	void stringsUpdated();
 
 protected slots:
+	// hashes:
 	void onHashReady(QString hash, int hType);
 	void onCalcThreadFinished();
 	void runHashesCalculation();
+	
+	// strings extraction:
+	bool runStringsExtraction();
+	void onStringsReady(StringsCollection *mapToFill);
+	void stringExtractionFinished();
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException
@@ -356,6 +333,9 @@ protected:
 	QString hash[CalcThread::HASHES_NUM];
 	QMutex m_hashMutex[CalcThread::HASHES_NUM];
 	bool calcQueued[CalcThread::HASHES_NUM];
+	
+	StringExtThread *stringThread;
+	QMutex m_StringMutex;
 
 	sig_ma::SigFinder *signFinder;
 };

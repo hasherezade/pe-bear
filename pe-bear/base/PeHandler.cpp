@@ -8,134 +8,9 @@
 using namespace sig_ma;
 using namespace pe;
 
-inline QString stripExtension(const QString & fileName)
-{
-    return fileName.left(fileName.lastIndexOf("."));
-}
-
-enum operation_ids { SIMPLE = 0, OP_ADD_SECTION = 1 };
-
-
-CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, offset_t checksumOffset)
-	: m_PE(pe), hashType(hType), checksumOff(checksumOffset)
-{
-}
-
-QString CalcThread::makeImpHash()
-{
-	static CommonOrdinalsLookup lookup;
-	ImportDirWrapper* imports = m_PE->getImports();
-	if (!imports) return QString();
-
-	QStringList exts;
-	exts.append(".ocx");
-	exts.append(".sys");
-	exts.append(".dll");
-
-	const size_t librariesCount = imports->getEntriesCount();
-
-	QList<offset_t> thunks = imports->getThunksList();
-	const size_t functionsCount = thunks.size();
-
-	QStringList impsBlock;
-	for (int i = 0; i < thunks.size(); i++) {
-		offset_t thunk = thunks[i];
-		if (thunk == 0 || thunk == INVALID_ADDR) continue;
-
-		QString lib =  imports->thunkToLibName(thunk).toLower();
-		for (QStringList::iterator itr = exts.begin(); itr != exts.end(); ++itr) {
-			if (lib.endsWith(*itr)) {
-				lib = stripExtension(lib);
-				break;
-			}
-		}
-		ImportBaseFuncWrapper* func = imports->thunkToFunction(thunk);
-		if (!func) continue;
-		QString funcName;
-		if (!func->isByOrdinal()) {
-			funcName = func->getShortName();
-		} else {
-			int ord = func->getOrdinal();
-			funcName = lookup.findFuncName(lib, ord);
-			if (!funcName.length()) {
-				funcName = "ord" + QString::number(ord, 10);
-			}
-		}
-		impsBlock << QString(lib + "." + funcName.toLower());
-	}
-
-	const QString allImps = impsBlock.join(",");
-	//std::cout << allImps.toStdString() << "\n";
-	QCryptographicHash calcHash(QCryptographicHash::Md5);
-	calcHash.addData((char*) allImps.toStdString().c_str(), allImps.length());
-	return QString(calcHash.result().toHex());
-}
-
-QString CalcThread::makeRichHdrHash()
-{
-	pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
-	pe::RICH_DANS_HEADER* dans = NULL;
-	if (sign) {
-		dans = m_PE->getRichHeaderBgn(sign);
-	}
-	if (!dans) {
-		return QString();
-	}
-	const size_t diff = (ULONGLONG)sign - (ULONGLONG)dans;
-	ByteBuffer tmpBuf((BYTE*)dans, diff, true);
-	DWORD* dw_ptr = (DWORD*)tmpBuf.getContent();
-	size_t dw_size = tmpBuf.getContentSize() / sizeof(DWORD);
-	for (int i = 0; i < dw_size; i++) {
-		dw_ptr[i] ^= sign->checksum;
-	}
-	QCryptographicHash calcHash(QCryptographicHash::Md5);
-	calcHash.addData((char*) tmpBuf.getContent(), tmpBuf.getContentSize());
-	return QString(calcHash.result().toHex());
-}
-
-void CalcThread::run()
-{
-	QMutexLocker lock(&m_arrMutex);
-
-	QString fileHash = "Cannot calculate!";
-	if (!m_PE || !m_PE->getContent()) {
-		emit gotHash(fileHash, hashType);
-		return;
-	}
-	QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
-	if (hashType == MD5) {
-		qHashType = QCryptographicHash::Md5;
-	} else if (hashType == SHA1) {
-		qHashType = QCryptographicHash::Sha1;
-	} 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) //the feature was introduced in Qt5.0
-	else if (hashType == SHA256) {
-		qHashType = QCryptographicHash::Sha256;
-	}
-#endif
-	try {
-		if (hashType == CHECKSUM) {
-			long checksum = PEFile::computeChecksum((BYTE*) m_PE->getContent(), m_PE->getContentSize(), checksumOff);
-			fileHash = QString::number(checksum, 16);
-		}
-		else if (hashType == RICH_HDR_MD5) {
-			fileHash = makeRichHdrHash();
-		}
-		else if (hashType == IMP_MD5) {
-			fileHash = makeImpHash();
-		}
-		else {
-			QCryptographicHash calcHash(qHashType);
-			calcHash.addData((char*) m_PE->getContent(), m_PE->getContentSize());
-			fileHash = QString(calcHash.result().toHex());
-		}
-	} catch (...) {
-		fileHash = "Cannot calculate!";
-	}
-	emit gotHash(fileHash, hashType);
-}
 
 //-------------------------------------------------
+
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	: QObject(), 
 	m_fileModDate(QDateTime()), // init with empty
@@ -148,7 +23,8 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	resourcesAlbum(pe),
 	resourcesDirWrapper(pe, &resourcesAlbum),
 	signFinder(NULL), 
-	modifHndl(pe->getFileBuffer(), this)
+	modifHndl(pe->getFileBuffer(), this),
+	stringThread(NULL)
 {
 	if (!pe) return;
 
@@ -181,6 +57,9 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	//---
 	this->runHashesCalculation();
 	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
+	
+	this->runStringsExtraction();
+	connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
 }
 
 void PeHandler::associateWrappers()
@@ -256,6 +135,45 @@ void PeHandler::deleteThreads()
 			calcThread[hType] = NULL;
 		}
 	}
+	// delete strign extraction threads
+	if (this->stringThread != NULL) {
+		while (stringThread->isFinished() == false) {
+			stringThread->wait();
+		}
+		delete stringThread;
+		stringThread = NULL;
+	}
+}
+
+bool PeHandler::runStringsExtraction()
+{
+	if (stringThread != NULL) {
+		return false; //previous thread didn't finished
+	}
+	this->stringThread = new StringExtThread(m_PE);
+	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
+	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
+	stringThread->start();
+	return true;
+}
+
+void PeHandler::onStringsReady(StringsCollection* mapToFill)
+{
+	if (!mapToFill) {
+		return;
+	}
+	mapToFill->incRefCntr();
+	this->stringsMap.fill(*mapToFill);
+	mapToFill->release();
+	stringsUpdated();
+}
+
+void PeHandler::stringExtractionFinished()
+{
+	if (stringThread != NULL && stringThread->isFinished()) {
+		delete stringThread;
+		stringThread = NULL;
+	}
 }
 
 void PeHandler::calculateHash(CalcThread::hash_type type)
@@ -272,15 +190,15 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 
 	if (!content || !size || !isSizeAcceptable) {
 		hash[type] = "Cannot calculate!";
-	} else {
-		hash[type] = "Calculating...";
-		offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
-		QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
-		QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
-		calcThread[type]->start();
-		calcQueued[type] = false;
+		return;
 	}
+	hash[type] = "Calculating...";
+	offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
+	this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
+	QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
+	QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
+	calcThread[type]->start();
+	calcQueued[type] = false;
 }
 
 void PeHandler::setPackerSignFinder(SigFinder *sFinder)
@@ -329,7 +247,6 @@ PckrSign* PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT
 	emit foundSignatures(foundCount, 0);
 	return packer;
 }
-
 
 PckrSign* PeHandler::findPackerInArea(offset_t rawOff, size_t areaSize, sig_ma::match_direction md)
 {
@@ -611,11 +528,17 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 	return true;
 }
 
+#include <iostream>
 bool PeHandler::isVirtualFormat()
 {
+	ImportDirWrapper* imp = m_PE->getImports();
+	if (imp && imp->isValid()) {
+		return false;
+	}
 	const size_t count = this->m_PE->getSectionsCount();
 	if (!count) return false;
 	
+	bool isDump = false;
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(0);
 	offset_t v = sec->getVirtualPtr();
 	offset_t r = sec->getRawPtr();
@@ -623,9 +546,9 @@ bool PeHandler::isVirtualFormat()
 	if (v == r) return false;
 	offset_t diff = v - r;
 	if (m_PE->isAreaEmpty(r, diff)) {
-		return true;
+		isDump = true;
 	}
-	return false;
+	return isDump;
 }
 
 bool PeHandler::isVirtualEqualRaw()

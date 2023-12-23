@@ -41,6 +41,7 @@ set (pebear_base_srcs
 	base/PeHandler.cpp
 	base/PeHandlerFactory.cpp
 	base/PeHandlersManager.cpp
+	base/CollectorThread.cpp
 	base/RegKeyManager.cpp
 )
 
@@ -53,6 +54,8 @@ set (pebear_base_hdrs
 	base/PeHandler.h
 	base/PeHandlerFactory.h
 	base/PeHandlersManager.h
+	base/StringsCollection.h
+	base/CollectorThread.h
 	base/RegKeyManager.h
 	base/ImportsAutoadderSettings.h
 )
