@@ -2,6 +2,7 @@
 #include <QtGlobal>
 #include <bearparser/bearparser.h>
 
+class stringsModel;
 enum InfoFieldId {
 	INFO_NONE = -1,
 	INFO_NAME = 0,
@@ -193,9 +194,9 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 GeneralPanel::GeneralPanel(PeHandler *peHndl, QWidget *parent)
 	: QSplitter(Qt::Horizontal, parent), PeViewItem(peHndl),
 	packersModel(peHndl, this), packersTree(this),
-	stringsModel(peHndl, this),
 	generalInfoModel(peHndl, this), generalInfo(this),
-	packersDock(NULL)
+	packersDock(NULL),
+	stringsModel(NULL), stringsProxyModel(NULL)
 {
 	if (!this->myPeHndl) return;
 	if (!this->myPeHndl->getPe()) return;
@@ -216,7 +217,12 @@ void GeneralPanel::init()
 	packersTree.setRootIsDecorated(false);
 	packersTree.setModel(&this->packersModel);
 	
-	stringsTable.setModel(&this->stringsModel);
+	this->stringsModel = new StringsTableModel(this->myPeHndl, this);
+	this->stringsProxyModel = new StringsSortFilterProxyModel(this);
+	stringsProxyModel->setSourceModel( this->stringsModel );
+	stringsTable.setModel(stringsProxyModel);
+	stringsTable.setSortingEnabled(false);
+
 	hdr = stringsTable.horizontalHeader();
 	if (hdr) hdr->setStretchLastSection(true);
 	
@@ -263,7 +269,7 @@ void GeneralPanel::refreshView()
 	this->packersTree.reset();
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
 
-	this->stringsModel.reset();
+	this->stringsModel->reset();
 	this->stringsTable.reset();
 	showExtractedStrCount();
 }

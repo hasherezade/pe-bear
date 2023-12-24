@@ -1,7 +1,7 @@
 #include "StringsTableModel.h"
 
 StringsTableModel::StringsTableModel(PeHandler *peHndl, QObject *parent)
-	: QAbstractTableModel(parent), m_PE(peHndl)
+	: QAbstractTableModel(parent), m_PE(peHndl), page(1)
 {
 }
 
@@ -28,11 +28,24 @@ Qt::ItemFlags StringsTableModel::flags(const QModelIndex &index) const
 int StringsTableModel::rowCount(const QModelIndex &parent) const 
 {
 	if (!m_PE) return 0;
-	return m_PE->stringsMap.size();
+
+	const size_t stringsTotalCount = m_PE->stringsMap.size();
+/*	if (stringsTotalCount < STRINGS_MAX) return stringsTotalCount;
+
+	size_t _page = page != 0 ? page : 1;
+	const size_t totalPages = (stringsTotalCount / STRINGS_MAX) + ((m_PE->stringsMap.size() % STRINGS_MAX) ? 1 : 0);
+	if (page > totalPages) return 0;
+	if (page == (totalPages - 1)) return (m_PE->stringsMap.size() % STRINGS_MAX); //last page, display reminder
+	*/
+	return stringsTotalCount;
 }
 
 QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 {
+	if (!m_PE || m_PE->stringsMap.size() == 0) {
+		return QVariant();
+	}
+
 	int row = index.row();
 	int column = index.column();
 	
