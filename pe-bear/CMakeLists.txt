@@ -140,6 +140,7 @@ set (pebear_gui_srcs
 	gui/GeneralPanel.cpp
 	gui/DosHdrTableModel.cpp
 	gui/PackersTableModel.cpp
+	gui/StringsTableModel.cpp
 	gui/HexDiffModel.cpp
 	gui/WrapperSplitter.cpp
 	gui/DataDirWrapperSplitter.cpp
@@ -168,6 +169,7 @@ set (pebear_gui_hdrs
 	gui/GeneralPanel.h
 	gui/DosHdrTableModel.h
 	gui/PackersTableModel.h
+	gui/StringsTableModel.h
 	gui/HexDiffModel.h
 	gui/WrapperSplitter.h
 	gui/DataDirWrapperSplitter.h
