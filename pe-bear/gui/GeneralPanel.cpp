@@ -196,7 +196,7 @@ GeneralPanel::GeneralPanel(PeHandler *peHndl, QWidget *parent)
 	packersModel(peHndl, this), packersTree(this),
 	generalInfoModel(peHndl, this), generalInfo(this),
 	packersDock(NULL),
-	stringsModel(NULL), stringsProxyModel(NULL)
+	stringsBrowseWindow(peHndl, this)
 {
 	if (!this->myPeHndl) return;
 	if (!this->myPeHndl->getPe()) return;
@@ -216,16 +216,7 @@ void GeneralPanel::init()
 	packersTree.setItemsExpandable(false);
 	packersTree.setRootIsDecorated(false);
 	packersTree.setModel(&this->packersModel);
-	
-	this->stringsModel = new StringsTableModel(this->myPeHndl, this);
-	this->stringsProxyModel = new StringsSortFilterProxyModel(this);
-	stringsProxyModel->setSourceModel( this->stringsModel );
-	stringsTable.setModel(stringsProxyModel);
-	stringsTable.setSortingEnabled(false);
 
-	hdr = stringsTable.horizontalHeader();
-	if (hdr) hdr->setStretchLastSection(true);
-	
 	packersDock = new QDockWidget(this);
 	packersDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	packersDock->setWidget(&packersTree);
@@ -235,8 +226,8 @@ void GeneralPanel::init()
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
 
 	stringsDock = new QDockWidget(this);
-	stringsDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-	stringsDock->setWidget(&stringsTable);
+	stringsDock->setFeatures(QDockWidget::DockWidgetClosable);
+	stringsDock->setWidget(&stringsBrowseWindow);
 	showExtractedStrCount();
 	
 	this->addWidget(stringsDock);
@@ -257,8 +248,7 @@ void GeneralPanel::connectSignals()
 	connect(myPeHndl, SIGNAL(modified()), this, SLOT(refreshView()));
 	connect(myPeHndl, SIGNAL(foundSignatures(int, int)), this, SLOT(refreshView()));
 	connect(myPeHndl, SIGNAL(hashChanged()), &generalInfoModel, SLOT(onNeedReset()));
-	
-	connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
+	connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(showExtractedStrCount()));
 }
 
 void GeneralPanel::refreshView()
@@ -268,8 +258,4 @@ void GeneralPanel::refreshView()
 	this->generalInfo.reset();
 	this->packersTree.reset();
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
-
-	this->stringsModel->reset();
-	this->stringsTable.reset();
-	showExtractedStrCount();
 }

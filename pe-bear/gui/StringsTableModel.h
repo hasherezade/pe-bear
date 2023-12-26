@@ -1,5 +1,6 @@
 #pragma once
 
+//#include <iostream>
 #include <bearparser/bearparser.h>
 #include <QtGlobal>
 
@@ -9,20 +10,12 @@
 	#include <QtGui>
 #endif
 
-
 #include "../base/PeHandler.h"
 
-#define STRINGS_MAX 100
 
 class StringsTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
-
-signals:
-	void modelUpdated();
-
-protected slots:
-	virtual void onNeedReset() { reset(); emit modelUpdated(); }
 
 public:
 	enum COLS {
@@ -38,7 +31,7 @@ public:
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 
 	int columnCount(const QModelIndex &parent) const { return MAX_COL; }
-	int rowCount(const QModelIndex &parent) const;//{ return INFO_COUNTER; }
+	int rowCount(const QModelIndex &parent) const { return stringsOffsets.size(); }
 
 	QVariant data(const QModelIndex &index, int role) const;
 	bool setData(const QModelIndex &, const QVariant &, int) { return false; }
@@ -47,18 +40,33 @@ public:
 	{
 		return createIndex(row, column); //no index item pointer
 	}
-	
+
 	QModelIndex parent(const QModelIndex &index) const { return QModelIndex(); } // no parent
 
 	void reset()
 	{
 		//>
 		this->beginResetModel();
+		reloadList();
 		this->endResetModel();
 		//<
 	}
 
 protected:
+	bool reloadList()
+	{
+		if (!m_PE || m_PE->stringsMap.size() == 0) {
+			this->stringsMap = nullptr;
+			this->stringsOffsets.clear();
+			return false;
+		}
+		this->stringsMap = &m_PE->stringsMap;
+		this->stringsOffsets = stringsMap->getOffsets();
+		return true;
+	}
+
+	StringsCollection *stringsMap;
+	QList<offset_t> stringsOffsets;
 	PeHandler *m_PE;
 	size_t page;
 };
@@ -75,17 +83,58 @@ public:
 	
 	bool filterAcceptsRow(int sourceRow,const QModelIndex &sourceParent) const
 	{
-		return true;
 		QAbstractItemModel *source = sourceModel();
 		if (!source) return false;
 		
-		for(int i = 0; i < source->columnCount(); i++)
-		{
-			QModelIndex index = source->index(sourceRow, i, sourceParent);
-			if (source->data(index).toString().toLower().trimmed().contains(filterRegExp()))
-				return true;
-		}
+		QModelIndex index = source->index(sourceRow, StringsTableModel::COL_STRING, sourceParent);
+		if (source->data(index).toString().toLower().trimmed().contains(filterRegExp()))
+			return true;
 		return false;
 	}
 };
 
+//----------------------------------------------------
+
+class StringsBrowseWindow : public QMainWindow
+{
+    Q_OBJECT
+public:
+	StringsBrowseWindow(PeHandler *peHndl, QWidget *parent)
+		: stringsModel(nullptr), stringsProxyModel(nullptr)
+	{
+		this->stringsModel = new StringsTableModel(peHndl, this);
+		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
+		stringsProxyModel->setSourceModel( this->stringsModel );
+		stringsTable.setModel(stringsProxyModel);
+		stringsTable.setSortingEnabled(false);
+
+		QHeaderView *hdr = stringsTable.horizontalHeader();
+		if (hdr) hdr->setStretchLastSection(true);
+
+		initLayout();
+		refreshView();
+		connect(peHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
+	}
+
+private slots:
+	void refreshView()
+	{
+		this->stringsModel->reset();
+		this->stringsTable.reset();
+	}
+	
+	void onSave();
+	void onFilterChanged(QString);
+
+private:
+	void initLayout();
+	
+	QTableView stringsTable;
+	StringsTableModel *stringsModel;
+	StringsSortFilterProxyModel* stringsProxyModel;
+	
+	QVBoxLayout topLayout;
+	//QPushButton saveButton;
+	QLabel filterLabel;
+	QLineEdit filterEdit;
+};
