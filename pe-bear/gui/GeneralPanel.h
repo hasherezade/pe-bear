@@ -49,12 +49,12 @@ public:
 
 protected slots:
 	void refreshView();
-
+	void showExtractedStrCount();
+	
 protected:
 	void init();
 	void connectSignals();
-	void showExtractedStrCount();
-	
+
 	QDockWidget *packersDock, *stringsDock;
 	QTextEdit md5Text;
 	QTextEdit pathText;
@@ -62,7 +62,11 @@ protected:
 	ExtTableView generalInfo;
 	InfoTableModel generalInfoModel;
 	FollowablePeTreeView packersTree;
-	QTableView stringsTable;
+
 	PackersTableModel packersModel;
-	StringsTableModel stringsModel;
+
+	StringsBrowseWindow stringsBrowseWindow;
+	//QTableView stringsTable;
+	//StringsTableModel *stringsModel;
+	//QSortFilterProxyModel* stringsProxyModel;
 };
