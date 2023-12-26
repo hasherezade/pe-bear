@@ -33,6 +33,27 @@ public:
 			}
 		}
 	}
+	
+	bool saveToFile(const QString &fileName, const QString &delim = ";")
+	{
+		QFile fOut(fileName);
+		if (fOut.open(QFile::WriteOnly | QFile::Text) == false) {
+			return false;
+		}
+		QMutexLocker lock(&myMutex);
+		QTextStream out(&fOut);
+		for (auto itr = this->stringsMap.begin(); itr != this->stringsMap.end(); ++itr ) {
+			offset_t offset = itr.key();
+			QString qComment = itr.value();
+			QString offsetStr = QString::number(offset, 16);
+			qComment = qComment.trimmed();
+			
+			QString line = offsetStr + delim + qComment;
+			out << line << '\n';
+		}
+		fOut.close();
+		return true;
+	}
 
 	bool fillStrings(QMap<offset_t, QString> *mapToFill)
 	{

@@ -61,18 +61,15 @@ void StringsBrowseWindow::onFilterChanged(QString str)
 
 void StringsBrowseWindow::onSave()
 {
+	QString defaultFileName = this->myPeHndl->getFullName() + ".strings.txt";
 	QString filter = tr("Text Files (*.txt);;All Files (*)");
-	QString fName= QFileDialog::getSaveFileName(NULL, tr("Save strings as..."), NULL, filter);
-	std::string filename = fName.toStdString();
-
-	/*if (filename.length() > 0) {
-		int i = vSign->loadSignaturesFromFile(filename);
-		emit signaturesUpdated();
-		//---
-		QMessageBox msgBox;
-		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
-		msgBox.exec();
-	}*/
+	QString fName = QFileDialog::getSaveFileName(this, tr("Save strings as..."), defaultFileName, filter);
+	
+	if (fName.length() > 0) {
+		if (this->myPeHndl->stringsMap.saveToFile(fName)) {
+			QMessageBox::information(this, "Strings save", "Saved strings to: " + fName, QMessageBox::Ok);
+		}
+	}
 }
 
 void StringsBrowseWindow::initLayout()
@@ -80,14 +77,15 @@ void StringsBrowseWindow::initLayout()
 	QWidget *widget = new QWidget(this);
 	widget->setLayout(&topLayout);
 	setCentralWidget(widget);
-	//saveButton.setText(tr("Save"));
+	saveButton.setText(tr("Save"));
 
-	//topLayout.addWidget(&saveButton);
+	propertyLayout0.addWidget(&saveButton);
 	filterLabel.setText(tr("Search string"));
-	topLayout.addWidget(&filterLabel);
-	topLayout.addWidget(&filterEdit);
+	propertyLayout0.addWidget(&filterLabel);
+	propertyLayout0.addWidget(&filterEdit);
+	topLayout.addLayout(&propertyLayout0);
 	topLayout.addWidget(&stringsTable);
 
-	//connect(&saveButton, SIGNAL(clicked()), this, SLOT(onSave()) );
+	connect(&saveButton, SIGNAL(clicked()), this, SLOT(onSave()) );
 	connect(&filterEdit, SIGNAL(textChanged(QString)), this, SLOT(onFilterChanged(QString)) );
 }

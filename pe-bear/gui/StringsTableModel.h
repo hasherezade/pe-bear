@@ -100,20 +100,26 @@ class StringsBrowseWindow : public QMainWindow
     Q_OBJECT
 public:
 	StringsBrowseWindow(PeHandler *peHndl, QWidget *parent)
-		: stringsModel(nullptr), stringsProxyModel(nullptr)
+		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr)
 	{
-		this->stringsModel = new StringsTableModel(peHndl, this);
+		this->stringsModel = new StringsTableModel(myPeHndl, this);
 		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
 		stringsProxyModel->setSourceModel( this->stringsModel );
-		stringsTable.setModel(stringsProxyModel);
+		stringsTable.setModel( this->stringsProxyModel );
 		stringsTable.setSortingEnabled(false);
-
+		stringsTable.setMouseTracking(true);
+		stringsTable.setSelectionBehavior(QAbstractItemView::SelectItems);
+		stringsTable.setSelectionMode(QAbstractItemView::SingleSelection);
+		stringsTable.setAutoFillBackground(true);
+		stringsTable.setAlternatingRowColors(false);
 		QHeaderView *hdr = stringsTable.horizontalHeader();
 		if (hdr) hdr->setStretchLastSection(true);
-
+	
 		initLayout();
 		refreshView();
-		connect(peHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
+		if (myPeHndl) {
+			connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
+		}
 	}
 
 private slots:
@@ -129,12 +135,15 @@ private slots:
 private:
 	void initLayout();
 	
+	PeHandler *myPeHndl;
+	
 	QTableView stringsTable;
 	StringsTableModel *stringsModel;
 	StringsSortFilterProxyModel* stringsProxyModel;
 	
 	QVBoxLayout topLayout;
-	//QPushButton saveButton;
+	QHBoxLayout propertyLayout0;
+	QPushButton saveButton;
 	QLabel filterLabel;
 	QLineEdit filterEdit;
 };
