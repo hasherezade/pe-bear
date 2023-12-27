@@ -135,11 +135,11 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 		if (!IS_PRINTABLE(*ptr) || isspace(*ptr) ) {
 			continue;
 		}
-		const size_t maxLen = (maxStr != 0) ? maxStr :  (maxSize - step);
+		const size_t maxLen = (maxStr != 0) ? maxStr : (maxSize - step);
 		QString str = m_PE->getStringValue(step, maxLen);
 		if (str.length() == 1) {
 			isWide = true;
-			str = m_PE->getWAsciiStringValue(step, maxLen);
+			str = m_PE->getWAsciiStringValue(step, maxLen / 2);
 		}
 		if (!str.length() || str.length() < minStr) {
 			continue;
