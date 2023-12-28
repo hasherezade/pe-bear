@@ -30,13 +30,18 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	if (!this->stringsMap) {
 		return QVariant();
 	}
-	int row = index.row();
 	int column = index.column();
-	
-	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole) return QVariant();
-
+	int row = index.row();
 	if ((size_t)row >= stringsOffsets.size()) return QVariant();
-	
+
+	if (column == COL_OFFSET) {
+		if (role == Qt::UserRole) return qint64(stringsOffsets[row]);
+		if (role == Qt::ToolTipRole) return "Right click to follow [" + util::translateAddrTypeName(Executable::RAW) + "]";
+	}
+	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole) {
+		return QVariant();
+	}
+
 	offset_t strOffset = stringsOffsets[row];
 	switch (column) {
 		case COL_OFFSET:
@@ -59,15 +64,25 @@ void StringsBrowseWindow::onFilterChanged(QString str)
 	stringsProxyModel->setFilterRegExp(regExp);
 }
 
+void StringsBrowseWindow::offsetClicked(offset_t offset, Executable::addr_type type)
+{
+	if (!this->myPeHndl) {
+		return;
+	}
+	size_t strSize = this->myPeHndl->stringsMap.getStringSize(offset);
+	myPeHndl->setDisplayed(false, offset, strSize);
+	myPeHndl->setHilighted(offset, strSize);
+}
+
 void StringsBrowseWindow::onSave()
 {
 	QString defaultFileName = this->myPeHndl->getFullName() + ".strings.txt";
-	QString filter = tr("Text Files (*.txt);;All Files (*)");
+	QString filter = tr("Text Files") + "(*.txt);;" + tr("All Files") + "(*)";
 	QString fName = QFileDialog::getSaveFileName(this, tr("Save strings as..."), defaultFileName, filter);
 	
 	if (fName.length() > 0) {
 		if (this->myPeHndl->stringsMap.saveToFile(fName)) {
-			QMessageBox::information(this, "Strings save", "Saved strings to: " + fName, QMessageBox::Ok);
+			QMessageBox::information(this, tr("Strings save"), tr("Saved strings to: ") + fName, QMessageBox::Ok);
 		}
 	}
 }

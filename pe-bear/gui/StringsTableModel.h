@@ -11,6 +11,7 @@
 #endif
 
 #include "../base/PeHandler.h"
+#include "followable_table/FollowableOffsetedView.h"
 
 
 class StringsTableModel : public QAbstractTableModel
@@ -100,7 +101,8 @@ class StringsBrowseWindow : public QMainWindow
     Q_OBJECT
 public:
 	StringsBrowseWindow(PeHandler *peHndl, QWidget *parent)
-		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr)
+		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr),
+		stringsTable(this, Executable::RAW)
 	{
 		this->stringsModel = new StringsTableModel(myPeHndl, this);
 		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
@@ -118,8 +120,9 @@ public:
 		initLayout();
 		refreshView();
 		if (myPeHndl) {
-			connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
+			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()) );
 		}
+		connect( &stringsTable, SIGNAL(targetClicked(offset_t, Executable::addr_type)), this, SLOT(offsetClicked(offset_t, Executable::addr_type)) );
 	}
 
 private slots:
@@ -128,16 +131,17 @@ private slots:
 		this->stringsModel->reset();
 		this->stringsTable.reset();
 	}
-	
+
 	void onSave();
 	void onFilterChanged(QString);
+	void offsetClicked(offset_t offset, Executable::addr_type type);
 
 private:
 	void initLayout();
 	
 	PeHandler *myPeHndl;
 	
-	QTableView stringsTable;
+	FollowableOffsetedView stringsTable;
 	StringsTableModel *stringsModel;
 	StringsSortFilterProxyModel* stringsProxyModel;
 	

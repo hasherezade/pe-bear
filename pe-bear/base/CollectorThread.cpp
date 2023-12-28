@@ -145,8 +145,7 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 			continue;
 		}
 		mapToFill.insert(step, str, isWide);
-		const int multiplier = isWide ? 2 : 1;
-		step += multiplier * str.length();
+		step += util::getStringSize(str, isWide);
 		step--;
 	}
 	return mapToFill.size();

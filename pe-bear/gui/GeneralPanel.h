@@ -64,9 +64,5 @@ protected:
 	FollowablePeTreeView packersTree;
 
 	PackersTableModel packersModel;
-
 	StringsBrowseWindow stringsBrowseWindow;
-	//QTableView stringsTable;
-	//StringsTableModel *stringsModel;
-	//QSortFilterProxyModel* stringsProxyModel;
 };
