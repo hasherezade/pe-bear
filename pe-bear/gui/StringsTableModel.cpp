@@ -1,7 +1,8 @@
 #include "StringsTableModel.h"
 
-StringsTableModel::StringsTableModel(PeHandler *peHndl, QObject *parent)
-	: QAbstractTableModel(parent), m_PE(peHndl), stringsMap(nullptr)
+StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, QObject *parent)
+	: QAbstractTableModel(parent), m_PE(peHndl), 
+	stringsMap(nullptr), addrColors(_addrColors)
 {
 }
 
@@ -38,7 +39,9 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	if (role == Qt::UserRole && column == COL_OFFSET) {
 		return qint64(stringsOffsets[row]);
 	}
-
+	if (role == Qt::ForegroundRole && column == COL_OFFSET) {
+		return this->addrColors.rawColor();
+	}
 	if (role == Qt::ToolTipRole) {
 		switch (column) {
 			case COL_OFFSET:
