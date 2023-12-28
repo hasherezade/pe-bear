@@ -55,7 +55,7 @@ public:
 			offset_t offset = itr.key();
 			QString qComment = itr.value();
 			QString offsetStr = QString::number(offset, 16);
-			qComment = qComment.trimmed();
+			qComment = qComment.simplified();
 			
 			QString line = offsetStr + delim + qComment;
 			out << line << '\n';

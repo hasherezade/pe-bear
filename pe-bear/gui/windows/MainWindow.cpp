@@ -322,6 +322,9 @@ void MainWindow::createActions()
 	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), tr("Export disassembly to..."), this);
 	connect(this->exportAllPEsDisasmAction, SIGNAL(triggered()), this, SLOT(exportDisasmFromAllPEs()));
 	
+	exportAllPEsStrings = new QAction(tr("Export strings to..."), this);
+	connect(this->exportAllPEsStrings, SIGNAL(triggered()), this, SLOT(exportStringsFromAllPEs()));
+	
 	setRegKeyAction = new QAction(tr("Add to Explorer"), this);
 	this->setRegKeyAction->setCheckable(true);
 	this->setRegKeyAction->setChecked(isRegKey());
@@ -431,6 +434,7 @@ void MainWindow::createMenus()
 	this->fromLoadedPEsMenu = this->fileMenu->addMenu(tr("From all loaded..."));
 	this->fromLoadedPEsMenu->addAction(this->dumpAllPEsSecAction);
 	this->fromLoadedPEsMenu->addAction(this->exportAllPEsDisasmAction);
+	this->fromLoadedPEsMenu->addAction(this->exportAllPEsStrings);
 }
 
 void MainWindow::startTimer()
@@ -701,6 +705,37 @@ void MainWindow::exportDisasmFromAllPEs()
 	}
 	if (dumped > 0) {
 		QMessageBox::information(this, tr("Done!"), tr("Exported disasm from: ") + QString::number(dumped)
+			+ tr(" PEs into:") + "\n" + dirPath);
+	}
+}
+
+void MainWindow::exportStringsFromAllPEs()
+{
+	std::map<PEFile*, PeHandler*> &handlers = m_PEHandlers.getHandlersMap();
+	const size_t count = handlers.size();
+	if (count == 0) return;
+ 
+ 	QString dirPath = chooseDumpOutDir(NULL);
+	if (!dirPath.length()) return;
+	
+	size_t dumped = 0;
+	UniqueNameHelper uniquePeHelper;
+	
+	std::map<PEFile*, PeHandler*>::iterator iter;
+	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
+		PeHandler *hndl = iter->second;
+		if (!hndl) continue;
+		const QString peName = uniquePeHelper.getUniqueFromName(hndl->getShortName()); //protect against duplicated names
+		const QString fileName = dirPath + QDir::separator() + peName + ".strings.txt";
+		if (hndl->stringsMap.saveToFile(fileName)) {
+			dumped++;
+		}
+	}
+	if (dumped != count) {
+		QMessageBox::warning(this, tr("Error"), tr("Exporting strings from some of the PEs failed!"));
+	}
+	if (dumped > 0) {
+		QMessageBox::information(this, tr("Done!"), tr("Exported strings from: ") + QString::number(dumped)
 			+ tr(" PEs into:") + "\n" + dirPath);
 	}
 }

@@ -50,6 +50,7 @@ public slots:
 
 	void dumpSectionsFromAllPEs();
 	void exportDisasmFromAllPEs();
+	void exportStringsFromAllPEs();
 	void open();
 	void closePE(PeHandler*);
 	void reload(PeHandler*);
@@ -210,7 +211,8 @@ private:
 		*darkStyle, *defaultStyle,
 		*dumpAllPEsSecAction,
 		*searchSignature,
-		*exportAllPEsDisasmAction;
+		*exportAllPEsDisasmAction,
+		*exportAllPEsStrings;
 
 	ExeDependentAction *dumpAllSecAction,
 		*addSecAction,
