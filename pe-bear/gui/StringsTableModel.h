@@ -22,6 +22,7 @@ public:
 	enum COLS {
 		COL_OFFSET = 0,
 		COL_TYPE,
+		COL_LENGTH,
 		COL_STRING,
 		MAX_COL
 	};

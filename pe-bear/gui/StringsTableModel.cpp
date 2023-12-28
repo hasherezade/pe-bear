@@ -12,6 +12,7 @@ QVariant StringsTableModel::headerData(int section, Qt::Orientation orientation,
 		switch (section) {
 			case COL_OFFSET: return tr("Offset");
 			case COL_TYPE: return tr("Type");
+			case COL_LENGTH: return tr("Length");
 			case COL_STRING : return tr("String");
 		}
 	}
@@ -34,20 +35,42 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	int row = index.row();
 	if ((size_t)row >= stringsOffsets.size()) return QVariant();
 
-	if (column == COL_OFFSET) {
-		if (role == Qt::UserRole) return qint64(stringsOffsets[row]);
-		if (role == Qt::ToolTipRole) return "Right click to follow [" + util::translateAddrTypeName(Executable::RAW) + "]";
-	}
-	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole) {
-		return QVariant();
+	if (role == Qt::UserRole && column == COL_OFFSET) {
+		return qint64(stringsOffsets[row]);
 	}
 
+	if (role == Qt::ToolTipRole) {
+		switch (column) {
+			case COL_OFFSET:
+				return "Right click to follow [" + util::translateAddrTypeName(Executable::RAW) + "]";
+			case COL_TYPE:
+			{
+				offset_t strOffset = stringsOffsets[row];
+				return stringsMap->isWide(strOffset) ? "Wide" : "Ansi";
+			}
+			case COL_STRING : 
+			{
+				offset_t strOffset = stringsOffsets[row];
+				QString str = stringsMap->getString(strOffset).trimmed();
+				const size_t maxLen = 1000;
+				if (str.length() > maxLen) {
+					return str.left(maxLen) + "\n[...]";
+				}
+				return str;
+			}
+		}
+	}
+	if (role != Qt::DisplayRole && role != Qt::EditRole) {
+		return QVariant();
+	}
 	offset_t strOffset = stringsOffsets[row];
 	switch (column) {
 		case COL_OFFSET:
 			return QString::number(strOffset, 16);
 		case COL_TYPE:
 			return stringsMap->isWide(strOffset) ? "W" : "A";
+		case COL_LENGTH:
+			return stringsMap->getString(strOffset).length();
 		case COL_STRING : 
 			return stringsMap->getString(strOffset);
 	}
