@@ -11,7 +11,8 @@
 #endif
 
 #include "../base/PeHandler.h"
-
+#include "../base/MainSettings.h"
+#include "followable_table/FollowableOffsetedView.h"
 
 class StringsTableModel : public QAbstractTableModel
 {
@@ -21,11 +22,12 @@ public:
 	enum COLS {
 		COL_OFFSET = 0,
 		COL_TYPE,
+		COL_LENGTH,
 		COL_STRING,
 		MAX_COL
 	};
 
-	StringsTableModel(PeHandler *peHndl, QObject *parent = 0);
+	StringsTableModel(PeHandler *peHndl, ColorSettings &addrColors, QObject *parent = 0);
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -68,7 +70,7 @@ protected:
 	StringsCollection *stringsMap;
 	QList<offset_t> stringsOffsets;
 	PeHandler *m_PE;
-	size_t page;
+	ColorSettings &addrColors;
 };
 
 //----
@@ -100,9 +102,10 @@ class StringsBrowseWindow : public QMainWindow
     Q_OBJECT
 public:
 	StringsBrowseWindow(PeHandler *peHndl, QWidget *parent)
-		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr)
+		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr),
+		stringsTable(this, Executable::RAW)
 	{
-		this->stringsModel = new StringsTableModel(myPeHndl, this);
+		this->stringsModel = new StringsTableModel(myPeHndl, addrColors, this);
 		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
 		stringsProxyModel->setSourceModel( this->stringsModel );
 		stringsTable.setModel( this->stringsProxyModel );
@@ -118,8 +121,9 @@ public:
 		initLayout();
 		refreshView();
 		if (myPeHndl) {
-			connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()));
+			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()) );
 		}
+		connect( &stringsTable, SIGNAL(targetClicked(offset_t, Executable::addr_type)), this, SLOT(offsetClicked(offset_t, Executable::addr_type)) );
 	}
 
 private slots:
@@ -128,19 +132,21 @@ private slots:
 		this->stringsModel->reset();
 		this->stringsTable.reset();
 	}
-	
+
 	void onSave();
 	void onFilterChanged(QString);
+	void offsetClicked(offset_t offset, Executable::addr_type type);
 
 private:
 	void initLayout();
-	
+
 	PeHandler *myPeHndl;
-	
-	QTableView stringsTable;
+
+	ColorSettings addrColors;
+	FollowableOffsetedView stringsTable;
 	StringsTableModel *stringsModel;
 	StringsSortFilterProxyModel* stringsProxyModel;
-	
+
 	QVBoxLayout topLayout;
 	QHBoxLayout propertyLayout0;
 	QPushButton saveButton;

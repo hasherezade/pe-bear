@@ -193,6 +193,16 @@ set (pebear_gui_hdrs
 	gui/pe_models.h
 )
 
+set (pebear_followable_srcs
+	gui/followable_table/OffsetedView.cpp
+)
+
+set (pebear_followable_hdrs
+	gui/followable_table/MouseTrackingTableView.h
+	gui/followable_table/FollowableOffsetedView.h
+	gui/followable_table/OffsetedView.h
+)
+
 set (pebear_windows_srcs
 	gui/windows/OffsetsBrowseWindow.cpp
 	gui/windows/SignaturesBrowseWindow.cpp
@@ -219,6 +229,7 @@ set (pebear_srcs
 	${pebear_gui_srcs}
 	${pebear_gui_pe_mod_srcs}
 	${pebear_windows_srcs}
+	${pebear_followable_srcs}
 	main.cpp
 )
 
@@ -229,6 +240,7 @@ set (pebear_hdrs
 	${pebear_gui_hdrs}
 	${pebear_gui_pe_mod_hdrs}
 	${pebear_windows_hdrs}
+	${pebear_followable_hdrs}
 )
 
 set (pebear_rcc application.qrc )

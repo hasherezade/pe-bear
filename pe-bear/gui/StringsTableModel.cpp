@@ -1,7 +1,8 @@
 #include "StringsTableModel.h"
 
-StringsTableModel::StringsTableModel(PeHandler *peHndl, QObject *parent)
-	: QAbstractTableModel(parent), m_PE(peHndl), stringsMap(nullptr)
+StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, QObject *parent)
+	: QAbstractTableModel(parent), m_PE(peHndl), 
+	stringsMap(nullptr), addrColors(_addrColors)
 {
 }
 
@@ -12,6 +13,7 @@ QVariant StringsTableModel::headerData(int section, Qt::Orientation orientation,
 		switch (section) {
 			case COL_OFFSET: return tr("Offset");
 			case COL_TYPE: return tr("Type");
+			case COL_LENGTH: return tr("Length");
 			case COL_STRING : return tr("String");
 		}
 	}
@@ -30,19 +32,48 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	if (!this->stringsMap) {
 		return QVariant();
 	}
-	int row = index.row();
 	int column = index.column();
-	
-	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole) return QVariant();
-
+	int row = index.row();
 	if ((size_t)row >= stringsOffsets.size()) return QVariant();
-	
+
+	if (role == Qt::UserRole && column == COL_OFFSET) {
+		return qint64(stringsOffsets[row]);
+	}
+	if (role == Qt::ForegroundRole && column == COL_OFFSET) {
+		return this->addrColors.rawColor();
+	}
+	if (role == Qt::ToolTipRole) {
+		switch (column) {
+			case COL_OFFSET:
+				return "Right click to follow [" + util::translateAddrTypeName(Executable::RAW) + "]";
+			case COL_TYPE:
+			{
+				offset_t strOffset = stringsOffsets[row];
+				return stringsMap->isWide(strOffset) ? "Wide" : "Ansi";
+			}
+			case COL_STRING : 
+			{
+				offset_t strOffset = stringsOffsets[row];
+				QString str = stringsMap->getString(strOffset).trimmed();
+				const size_t maxLen = 1000;
+				if (str.length() > maxLen) {
+					return str.left(maxLen) + "\n[...]";
+				}
+				return str;
+			}
+		}
+	}
+	if (role != Qt::DisplayRole && role != Qt::EditRole) {
+		return QVariant();
+	}
 	offset_t strOffset = stringsOffsets[row];
 	switch (column) {
 		case COL_OFFSET:
 			return QString::number(strOffset, 16);
 		case COL_TYPE:
 			return stringsMap->isWide(strOffset) ? "W" : "A";
+		case COL_LENGTH:
+			return stringsMap->getString(strOffset).length();
 		case COL_STRING : 
 			return stringsMap->getString(strOffset);
 	}
@@ -59,15 +90,25 @@ void StringsBrowseWindow::onFilterChanged(QString str)
 	stringsProxyModel->setFilterRegExp(regExp);
 }
 
+void StringsBrowseWindow::offsetClicked(offset_t offset, Executable::addr_type type)
+{
+	if (!this->myPeHndl) {
+		return;
+	}
+	size_t strSize = this->myPeHndl->stringsMap.getStringSize(offset);
+	myPeHndl->setDisplayed(false, offset, strSize);
+	myPeHndl->setHilighted(offset, strSize);
+}
+
 void StringsBrowseWindow::onSave()
 {
 	QString defaultFileName = this->myPeHndl->getFullName() + ".strings.txt";
-	QString filter = tr("Text Files (*.txt);;All Files (*)");
+	QString filter = tr("Text Files") + "(*.txt);;" + tr("All Files") + "(*)";
 	QString fName = QFileDialog::getSaveFileName(this, tr("Save strings as..."), defaultFileName, filter);
 	
 	if (fName.length() > 0) {
 		if (this->myPeHndl->stringsMap.saveToFile(fName)) {
-			QMessageBox::information(this, "Strings save", "Saved strings to: " + fName, QMessageBox::Ok);
+			QMessageBox::information(this, tr("Strings save"), tr("Saved strings to: ") + fName, QMessageBox::Ok);
 		}
 	}
 }

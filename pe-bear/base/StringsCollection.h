@@ -4,6 +4,15 @@
 #include <bearparser/bearparser.h>
 #include "Releasable.h"
 
+namespace util {
+	
+	inline size_t getStringSize(const QString &str, bool isWide)
+	{
+		size_t mul = isWide ? 2 : 1;
+		return str.length() * mul;
+	}
+};
+
 class StringsCollection : public QObject, public Releasable
 {
 	Q_OBJECT
@@ -72,9 +81,13 @@ public:
 	QString getString(offset_t offset)
 	{
 		QMutexLocker lock(&myMutex);
-		auto itr = stringsMap.find(offset);
-		if (itr == stringsMap.end()) return "";
-		return itr.value();
+		return _getString(offset);
+	}
+	
+	size_t getStringSize(offset_t offset)
+	{
+		QMutexLocker lock(&myMutex);
+		return util::getStringSize(_getString(offset), _isWide(offset));
 	}
 
 	QList<offset_t> getOffsets()
@@ -106,6 +119,13 @@ protected:
 	{
 		stringsMap.clear();
 		wideStrings.clear();
+	}
+
+	QString _getString(offset_t offset)
+	{
+		auto itr = stringsMap.find(offset);
+		if (itr == stringsMap.end()) return "";
+		return itr.value();
 	}
 
 	bool _isWide(offset_t offset)
