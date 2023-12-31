@@ -1,8 +1,12 @@
 #include "StringsTableModel.h"
 
+#define MAX_PER_PAGE 10000
+
 StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, QObject *parent)
 	: QAbstractTableModel(parent), m_PE(peHndl), 
-	stringsMap(nullptr), addrColors(_addrColors)
+	stringsMap(nullptr), addrColors(_addrColors),
+	pageNum(0),
+	limitPerPage(MAX_PER_PAGE)
 {
 }
 
@@ -33,7 +37,7 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	}
 	int column = index.column();
-	int row = index.row();
+	int row = index.row() + getPageStartIndx();
 	if ((size_t)row >= stringsOffsets.size()) return QVariant();
 
 	if (role == Qt::UserRole && column == COL_OFFSET) {
@@ -121,6 +125,10 @@ void StringsBrowseWindow::initLayout()
 	saveButton.setText(tr("Save"));
 
 	propertyLayout0.addWidget(&saveButton);
+
+	propertyLayout0.addWidget(new QLabel(tr("Page"), this));
+	propertyLayout0.addWidget(&pageSelectBox);
+
 	filterLabel.setText(tr("Search string"));
 	propertyLayout0.addWidget(&filterLabel);
 	propertyLayout0.addWidget(&filterEdit);

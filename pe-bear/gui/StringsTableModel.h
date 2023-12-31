@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <iostream>
 #include <bearparser/bearparser.h>
 #include <QtGlobal>
 
@@ -33,8 +32,17 @@ public:
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 
 	int columnCount(const QModelIndex &parent) const { return MAX_COL; }
-	int rowCount(const QModelIndex &parent) const { return stringsOffsets.size(); }
 
+	int rowCount(const QModelIndex &parent) const
+	{
+		const int startRow = this->getPageStartIndx();
+		const int totalCount = stringsOffsets.size();
+		if (startRow >= totalCount) return 0;
+		const int remCount = totalCount - startRow;
+		if (remCount < this->limitPerPage) return remCount;
+		return this->limitPerPage;
+	}
+	
 	QVariant data(const QModelIndex &index, int role) const;
 	bool setData(const QModelIndex &, const QVariant &, int) { return false; }
 
@@ -54,6 +62,23 @@ public:
 		//<
 	}
 
+	int pagesCount() const 
+	{
+		const int totalCount = stringsOffsets.size();
+		int fullPages = totalCount / this->limitPerPage;
+		if ((totalCount % this->limitPerPage) != 0) {
+			fullPages++;
+		}
+		return fullPages;
+	}
+
+public slots:
+	void setPage(int _pageNum)
+	{
+		this->pageNum = _pageNum;
+		reset();
+	}
+	
 protected:
 	bool reloadList()
 	{
@@ -66,11 +91,20 @@ protected:
 		this->stringsOffsets = stringsMap->getOffsets();
 		return true;
 	}
+	
+	int getPageStartIndx() const
+	{
+		const int pageStart = pageNum * limitPerPage;
+		return pageStart;
+	}
 
 	StringsCollection *stringsMap;
 	QList<offset_t> stringsOffsets;
 	PeHandler *m_PE;
 	ColorSettings &addrColors;
+	
+	int pageNum;
+	int limitPerPage;
 };
 
 //----
@@ -123,6 +157,7 @@ public:
 		if (myPeHndl) {
 			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()) );
 		}
+		connect( &pageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setPage(int)) );
 		connect( &stringsTable, SIGNAL(targetClicked(offset_t, Executable::addr_type)), this, SLOT(offsetClicked(offset_t, Executable::addr_type)) );
 	}
 
@@ -131,6 +166,11 @@ private slots:
 	{
 		this->stringsModel->reset();
 		this->stringsTable.reset();
+		
+		int pagesCount = this->stringsModel->pagesCount();
+		if (pagesCount > 0) pagesCount--;
+		this->pageSelectBox.setMinimum(0);
+		this->pageSelectBox.setMaximum(pagesCount);
 	}
 
 	void onSave();
@@ -152,4 +192,5 @@ private:
 	QPushButton saveButton;
 	QLabel filterLabel;
 	QLineEdit filterEdit;
+	QSpinBox pageSelectBox;
 };
