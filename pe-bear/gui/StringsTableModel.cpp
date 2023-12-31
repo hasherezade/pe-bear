@@ -50,11 +50,11 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 	if (role == Qt::ToolTipRole) {
 		switch (column) {
 			case COL_OFFSET:
-				return "Right click to follow [" + util::translateAddrTypeName(Executable::RAW) + "]";
+				return tr("Right click to follow") +" [" + util::translateAddrTypeName(Executable::RAW) + "]";
 			case COL_TYPE:
 			{
 				offset_t strOffset = stringsOffsets[row];
-				return stringsMap->isWide(strOffset) ? "Wide" : "Ansi";
+				return stringsMap->isWide(strOffset) ? tr("Wide") : tr("Ansi");
 			}
 			case COL_STRING : 
 			{

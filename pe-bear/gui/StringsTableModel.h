@@ -175,10 +175,12 @@ public:
 private slots:
 	void resetPageSelection()
 	{
-		int pagesCount = this->stringsModel->pagesCount();
+		const int totalPages = this->stringsModel->pagesCount();
+		int pagesCount = totalPages;
 		if (pagesCount > 0) pagesCount--;
 		this->pageSelectBox.setMinimum(0);
 		this->pageSelectBox.setMaximum(pagesCount);
+		this->pageSelectBox.setToolTip(tr("Total pages") + ": " + QString::number(totalPages, 10));
 	}
 
 	void refreshView()
