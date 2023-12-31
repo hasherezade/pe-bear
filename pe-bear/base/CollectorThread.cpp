@@ -160,7 +160,8 @@ void StringExtThread::run()
 		emit gotStrings(nullptr);
 		return;
 	}
-	extractStrings(*mapToFill, 5, 0, true);
+	const size_t minLen = this->minStrLen > 2 ? this->minStrLen : 2;
+	extractStrings(*mapToFill, minLen, 0, true);
 	emit gotStrings(mapToFill);
 }
 

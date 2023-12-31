@@ -5,9 +5,10 @@
 #include <bearparser/bearparser.h>
 #include "../disasm/PeDisasm.h"
 
+#define MIN_STRING_LEN 5
+
 using namespace sig_ma;
 using namespace pe;
-
 
 //-------------------------------------------------
 
@@ -150,7 +151,7 @@ bool PeHandler::runStringsExtraction()
 	if (stringThread != NULL) {
 		return false; //previous thread didn't finished
 	}
-	this->stringThread = new StringExtThread(m_PE);
+	this->stringThread = new StringExtThread(m_PE, MIN_STRING_LEN);
 	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
 	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
 	stringThread->start();

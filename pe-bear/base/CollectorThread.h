@@ -63,8 +63,8 @@ class StringExtThread : public CollectorThread
 	Q_OBJECT
 
 public:
-	StringExtThread(PEFile* pe)
-		: CollectorThread(pe), mapToFill(nullptr)
+	StringExtThread(PEFile* pe, size_t _minStrLen)
+		: CollectorThread(pe), minStrLen(_minStrLen), mapToFill(nullptr)
 	{
 		mapToFill = new StringsCollection();
 	}
@@ -79,7 +79,8 @@ signals:
 
 private:
 	void run();
-	size_t extractStrings(StringsCollection &mapToFill, const size_t minStr = 3, const size_t maxStr = 0, bool acceptNonTerminated = true);
+	size_t extractStrings(StringsCollection &mapToFill, const size_t minStr, const size_t maxStr = 0, bool acceptNonTerminated = true);
 
 	StringsCollection *mapToFill;
+	size_t minStrLen;
 };
