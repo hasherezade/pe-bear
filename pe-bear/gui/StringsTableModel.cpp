@@ -1,8 +1,13 @@
 #include "StringsTableModel.h"
 
-StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, QObject *parent)
+#define MIN_STR_PER_PAGE 100
+#define MAX_STR_PER_PAGE 100000
+
+StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, int maxPerPage, QObject *parent)
 	: QAbstractTableModel(parent), m_PE(peHndl), 
-	stringsMap(nullptr), addrColors(_addrColors)
+	stringsMap(nullptr), addrColors(_addrColors),
+	pageNum(0),
+	limitPerPage(maxPerPage)
 {
 }
 
@@ -33,7 +38,7 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	}
 	int column = index.column();
-	int row = index.row();
+	int row = index.row() + getPageStartIndx();
 	if ((size_t)row >= stringsOffsets.size()) return QVariant();
 
 	if (role == Qt::UserRole && column == COL_OFFSET) {
@@ -121,6 +126,17 @@ void StringsBrowseWindow::initLayout()
 	saveButton.setText(tr("Save"));
 
 	propertyLayout0.addWidget(&saveButton);
+
+	propertyLayout0.addWidget(new QLabel(tr("Page"), this));
+	propertyLayout0.addWidget(&pageSelectBox);
+
+	propertyLayout0.addWidget(new QLabel(tr("Max per page"), this));
+	propertyLayout0.addWidget(&maxPerPageSelectBox);
+	maxPerPageSelectBox.setMinimum(MIN_STR_PER_PAGE);
+	maxPerPageSelectBox.setMaximum(MAX_STR_PER_PAGE);
+	maxPerPageSelectBox.setValue(DEFAULT_STR_PER_PAGE);
+	maxPerPageSelectBox.setSingleStep(MIN_STR_PER_PAGE);
+
 	filterLabel.setText(tr("Search string"));
 	propertyLayout0.addWidget(&filterLabel);
 	propertyLayout0.addWidget(&filterEdit);
