@@ -1,12 +1,13 @@
 #include "StringsTableModel.h"
 
-#define MAX_PER_PAGE 10000
+#define MIN_STR_PER_PAGE 100
+#define MAX_STR_PER_PAGE 100000
 
-StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, QObject *parent)
+StringsTableModel::StringsTableModel(PeHandler *peHndl, ColorSettings &_addrColors, int maxPerPage, QObject *parent)
 	: QAbstractTableModel(parent), m_PE(peHndl), 
 	stringsMap(nullptr), addrColors(_addrColors),
 	pageNum(0),
-	limitPerPage(MAX_PER_PAGE)
+	limitPerPage(maxPerPage)
 {
 }
 
@@ -128,6 +129,13 @@ void StringsBrowseWindow::initLayout()
 
 	propertyLayout0.addWidget(new QLabel(tr("Page"), this));
 	propertyLayout0.addWidget(&pageSelectBox);
+
+	propertyLayout0.addWidget(new QLabel(tr("Max per page"), this));
+	propertyLayout0.addWidget(&maxPerPageSelectBox);
+	maxPerPageSelectBox.setMinimum(MIN_STR_PER_PAGE);
+	maxPerPageSelectBox.setMaximum(MAX_STR_PER_PAGE);
+	maxPerPageSelectBox.setValue(DEFAULT_STR_PER_PAGE);
+	maxPerPageSelectBox.setSingleStep(MIN_STR_PER_PAGE);
 
 	filterLabel.setText(tr("Search string"));
 	propertyLayout0.addWidget(&filterLabel);

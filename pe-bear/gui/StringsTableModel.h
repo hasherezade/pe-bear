@@ -13,6 +13,8 @@
 #include "../base/MainSettings.h"
 #include "followable_table/FollowableOffsetedView.h"
 
+#define DEFAULT_STR_PER_PAGE 10000
+
 class StringsTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
@@ -26,7 +28,7 @@ public:
 		MAX_COL
 	};
 
-	StringsTableModel(PeHandler *peHndl, ColorSettings &addrColors, QObject *parent = 0);
+	StringsTableModel(PeHandler *peHndl, ColorSettings &addrColors, int maxPerPage = DEFAULT_STR_PER_PAGE, QObject *parent = 0);
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -73,12 +75,18 @@ public:
 	}
 
 public slots:
+	void setMaxPerPage(int _maxPerPage)
+	{
+		this->limitPerPage = _maxPerPage;
+		reset();
+	}
+	
 	void setPage(int _pageNum)
 	{
 		this->pageNum = _pageNum;
 		reset();
 	}
-	
+
 protected:
 	bool reloadList()
 	{
@@ -139,7 +147,7 @@ public:
 		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr),
 		stringsTable(this, Executable::RAW)
 	{
-		this->stringsModel = new StringsTableModel(myPeHndl, addrColors, this);
+		this->stringsModel = new StringsTableModel(myPeHndl, addrColors, DEFAULT_STR_PER_PAGE, this);
 		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
 		stringsProxyModel->setSourceModel( this->stringsModel );
 		stringsTable.setModel( this->stringsProxyModel );
@@ -158,21 +166,28 @@ public:
 			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()) );
 		}
 		connect( &pageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setPage(int)) );
+		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setMaxPerPage(int)) );
+		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), this, SLOT(resetPageSelection()) );
+
 		connect( &stringsTable, SIGNAL(targetClicked(offset_t, Executable::addr_type)), this, SLOT(offsetClicked(offset_t, Executable::addr_type)) );
 	}
 
 private slots:
-	void refreshView()
+	void resetPageSelection()
 	{
-		this->stringsModel->reset();
-		this->stringsTable.reset();
-		
 		int pagesCount = this->stringsModel->pagesCount();
 		if (pagesCount > 0) pagesCount--;
 		this->pageSelectBox.setMinimum(0);
 		this->pageSelectBox.setMaximum(pagesCount);
 	}
 
+	void refreshView()
+	{
+		this->stringsModel->reset();
+		this->stringsTable.reset();
+		resetPageSelection();
+	}
+	
 	void onSave();
 	void onFilterChanged(QString);
 	void offsetClicked(offset_t offset, Executable::addr_type type);
@@ -193,4 +208,5 @@ private:
 	QLabel filterLabel;
 	QLineEdit filterEdit;
 	QSpinBox pageSelectBox;
+	QSpinBox maxPerPageSelectBox;
 };
