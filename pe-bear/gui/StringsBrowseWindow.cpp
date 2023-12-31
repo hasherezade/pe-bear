@@ -1,4 +1,4 @@
-#include "StringsTableModel.h"
+#include "StringsBrowseWindow.h"
 
 #define MIN_STR_PER_PAGE 100
 #define MAX_STR_PER_PAGE 100000
