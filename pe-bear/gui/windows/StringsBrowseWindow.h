@@ -157,13 +157,15 @@ public:
 		stringsTable.setSelectionMode(QAbstractItemView::SingleSelection);
 		stringsTable.setAutoFillBackground(true);
 		stringsTable.setAlternatingRowColors(false);
+
 		QHeaderView *hdr = stringsTable.horizontalHeader();
 		if (hdr) hdr->setStretchLastSection(true);
 	
 		initLayout();
 		refreshView();
 		if (myPeHndl) {
-			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(refreshView()) );
+			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(updateStringsView()) );
+			connect( myPeHndl, SIGNAL(modified()), this, SLOT(refreshView()) );
 		}
 		connect( &pageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setPage(int)) );
 		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setMaxPerPage(int)) );
@@ -187,6 +189,11 @@ private slots:
 	{
 		this->stringsModel->reset();
 		this->stringsTable.reset();
+	}
+	
+	void updateStringsView()
+	{
+		refreshView();
 		resetPageSelection();
 	}
 	
