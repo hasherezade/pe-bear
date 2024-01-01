@@ -7,7 +7,7 @@
 	#include <QtGui>
 #endif
 
-#include "../../base/PeHandlersManager.h"
+#include <bearparser/bearparser.h>
 
 //---
 class PatternSearchWindow : public QDialog
@@ -15,10 +15,19 @@ class PatternSearchWindow : public QDialog
 	Q_OBJECT
 
 public:
-	PatternSearchWindow(QWidget *parent, offset_t offset, offset_t maxOffset);
+	PatternSearchWindow(QWidget *parent);
 	~PatternSearchWindow() { }
-	
+
 	QString getSignature();
+
+	void exec(offset_t offset, offset_t maxOffset)
+	{
+		startOffset.setRange(0, maxOffset);
+		startOffset.setPrefix("0x");
+		startOffset.setValue(offset);
+		this->signPattern = "";
+		QDialog::exec();
+	}
 
 protected slots:
 	void accept();

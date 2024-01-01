@@ -43,7 +43,8 @@ protected:
 MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent) 
 	: QMainWindow(parent), mainSettings(_mainSettings),
 	m_PeHndl(NULL), m_Timer(this),
-	diffWindow(this->m_PEHandlers, this), secAddWindow(this), userConfigWindow(this),
+	diffWindow(this->m_PEHandlers, this),
+	secAddWindow(this), userConfigWindow(this), patternSearchWindow(this),
 	sectionsTree(this), sectionMenu(mainSettings, this),
 	peFileModel(NULL),
 	rightPanel(this), 
@@ -1196,9 +1197,8 @@ void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 	if (!selectedPeHndl || !selectedPeHndl->getPe()) return;
 	offset_t maxOffset = selectedPeHndl->getPe()->getContentSize();
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
-	PatternSearchWindow win(this, offset, maxOffset);
-	win.exec();
-	QString text = win.getSignature();
+	patternSearchWindow.exec(offset, maxOffset);
+	QString text = patternSearchWindow.getSignature();
 	if (!text.length()) return;
 	
 	size_t fullSize = selectedPeHndl->getPe()->getContentSize();

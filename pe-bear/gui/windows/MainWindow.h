@@ -175,6 +175,7 @@ private:
 
 	DiffWindow diffWindow;
 	SectionAddWindow secAddWindow;
+	PatternSearchWindow patternSearchWindow;
 
 	QStatusBar statusBar;
 	QGridLayout cntntLayout;

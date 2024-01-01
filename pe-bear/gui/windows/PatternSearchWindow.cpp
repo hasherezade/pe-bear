@@ -1,6 +1,6 @@
 #include "PatternSearchWindow.h"
 
-PatternSearchWindow::PatternSearchWindow(QWidget *parent, offset_t offset, offset_t maxOffset)
+PatternSearchWindow::PatternSearchWindow(QWidget *parent)
 	: QDialog(0, Qt::Dialog),
 	buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
 	signPattern("")
@@ -13,9 +13,9 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, offset_t offset, offse
 	secPropertyLayout2.addWidget(&startOffset);
 	
 	startOffset.setDisplayIntegerBase(16);
-	startOffset.setRange(0, maxOffset);
+	startOffset.setRange(0, 0);
 	startOffset.setPrefix("0x");
-	startOffset.setValue(offset);
+	startOffset.setValue(0);
 
 	QRegExpValidator *validator = new QRegExpValidator(QRegExp("([0-9A-Fa-f\\?]{0,2} {0,1})*"), this);
 	patternEdit.setValidator(validator);
