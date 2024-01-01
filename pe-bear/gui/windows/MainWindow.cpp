@@ -6,6 +6,7 @@
 #include "../../HexView.h"
 #include "../../base/RegKeyManager.h"
 
+
 #ifdef _DEBUG
 	#include <iostream>
 #endif
@@ -1174,7 +1175,7 @@ void MainWindow::addSection(PeHandler* selectedPeHndl)
 void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 {
 	if (!selectedPeHndl) return;
-
+	
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
 	SectionHdrWrapper *sec = selectedPeHndl->getPe()->getSecHdrAtOffset(offset, Executable::RAW, false);
 	if (sec == NULL) {
@@ -1192,15 +1193,13 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 
 void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 {
-	if (!selectedPeHndl) return;
-
+	if (!selectedPeHndl || !selectedPeHndl->getPe()) return;
+	offset_t maxOffset = selectedPeHndl->getPe()->getContentSize();
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
-	bool ok = false;
-	QString text = QInputDialog::getText(this, tr("Define search"),
-		tr("Search starting from the offset:" ) + " 0x" + QString::number(offset, 16) + "\n" + 
-		tr("Signature to search:"), QLineEdit::Normal, 
-		"", &ok);
-	if (!ok || !text.length()) return;
+	PatternSearchWindow win(this, offset, maxOffset);
+	win.exec();
+	QString text = win.getSignature();
+	if (!text.length()) return;
 	
 	size_t fullSize = selectedPeHndl->getPe()->getContentSize();
 	if (offset >= fullSize) return;

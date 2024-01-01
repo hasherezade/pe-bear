@@ -202,6 +202,7 @@ set (pebear_followable_hdrs
 )
 
 set (pebear_windows_srcs
+	gui/windows/PatternSearchWindow.cpp
 	gui/windows/StringsBrowseWindow.cpp
 	gui/windows/OffsetsBrowseWindow.cpp
 	gui/windows/SignaturesBrowseWindow.cpp
@@ -213,6 +214,7 @@ set (pebear_windows_srcs
 )
 
 set (pebear_windows_hdrs
+	gui/windows/PatternSearchWindow.h
 	gui/windows/StringsBrowseWindow.h
 	gui/windows/OffsetsBrowseWindow.h
 	gui/windows/SignaturesBrowseWindow.h
