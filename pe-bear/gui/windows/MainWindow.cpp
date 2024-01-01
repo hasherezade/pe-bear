@@ -1195,6 +1195,7 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 {
 	if (!selectedPeHndl || !selectedPeHndl->getPe()) return;
+	
 	offset_t maxOffset = selectedPeHndl->getPe()->getContentSize();
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
 	patternSearchWindow.exec(offset, maxOffset);

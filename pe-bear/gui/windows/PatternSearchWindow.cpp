@@ -8,7 +8,7 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent)
 	//setWindowFlags(Qt::Dialog);
 	setModal(true);
 	setWindowTitle(tr("Define search"));
-	offsetLabel.setText(tr("Search starting from the offset:" ));
+	offsetLabel.setText(tr("Starting from the offset:" ));
 	secPropertyLayout2.addWidget(&offsetLabel);
 	secPropertyLayout2.addWidget(&startOffset);
 	
