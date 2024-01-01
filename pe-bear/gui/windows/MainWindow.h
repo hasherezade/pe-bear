@@ -13,6 +13,7 @@
 
 #include "DiffWindow.h"
 #include "SectionAddWindow.h"
+#include "PatternSearchWindow.h"
 #include "SignaturesBrowseWindow.h"
 #include "UserConfigWindow.h"
 
