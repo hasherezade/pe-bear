@@ -25,17 +25,17 @@ public slots:
 
 protected:
 	void fetchSignature();
-	
+
 	QVBoxLayout topLayout;
 	QHBoxLayout secPropertyLayout2;
 	QHBoxLayout secPropertyLayout3;
 	QHBoxLayout buttonLayout;
-	
-	QLabel offsetLabel;
-	QSpinBox startOffset;
 
 	QLabel patternLabel;
 	QLineEdit patternEdit;
+
+	QLabel offsetLabel;
+	QSpinBox startOffset;
 
 	QDialogButtonBox buttonBox;
 	QString signPattern;
