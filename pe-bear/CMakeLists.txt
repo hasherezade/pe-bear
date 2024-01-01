@@ -140,7 +140,6 @@ set (pebear_gui_srcs
 	gui/GeneralPanel.cpp
 	gui/DosHdrTableModel.cpp
 	gui/PackersTableModel.cpp
-	gui/StringsBrowseWindow.cpp
 	gui/HexDiffModel.cpp
 	gui/WrapperSplitter.cpp
 	gui/DataDirWrapperSplitter.cpp
@@ -169,7 +168,6 @@ set (pebear_gui_hdrs
 	gui/GeneralPanel.h
 	gui/DosHdrTableModel.h
 	gui/PackersTableModel.h
-	gui/StringsBrowseWindow.h
 	gui/HexDiffModel.h
 	gui/WrapperSplitter.h
 	gui/DataDirWrapperSplitter.h
@@ -204,6 +202,7 @@ set (pebear_followable_hdrs
 )
 
 set (pebear_windows_srcs
+	gui/windows/StringsBrowseWindow.cpp
 	gui/windows/OffsetsBrowseWindow.cpp
 	gui/windows/SignaturesBrowseWindow.cpp
 	gui/windows/SectionAddWindow.cpp
@@ -214,6 +213,7 @@ set (pebear_windows_srcs
 )
 
 set (pebear_windows_hdrs
+	gui/windows/StringsBrowseWindow.h
 	gui/windows/OffsetsBrowseWindow.h
 	gui/windows/SignaturesBrowseWindow.h
 	gui/windows/SectionAddWindow.h

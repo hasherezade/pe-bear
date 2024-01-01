@@ -9,9 +9,9 @@
 	#include <QtGui>
 #endif
 
-#include "../base/PeHandler.h"
-#include "../base/MainSettings.h"
-#include "followable_table/FollowableOffsetedView.h"
+#include "../../base/PeHandler.h"
+#include "../../base/MainSettings.h"
+#include "../followable_table/FollowableOffsetedView.h"
 
 #define DEFAULT_STR_PER_PAGE 10000
 

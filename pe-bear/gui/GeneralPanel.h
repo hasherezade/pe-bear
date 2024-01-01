@@ -11,7 +11,7 @@
 #include "../gui_base/ExtTableView.h"
 
 #include "PackersTableModel.h"
-#include "StringsBrowseWindow.h"
+#include "windows/StringsBrowseWindow.h"
 
 
 class InfoTableModel : public PeTableModel
