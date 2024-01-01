@@ -156,7 +156,7 @@ bool MainWindow::checkFileChanges(const QString &path)
 	}
 	bool shouldReload = (rMode == RELOAD_AUTO);
 	if (!shouldReload || isFileDeleted) {
-		const QString wndTitle = (!isFileDeleted) ?tr("File changed!") : tr("File deleted!");
+		const QString wndTitle = (!isFileDeleted) ? tr("File changed!") : tr("File deleted!");
 		const QString wndInfo = (!isFileDeleted) 
 			? tr("The file:")+"\n" + path + "\n"+tr("- has changed.") + "\n" + tr("Do you want to reload ? " )
 			: tr("The file:") +"\n" + path + "\n"+tr("- has been deleted.")+"\n"+tr("Do you want to unload?");
@@ -207,8 +207,8 @@ bool MainWindow::checkFileChanges(const QString &path)
 bool MainWindow::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	restoreGeometry(settings.value(tr("geometry")).toByteArray());
-	restoreState(settings.value(tr("windowState")).toByteArray());
+	restoreGeometry(settings.value("geometry").toByteArray());
+	restoreState(settings.value("windowState").toByteArray());
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -219,8 +219,8 @@ bool MainWindow::readPersistent()
 bool MainWindow::writePersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	settings.setValue(tr("geometry"), saveGeometry());
-	settings.setValue(tr("windowState"), saveState());
+	settings.setValue("geometry", saveGeometry());
+	settings.setValue("windowState", saveState());
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
