@@ -69,7 +69,6 @@ set (pebear_gui_base_srcs
 	gui_base/PeTreeView.cpp
 	gui_base/PeTableModel.cpp
 	gui_base/FollowablePeTreeView.cpp
-	gui_base/HexSpinBox.cpp
 	gui_base/HexInputDialog.cpp
 	gui_base/AddressInputDialog.cpp
 	gui_base/OffsetDependentAction.cpp
@@ -86,7 +85,6 @@ set (pebear_gui_base_hdrs
 	gui_base/PeTreeView.h
 	gui_base/PeTableModel.h
 	gui_base/FollowablePeTreeView.h
-	gui_base/HexSpinBox.h
 	gui_base/HexInputDialog.h
 	gui_base/AddressInputDialog.h
 	gui_base/OffsetDependentAction.h

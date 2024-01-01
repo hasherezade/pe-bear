@@ -8,7 +8,6 @@
 #endif
 
 #include "../../base/PeHandlersManager.h"
-#include "../../gui_base/HexSpinBox.h"
 #include "../../base/ImportsAutoadderSettings.h"
 
 class ImpAdderSettingsTableModel : public QAbstractTableModel

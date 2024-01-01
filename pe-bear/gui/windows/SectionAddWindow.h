@@ -8,7 +8,6 @@
 #endif
 
 #include "../../base/PeHandlersManager.h"
-#include "../../gui_base/HexSpinBox.h"
 
 class SectionAddWindow : public QDialog
 {
@@ -31,10 +30,10 @@ protected:
 	QHBoxLayout buttonLayout;
 
 	QLabel secRsizeLabel;
-	HexSpinBox secRsizeEdit;
+	QSpinBox secRsizeEdit;
 
 	QLabel secVsizeLabel;
-	HexSpinBox secVsizeEdit;
+	QSpinBox secVsizeEdit;
 	
 	QLabel secNameLabel;
 	QLineEdit secNameEdit;
