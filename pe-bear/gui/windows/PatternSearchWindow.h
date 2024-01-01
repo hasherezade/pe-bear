@@ -20,7 +20,7 @@ public:
 	
 	QString getSignature();
 
-public slots:
+protected slots:
 	void accept();
 
 protected:

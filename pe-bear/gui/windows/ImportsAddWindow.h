@@ -22,19 +22,20 @@ public slots:
     }
 
 public:
-    enum COLS
-    {
-        COL_LIB = 0,
-        COL_FUNC,
-        COUNT_COL
-    };
-    ImpAdderSettingsTableModel(QObject *v_parent, ImportsAutoadderSettings& _settings)
-        : QAbstractTableModel(v_parent), m_Settings(_settings)
+	enum COLS
+	{
+		COL_LIB = 0,
+		COL_FUNC,
+		COUNT_COL
+	};
+
+	ImpAdderSettingsTableModel(QObject *v_parent, ImportsAutoadderSettings& _settings)
+		: QAbstractTableModel(v_parent), m_Settings(_settings)
 	{
 		reloadSettings();
 	}
 
-    virtual ~ImpAdderSettingsTableModel() { }
+	virtual ~ImpAdderSettingsTableModel() { }
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const
 	{
@@ -54,10 +55,10 @@ public:
 		return f;
 	}
 
-    int columnCount(const QModelIndex &parent) const { return COUNT_COL; }
-    int rowCount(const QModelIndex &parent) const { return countElements(); }
+	int columnCount(const QModelIndex &parent) const { return COUNT_COL; }
+	int rowCount(const QModelIndex &parent) const { return countElements(); }
 
-    QVariant data(const QModelIndex &index, int role) const
+	QVariant data(const QModelIndex &index, int role) const
 	{
 		const int elNum = index.row();
 		
@@ -111,12 +112,12 @@ public:
 		}
 		endResetModel();
 	}
-	
+
 	int countElements() const
 	{
 		return dllAndFunc.size();
 	}
-	
+
 	QPair<QString,QString> getPairAt(int elNum)
 	{
 		return dllAndFunc.at(elNum);
@@ -168,7 +169,7 @@ protected:
 
 	QLabel addSecLabel, separateOFTLabel;
 	QCheckBox addSecCBox, separateOFTBox;
-	
+
 private:
 	ImpAdderSettingsTableModel *tableModel;
 	QTableView *ui_elementsView;
