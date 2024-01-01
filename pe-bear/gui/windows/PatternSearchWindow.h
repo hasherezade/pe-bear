@@ -20,13 +20,13 @@ public:
 
 	QString getSignature();
 
-	void exec(offset_t offset, offset_t maxOffset)
+	int exec(offset_t offset, offset_t maxOffset)
 	{
 		startOffset.setRange(0, maxOffset);
 		startOffset.setPrefix("0x");
 		startOffset.setValue(offset);
 		this->signPattern = "";
-		QDialog::exec();
+		return QDialog::exec();
 	}
 
 protected slots:

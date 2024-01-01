@@ -1198,10 +1198,14 @@ void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 	
 	offset_t maxOffset = selectedPeHndl->getPe()->getContentSize();
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
-	patternSearchWindow.exec(offset, maxOffset);
+	int ret = patternSearchWindow.exec(offset, maxOffset);
+	if ((QDialog::DialogCode) ret != QDialog::Accepted) {
+		return;
+	}
 	QString text = patternSearchWindow.getSignature();
-	if (!text.length()) return;
-	
+	if (!text.length()) {
+		return;
+	}
 	size_t fullSize = selectedPeHndl->getPe()->getContentSize();
 	if (offset >= fullSize) return;
 
