@@ -175,7 +175,7 @@ public:
 		refreshView();
 		if (myPeHndl) {
 			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(updateStringsView()) );
-			connect( myPeHndl, SIGNAL(modified()), this, SLOT(refreshView()) );
+			connect( myPeHndl, SIGNAL(stringsLoadingProgress(int)), this, SLOT(showProgress(int)) );
 		}
 		connect( &pageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setPage(int)) );
 		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setMaxPerPage(int)) );
@@ -200,14 +200,15 @@ private slots:
 		this->stringsModel->reset();
 		this->stringsTable.reset();
 	}
-	
+
 	void updateStringsView()
 	{
-		refreshView();
-		resetPageSelection();
-		if (myPeHndl){
-			infoStrings.setText(tr("Extracted strings") + ": " + QString::number(this->myPeHndl->stringsMap.size()));
-		}
+		_updateStringsView(true);
+	}
+	
+	void showProgress(int progress)
+	{
+		_updateStringsView(false, progress);
 	}
 	
 	void onSave();
@@ -215,6 +216,20 @@ private slots:
 	void offsetClicked(offset_t offset, Executable::addr_type type);
 
 private:
+	
+	void _updateStringsView(bool isFinished, int progress = 0)
+	{
+		refreshView();
+		resetPageSelection();
+		if (myPeHndl){
+			if (!isFinished) {
+				infoStrings.setText(tr("Loading strings: ") + QString::number(progress, 10) + "%");
+			} else {
+				infoStrings.setText(tr("Extracted strings") + ": " + QString::number(this->myPeHndl->stringsMap.size()));
+			}
+		}
+	}
+	
 	void initLayout();
 
 	PeHandler *myPeHndl;

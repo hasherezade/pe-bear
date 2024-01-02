@@ -282,6 +282,7 @@ signals:
 	void foundSignatures(int count, int requestType);
 	void hashChanged();
 	void stringsUpdated();
+	void stringsLoadingProgress(int progress);
 
 protected slots:
 	// hashes:
@@ -293,6 +294,11 @@ protected slots:
 	bool runStringsExtraction();
 	void onStringsReady(StringsCollection *mapToFill);
 	void stringExtractionFinished();
+
+	void onStringsLoadingProgress(int progress)
+	{
+		emit stringsLoadingProgress(progress); // forward the signal
+	}
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException

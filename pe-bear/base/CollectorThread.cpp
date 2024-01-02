@@ -128,6 +128,9 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 {
 	if (!m_PE) return 0;
 
+	int progress = 0;
+	emit loadingStrings(progress);
+	
 	offset_t step = 0;
 	size_t maxSize = m_PE->getContentSize();
 	for (step = 0; step < maxSize && !this->stopRequested; step++) {
@@ -149,6 +152,12 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 		mapToFill.insert(step, str, isWide);
 		step += util::getStringSize(str, isWide);
 		step--;
+		int proc = int(((float)step / (float)maxSize) * 100);
+		if ((proc - progress) > 1) {
+			progress = proc;
+			emit loadingStrings(progress);
+		}
+
 	}
 	return mapToFill.size();
 }
@@ -156,6 +165,7 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 void StringExtThread::run()
 {
 	QMutexLocker lock(&myMutex);
+
 	this->mapToFill->clear();
 	
 	if (!isByteArrInit()) {

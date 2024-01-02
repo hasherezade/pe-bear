@@ -157,6 +157,7 @@ bool PeHandler::runStringsExtraction()
 	}
 	this->stringThread = new StringExtThread(m_PE, MIN_STRING_LEN);
 	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
+	QObject::connect(stringThread, SIGNAL(loadingStrings(int)), this, SLOT(onStringsLoadingProgress(int)));
 	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
 	stringThread->start();
 	stringExtractQueued = false;

@@ -82,7 +82,8 @@ public:
 	
 signals:
 	void gotStrings(StringsCollection* mapToFill);
-
+	void loadingStrings(int progress);
+	
 private:
 	void run();
 	size_t extractStrings(StringsCollection &mapToFill, const size_t minStr, const size_t maxStr = 0, bool acceptNonTerminated = true);
