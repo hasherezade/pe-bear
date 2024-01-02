@@ -160,7 +160,17 @@ public:
 
 		QHeaderView *hdr = stringsTable.horizontalHeader();
 		if (hdr) hdr->setStretchLastSection(true);
-	
+
+		QHeaderView *vHdr = new QHeaderView(Qt::Vertical, &stringsTable);
+		stringsTable.setVerticalHeader(vHdr);
+		vHdr->setVisible(true);
+		stringsTable.setWordWrap(false);
+
+#if QT_VERSION >= 0x050000
+		stringsTable.verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#else
+		stringsTable.verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
 		initLayout();
 		refreshView();
 		if (myPeHndl) {

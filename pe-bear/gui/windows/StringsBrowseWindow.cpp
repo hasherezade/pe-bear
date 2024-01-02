@@ -22,6 +22,11 @@ QVariant StringsTableModel::headerData(int section, Qt::Orientation orientation,
 			case COL_STRING : return tr("String");
 		}
 	}
+	if (orientation == Qt::Vertical) {
+		int row = section + getPageStartIndx();
+		if ((size_t)row >= stringsOffsets.size()) return QVariant();
+		return row + 1;
+	}
 	return QVariant();
 }
 
@@ -80,7 +85,7 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 		case COL_LENGTH:
 			return stringsMap->getString(strOffset).length();
 		case COL_STRING : 
-			return stringsMap->getString(strOffset);
+			return stringsMap->getString(strOffset).simplified();
 	}
 	return QVariant();
 }
