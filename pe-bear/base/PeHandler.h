@@ -156,6 +156,8 @@ public:
 	/* resize */
 	bool resize(bufsize_t newSize, bool continueLastOperation = false);
 	bool resizeImage(bufsize_t newSize);
+	
+	bool setByte(offset_t offset, BYTE val);
 
 	bool isVirtualFormat();
 	bool isVirtualEqualRaw();
@@ -319,12 +321,15 @@ protected:
 	void associateWrappers();
 
 	bool isBaseHdrModif(offset_t modifOffset, bufsize_t size);
+	
 	bool rewrapDataDirs();
+
 	bool updatePeOnModified(offset_t modOffset = INVALID_ADDR, bufsize_t modSize = 0);// throws exception
 	void updatePeOnResized();
 
 	PEFile* m_PE;
 	FileBuffer *m_fileBuffer;
+	QMutex m_UpdateMutex;
 
 	QDateTime m_fileModDate; //modification time of the corresponding file on the disk
 	QDateTime m_loadedFileModDate; //modification time of the version that is currently loaded

@@ -534,6 +534,24 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 	return true;
 }
 
+bool PeHandler::setByte(offset_t offset, BYTE val)
+{
+	QMutexLocker lock(&m_UpdateMutex);
+
+	BYTE* contentPtr = m_PE->getContentAt(offset, 1);
+	if (!contentPtr) {
+		return false;
+	}
+	BYTE prev_val = contentPtr[0];
+	if (prev_val == val) {
+		return false; // nothing has changed
+	}
+	this->backupModification(offset, 1);
+	contentPtr[0] = val;
+	this->setBlockModified(offset, 1);
+	return true;
+}
+
 #include <iostream>
 bool PeHandler::isVirtualFormat()
 {
@@ -1166,6 +1184,7 @@ void PeHandler::backupResize(bufsize_t newSize, bool continueLastOperation)
 
 void PeHandler::unbackupLastModification()
 {
+	QMutexLocker lock(&m_UpdateMutex);
 	modifHndl.unStoreLast();
 }
 
