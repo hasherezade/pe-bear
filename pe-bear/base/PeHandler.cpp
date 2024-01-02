@@ -129,6 +129,7 @@ void PeHandler::deleteThreads()
 {
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
 		if (calcThread[hType]) {
+			calcThread[hType]->stop();
 			while (calcThread[hType]->isFinished() == false) {
 				calcThread[hType]->wait();
 			}
@@ -138,6 +139,7 @@ void PeHandler::deleteThreads()
 	}
 	// delete strign extraction threads
 	if (this->stringThread) {
+		this->stringThread->stop();
 		while (stringThread->isFinished() == false) {
 			stringThread->wait();
 		}
@@ -149,6 +151,7 @@ void PeHandler::deleteThreads()
 bool PeHandler::runStringsExtraction()
 {
 	if (this->stringThread) {
+		this->stringThread->stop();
 		stringExtractQueued = true;
 		return false; //previous thread didn't finished
 	}
@@ -187,6 +190,7 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 	if (type >= CalcThread::HASHES_NUM) return;
 	
 	if (calcThread[type]) {
+		calcThread[type]->stop();
 		calcQueued[type] = true;
 		return; //previous thread didn't finished
 	}
@@ -522,15 +526,38 @@ bool PeHandler::resize(bufsize_t newSize, bool continueLastOperation)
 
 bool PeHandler::resizeImage(bufsize_t newSize)
 {
-	if (m_PE->getImageSize() == newSize) return false; //nothing to change
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!m_PE || m_PE->getImageSize() == newSize) return false; //nothing to change
 
-	offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
-	bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
-	this->modifHndl.backupModification(modOffset, modSize, false);
-	m_PE->setImageSize(newSize);
-
+		offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
+		bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
+		this->modifHndl.backupModification(modOffset, modSize, false);
+		m_PE->setImageSize(newSize);
+	} //!scope0
+	
 	updatePeOnResized();
 	emit modified();
+	return true;
+}
+
+bool PeHandler::setByte(offset_t offset, BYTE val)
+{
+	{//scope0
+		QMutexLocker lock(&m_UpdateMutex);
+
+		BYTE* contentPtr = m_PE->getContentAt(offset, 1);
+		if (!contentPtr) {
+			return false;
+		}
+		BYTE prev_val = contentPtr[0];
+		if (prev_val == val) {
+			return false; // nothing has changed
+		}
+		this->backupModification(offset, 1);
+		contentPtr[0] = val;
+	}//!scope0
+	this->setBlockModified(offset, 1);
 	return true;
 }
 
@@ -642,21 +669,27 @@ SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_
 
 offset_t PeHandler::loadSectionContent(SectionHdrWrapper* sec, QFile &fIn, bool continueLastOperation)
 {
-	if (!m_PE || !sec) return 0;
+	if (!sec) return 0;
+	offset_t loaded = 0;
+	offset_t modifOffset = INVALID_ADDR;
+	bufsize_t modifSize = 0;
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!m_PE) return 0;
 
-	offset_t modifOffset = sec->getRawPtr();
-	bufsize_t modifSize = sec->getContentSize(Executable::RAW, true);
-	if (modifOffset == INVALID_ADDR|| modifSize == 0) {
-		return 0;
-	}
-	AbstractByteBuffer *buf = m_PE->getFileBuffer();
-	if (!buf) return 0;
-	
-	backupModification(modifOffset, modifSize, continueLastOperation);
-	offset_t loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
-
-	setDisplayed(false, modifOffset, modifSize);
+		AbstractByteBuffer *buf = m_PE->getFileBuffer();
+		if (!buf) return 0;
+		
+		modifOffset = sec->getRawPtr();
+		modifSize = sec->getContentSize(Executable::RAW, true);
+		if (modifOffset == INVALID_ADDR|| modifSize == 0) {
+			return 0;
+		}
+		backupModification(modifOffset, modifSize, continueLastOperation);
+		loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
+	} //!scope0
 	setBlockModified(modifOffset, loaded);
+	setDisplayed(false, modifOffset, modifSize);
 	return loaded;
 }
 
@@ -784,7 +817,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// get a new entry to be filled:
 	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
 	if (libWr == NULL) {
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to add a DLL entry!");
 		return NULL;
 	}
@@ -798,7 +831,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
 		if (!ptr) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Failed to get a free space to fill the entry!");
 			return NULL;
 		}
@@ -811,7 +844,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// fill in the name
 	backupModification(nameOffset, nameTotalSize, true);
 	if (m_PE->setStringValue(nameOffset, name) == false) {
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to fill library name!");
 		return NULL;
 	}
@@ -850,7 +883,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 	backupModification(fWr->getOffset(), fWr->getSize(), true);
 	if (name.length()) {
 		if (!pe_util::validateFuncName(name.toStdString().c_str(), name.length())) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Invalid function name supplied!");
 		}
 		const offset_t thunkRVA = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
@@ -865,7 +898,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 		const size_t nameTotalLen = name.length() + 1;
 		backupModification(storageOffset, nameTotalLen, true);
 		if (m_PE->setStringValue(storageOffset, name) == false) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Failed to fill the function name");
 			return false;
 		}
@@ -955,12 +988,12 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const DWORD oldCharact = stubHdr->getCharacteristics();
 		const DWORD requiredCharact = SCN_MEM_READ | SCN_MEM_WRITE;
 		if (!stubHdr->setCharacteristics(oldCharact | requiredCharact)) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Cannot modify the section characteristics");
 			return false;
 		}
 		if (!this->_moveDataDirEntry(pe::DIR_IMPORT, newImpOffset, continueLastOperation)) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Cannot move the data dir");
 			return false;
 		}
@@ -1066,7 +1099,7 @@ ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool con
 	
 	if (!isSet) {
 		delete nextFunc; nextFunc = NULL;
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to add imported function!");
 		return NULL;
 	}
@@ -1169,6 +1202,11 @@ void PeHandler::unbackupLastModification()
 	modifHndl.unStoreLast();
 }
 
+bool PeHandler::undoLastModification()
+{
+	return modifHndl.undoLastOperation();
+}
+
 bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 {
 	bool isOk = false;
@@ -1177,7 +1215,7 @@ bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 		isOk = true;
 
 	} catch (CustomException &e) {
-		this->unModify();
+		this->undoLastModification();
 		std::cerr << "Unacceptable modification: " << e.what() << "\n";
 		isOk = false;
 	}
@@ -1230,36 +1268,38 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 {
 	if (!m_PE) return false;
 
-	m_PE->wrap();
-
 	bool isSecHdrModified = false;
 	bool baseHdrModified = false;
 
-	if (modO != INVALID_ADDR && modSize) { // if modification offset is specified
-		if (isBaseHdrModif(modO, modSize)) {
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		m_PE->wrap();
+		if (modO != INVALID_ADDR && modSize) { // if modification offset is specified
+			if (isBaseHdrModif(modO, modSize)) {
+				baseHdrModified = true;
+				isSecHdrModified = true;
+			}
+			if (this->m_PE->getSectionsCount() != m_PE->hdrSectionsNum()) {
+				isSecHdrModified = true;
+			}
+			if (isSectionsHeadersModified(modO, modSize)) {
+				isSecHdrModified = true;
+			}
+		}
+		else {
+			// if the modification offset is unknown, assume modified:
 			baseHdrModified = true;
 			isSecHdrModified = true;
 		}
-		if (this->m_PE->getSectionsCount() != m_PE->hdrSectionsNum()) {
-			isSecHdrModified = true;
+
+		if (baseHdrModified) {
+			fileHdrWrapper.wrap();
+			optHdrWrapper.wrap();
 		}
-		if (isSectionsHeadersModified(modO, modSize)) {
-			isSecHdrModified = true;
-		}
-	}
-	else {
-		// if the modification offset is unknown, assume modified:
-		baseHdrModified = true;
-		isSecHdrModified = true;
-	}
 
-	if (baseHdrModified) {
-		fileHdrWrapper.wrap();
-		optHdrWrapper.wrap();
-	}
-
-	rewrapDataDirs();
-
+		rewrapDataDirs();
+	}//!scope0
+	
 	if (isSecHdrModified) {
 		emit secHeadersModified();
 	}
@@ -1268,8 +1308,10 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 
 void PeHandler::updatePeOnResized()
 {
-	rewrapDataDirs();
-
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		rewrapDataDirs();
+	}//!scope0
 	emit secHeadersModified();
 }
 
@@ -1284,16 +1326,20 @@ void PeHandler::runHashesCalculation()
 
 void PeHandler::unModify()
 {
-	if (this->modifHndl.undoLastOperation()) {
-		try {
-			updatePeOnModified();
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!undoLastModification()) {
+			return;
 		}
-		catch (CustomException &e)
-		{
-			std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
-		}
-		emit modified();
+	} //!scope0
+	try {
+		updatePeOnModified();
 	}
+	catch (CustomException &e)
+	{
+		std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
+	}
+	emit modified();
 }
 
 bool PeHandler::markedBranching(offset_t cRva, offset_t tRva)

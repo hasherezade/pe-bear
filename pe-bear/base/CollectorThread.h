@@ -11,15 +11,21 @@ class CollectorThread : public QThread
 	Q_OBJECT
 public:
 	CollectorThread(PEFile* pe)
-		: m_PE(pe)
+		: m_PE(pe), stopRequested(false)
 	{
 	}
 	
 	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
-
+	
+	void stop()
+	{
+		stopRequested = true;
+	}
+	
 protected:
 	PEFile* m_PE;
 	QMutex myMutex;
+	bool stopRequested;
 };
 
 ///----

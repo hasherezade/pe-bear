@@ -197,13 +197,7 @@ bool HexDumpModel::setData(const QModelIndex &index, const QVariant &value, int 
 		return false;
 	}
 	text = text.left(el_size);
-
-	BYTE* contentPtr = m_PE->getContentAt(offset, 1);
-	if (!contentPtr) return false;
-	
-	BYTE prev_val = contentPtr[0];
 	BYTE val = 0;
-
 	if (showHex) {
 		bool isConv = false;
 		BYTE number = text.toUShort(&isConv, 16);
@@ -216,11 +210,5 @@ bool HexDumpModel::setData(const QModelIndex &index, const QVariant &value, int 
 		val = (BYTE) text.at(0).toAscii();
 #endif
 	}
-	if (prev_val == val) {
-		return false; // nothing has changed
-	}
-	myPeHndl->backupModification(offset, 1);
-	contentPtr[0] = val;
-	myPeHndl->setBlockModified(offset, 1);
-	return true;
+	return myPeHndl->setByte(offset, val);
 }
