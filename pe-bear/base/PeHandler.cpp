@@ -813,7 +813,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// get a new entry to be filled:
 	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
 	if (libWr == NULL) {
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to add a DLL entry!");
 		return NULL;
 	}
@@ -827,7 +827,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
 		if (!ptr) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Failed to get a free space to fill the entry!");
 			return NULL;
 		}
@@ -840,7 +840,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// fill in the name
 	backupModification(nameOffset, nameTotalSize, true);
 	if (m_PE->setStringValue(nameOffset, name) == false) {
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to fill library name!");
 		return NULL;
 	}
@@ -879,7 +879,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 	backupModification(fWr->getOffset(), fWr->getSize(), true);
 	if (name.length()) {
 		if (!pe_util::validateFuncName(name.toStdString().c_str(), name.length())) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Invalid function name supplied!");
 		}
 		const offset_t thunkRVA = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
@@ -894,7 +894,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 		const size_t nameTotalLen = name.length() + 1;
 		backupModification(storageOffset, nameTotalLen, true);
 		if (m_PE->setStringValue(storageOffset, name) == false) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Failed to fill the function name");
 			return false;
 		}
@@ -984,12 +984,12 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const DWORD oldCharact = stubHdr->getCharacteristics();
 		const DWORD requiredCharact = SCN_MEM_READ | SCN_MEM_WRITE;
 		if (!stubHdr->setCharacteristics(oldCharact | requiredCharact)) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Cannot modify the section characteristics");
 			return false;
 		}
 		if (!this->_moveDataDirEntry(pe::DIR_IMPORT, newImpOffset, continueLastOperation)) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Cannot move the data dir");
 			return false;
 		}
@@ -1095,7 +1095,7 @@ ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool con
 	
 	if (!isSet) {
 		delete nextFunc; nextFunc = NULL;
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to add imported function!");
 		return NULL;
 	}
@@ -1198,6 +1198,11 @@ void PeHandler::unbackupLastModification()
 	modifHndl.unStoreLast();
 }
 
+bool PeHandler::undoLastModification()
+{
+	return modifHndl.undoLastOperation();
+}
+
 bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 {
 	bool isOk = false;
@@ -1206,7 +1211,7 @@ bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 		isOk = true;
 
 	} catch (CustomException &e) {
-		this->unModify();
+		this->undoLastModification();
 		std::cerr << "Unacceptable modification: " << e.what() << "\n";
 		isOk = false;
 	}
@@ -1317,16 +1322,20 @@ void PeHandler::runHashesCalculation()
 
 void PeHandler::unModify()
 {
-	if (this->modifHndl.undoLastOperation()) {
-		try {
-			updatePeOnModified();
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!undoLastModification()) {
+			return;
 		}
-		catch (CustomException &e)
-		{
-			std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
-		}
-		emit modified();
+	} //!scope0
+	try {
+		updatePeOnModified();
 	}
+	catch (CustomException &e)
+	{
+		std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
+	}
+	emit modified();
 }
 
 bool PeHandler::markedBranching(offset_t cRva, offset_t tRva)
