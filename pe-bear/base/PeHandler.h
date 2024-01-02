@@ -335,6 +335,7 @@ protected:
 	bool calcQueued[CalcThread::HASHES_NUM];
 	
 	StringExtThread *stringThread;
+	bool stringExtractQueued;
 	QMutex m_StringMutex;
 
 	sig_ma::SigFinder *signFinder;

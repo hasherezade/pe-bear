@@ -23,9 +23,9 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	delayImpDirWrapper(pe), debugDirWrapper(pe), exceptDirWrapper(pe), clrDirWrapper(pe),
 	resourcesAlbum(pe),
 	resourcesDirWrapper(pe, &resourcesAlbum),
-	signFinder(NULL), 
+	signFinder(nullptr), 
 	modifHndl(pe->getFileBuffer(), this),
-	stringThread(NULL)
+	stringThread(nullptr), stringExtractQueued(false)
 {
 	if (!pe) return;
 
@@ -114,9 +114,9 @@ void PeHandler::onHashReady(QString hash, int hType)
 void PeHandler::onCalcThreadFinished()
 {
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
-		if (calcThread[hType] != NULL && calcThread[hType]->isFinished()) {
+		if (calcThread[hType] && calcThread[hType]->isFinished()) {
 			delete calcThread[hType];
-			calcThread[hType] = NULL;
+			calcThread[hType] = nullptr;
 			if (calcQueued[hType]) {
 				//printf("starting queued\n");
 				calculateHash((CalcThread::hash_type) hType);
@@ -128,33 +128,35 @@ void PeHandler::onCalcThreadFinished()
 void PeHandler::deleteThreads()
 {
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
-		if (calcThread[hType] != NULL) {
+		if (calcThread[hType]) {
 			while (calcThread[hType]->isFinished() == false) {
 				calcThread[hType]->wait();
 			}
 			delete calcThread[hType];
-			calcThread[hType] = NULL;
+			calcThread[hType] = nullptr;
 		}
 	}
 	// delete strign extraction threads
-	if (this->stringThread != NULL) {
+	if (this->stringThread) {
 		while (stringThread->isFinished() == false) {
 			stringThread->wait();
 		}
 		delete stringThread;
-		stringThread = NULL;
+		stringThread = nullptr;
 	}
 }
 
 bool PeHandler::runStringsExtraction()
 {
-	if (stringThread != NULL) {
+	if (this->stringThread) {
+		stringExtractQueued = true;
 		return false; //previous thread didn't finished
 	}
 	this->stringThread = new StringExtThread(m_PE, MIN_STRING_LEN);
 	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
 	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
 	stringThread->start();
+	stringExtractQueued = false;
 	return true;
 }
 
@@ -171,9 +173,12 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 
 void PeHandler::stringExtractionFinished()
 {
-	if (stringThread != NULL && stringThread->isFinished()) {
+	if (stringThread && stringThread->isFinished()) {
 		delete stringThread;
-		stringThread = NULL;
+		stringThread = nullptr;
+	}
+	if (stringExtractQueued) {
+		runStringsExtraction();
 	}
 }
 
@@ -181,7 +186,7 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 {
 	if (type >= CalcThread::HASHES_NUM) return;
 	
-	if (calcThread[type] != NULL) {
+	if (calcThread[type]) {
 		calcQueued[type] = true;
 		return; //previous thread didn't finished
 	}
