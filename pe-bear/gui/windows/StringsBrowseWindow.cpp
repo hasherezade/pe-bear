@@ -132,6 +132,9 @@ void StringsBrowseWindow::initLayout()
 
 	infoStrings.setText(tr("Loading strings..."));
 	propertyLayout0.addWidget(&infoStrings);
+	propertyLayout0.addWidget(&stringProgress);
+	stringProgress.setRange(0, 100);
+	stringProgress.setVisible(false);
 	propertyLayout1.addWidget(&saveButton);
 
 	propertyLayout1.addWidget(new QLabel(tr("Page"), this));

@@ -223,9 +223,12 @@ private:
 		resetPageSelection();
 		if (myPeHndl){
 			if (!isFinished) {
-				infoStrings.setText(tr("Loading strings: ") + QString::number(progress, 10) + "%");
+				infoStrings.setText(tr("Loading strings: "));
+				stringProgress.setVisible(true);
+				stringProgress.setValue(progress);
 			} else {
 				infoStrings.setText(tr("Extracted strings") + ": " + QString::number(this->myPeHndl->stringsMap.size()));
+				stringProgress.setVisible(false);
 			}
 		}
 	}
@@ -247,4 +250,5 @@ private:
 	QLineEdit filterEdit;
 	QSpinBox pageSelectBox;
 	QSpinBox maxPerPageSelectBox;
+	QProgressBar stringProgress;
 };
