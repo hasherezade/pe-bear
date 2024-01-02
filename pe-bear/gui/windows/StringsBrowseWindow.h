@@ -145,7 +145,7 @@ class StringsBrowseWindow : public QMainWindow
 public:
 	StringsBrowseWindow(PeHandler *peHndl, QWidget *parent)
 		: myPeHndl(peHndl), stringsModel(nullptr), stringsProxyModel(nullptr),
-		stringsTable(this, Executable::RAW)
+		stringsTable(this, Executable::RAW), vHdr(Qt::Vertical, &stringsTable)
 	{
 		this->stringsModel = new StringsTableModel(myPeHndl, addrColors, DEFAULT_STR_PER_PAGE, this);
 		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
@@ -161,9 +161,8 @@ public:
 		QHeaderView *hdr = stringsTable.horizontalHeader();
 		if (hdr) hdr->setStretchLastSection(true);
 
-		QHeaderView *vHdr = new QHeaderView(Qt::Vertical, &stringsTable);
-		stringsTable.setVerticalHeader(vHdr);
-		vHdr->setVisible(true);
+		stringsTable.setVerticalHeader(&vHdr);
+		vHdr.setVisible(true);
 		stringsTable.setWordWrap(false);
 
 #if QT_VERSION >= 0x050000
@@ -178,6 +177,7 @@ public:
 			connect( myPeHndl, SIGNAL(stringsLoadingProgress(int)), this, SLOT(showProgress(int)) );
 		}
 		connect( &pageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setPage(int)) );
+		connect( &pageSelectBox, SIGNAL(valueChanged(int)), this, SLOT(refreshHdr()) );
 		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setMaxPerPage(int)) );
 		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), this, SLOT(resetPageSelection()) );
 
@@ -195,6 +195,12 @@ private slots:
 		this->pageSelectBox.setToolTip(tr("Total pages") + ": " + QString::number(totalPages, 10));
 	}
 
+	void refreshHdr()
+	{
+		this->vHdr.setVisible(false);
+		this->vHdr.setVisible(true);
+	}
+	
 	void refreshView()
 	{
 		this->stringsModel->reset();
@@ -242,6 +248,7 @@ private:
 	StringsTableModel *stringsModel;
 	StringsSortFilterProxyModel* stringsProxyModel;
 
+	QHeaderView vHdr;
 	QVBoxLayout topLayout;
 	QHBoxLayout propertyLayout0, propertyLayout1;
 	QLabel infoStrings;
