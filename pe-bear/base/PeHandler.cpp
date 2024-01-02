@@ -522,13 +522,16 @@ bool PeHandler::resize(bufsize_t newSize, bool continueLastOperation)
 
 bool PeHandler::resizeImage(bufsize_t newSize)
 {
-	if (m_PE->getImageSize() == newSize) return false; //nothing to change
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!m_PE || m_PE->getImageSize() == newSize) return false; //nothing to change
 
-	offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
-	bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
-	this->modifHndl.backupModification(modOffset, modSize, false);
-	m_PE->setImageSize(newSize);
-
+		offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
+		bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
+		this->modifHndl.backupModification(modOffset, modSize, false);
+		m_PE->setImageSize(newSize);
+	} //!scope0
+	
 	updatePeOnResized();
 	emit modified();
 	return true;
@@ -536,18 +539,20 @@ bool PeHandler::resizeImage(bufsize_t newSize)
 
 bool PeHandler::setByte(offset_t offset, BYTE val)
 {
-	QMutexLocker lock(&m_UpdateMutex);
+	{//scope0
+		QMutexLocker lock(&m_UpdateMutex);
 
-	BYTE* contentPtr = m_PE->getContentAt(offset, 1);
-	if (!contentPtr) {
-		return false;
-	}
-	BYTE prev_val = contentPtr[0];
-	if (prev_val == val) {
-		return false; // nothing has changed
-	}
-	this->backupModification(offset, 1);
-	contentPtr[0] = val;
+		BYTE* contentPtr = m_PE->getContentAt(offset, 1);
+		if (!contentPtr) {
+			return false;
+		}
+		BYTE prev_val = contentPtr[0];
+		if (prev_val == val) {
+			return false; // nothing has changed
+		}
+		this->backupModification(offset, 1);
+		contentPtr[0] = val;
+	}//!scope0
 	this->setBlockModified(offset, 1);
 	return true;
 }
@@ -660,21 +665,27 @@ SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_
 
 offset_t PeHandler::loadSectionContent(SectionHdrWrapper* sec, QFile &fIn, bool continueLastOperation)
 {
-	if (!m_PE || !sec) return 0;
+	if (!sec) return 0;
+	offset_t loaded = 0;
+	offset_t modifOffset = INVALID_ADDR;
+	bufsize_t modifSize = 0;
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!m_PE) return 0;
 
-	offset_t modifOffset = sec->getRawPtr();
-	bufsize_t modifSize = sec->getContentSize(Executable::RAW, true);
-	if (modifOffset == INVALID_ADDR|| modifSize == 0) {
-		return 0;
-	}
-	AbstractByteBuffer *buf = m_PE->getFileBuffer();
-	if (!buf) return 0;
-	
-	backupModification(modifOffset, modifSize, continueLastOperation);
-	offset_t loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
-
-	setDisplayed(false, modifOffset, modifSize);
+		AbstractByteBuffer *buf = m_PE->getFileBuffer();
+		if (!buf) return 0;
+		
+		modifOffset = sec->getRawPtr();
+		modifSize = sec->getContentSize(Executable::RAW, true);
+		if (modifOffset == INVALID_ADDR|| modifSize == 0) {
+			return 0;
+		}
+		backupModification(modifOffset, modifSize, continueLastOperation);
+		loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
+	} //!scope0
 	setBlockModified(modifOffset, loaded);
+	setDisplayed(false, modifOffset, modifSize);
 	return loaded;
 }
 
@@ -1184,7 +1195,6 @@ void PeHandler::backupResize(bufsize_t newSize, bool continueLastOperation)
 
 void PeHandler::unbackupLastModification()
 {
-	QMutexLocker lock(&m_UpdateMutex);
 	modifHndl.unStoreLast();
 }
 
@@ -1249,36 +1259,38 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 {
 	if (!m_PE) return false;
 
-	m_PE->wrap();
-
 	bool isSecHdrModified = false;
 	bool baseHdrModified = false;
 
-	if (modO != INVALID_ADDR && modSize) { // if modification offset is specified
-		if (isBaseHdrModif(modO, modSize)) {
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		m_PE->wrap();
+		if (modO != INVALID_ADDR && modSize) { // if modification offset is specified
+			if (isBaseHdrModif(modO, modSize)) {
+				baseHdrModified = true;
+				isSecHdrModified = true;
+			}
+			if (this->m_PE->getSectionsCount() != m_PE->hdrSectionsNum()) {
+				isSecHdrModified = true;
+			}
+			if (isSectionsHeadersModified(modO, modSize)) {
+				isSecHdrModified = true;
+			}
+		}
+		else {
+			// if the modification offset is unknown, assume modified:
 			baseHdrModified = true;
 			isSecHdrModified = true;
 		}
-		if (this->m_PE->getSectionsCount() != m_PE->hdrSectionsNum()) {
-			isSecHdrModified = true;
+
+		if (baseHdrModified) {
+			fileHdrWrapper.wrap();
+			optHdrWrapper.wrap();
 		}
-		if (isSectionsHeadersModified(modO, modSize)) {
-			isSecHdrModified = true;
-		}
-	}
-	else {
-		// if the modification offset is unknown, assume modified:
-		baseHdrModified = true;
-		isSecHdrModified = true;
-	}
 
-	if (baseHdrModified) {
-		fileHdrWrapper.wrap();
-		optHdrWrapper.wrap();
-	}
-
-	rewrapDataDirs();
-
+		rewrapDataDirs();
+	}//!scope0
+	
 	if (isSecHdrModified) {
 		emit secHeadersModified();
 	}
@@ -1287,8 +1299,10 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 
 void PeHandler::updatePeOnResized()
 {
-	rewrapDataDirs();
-
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		rewrapDataDirs();
+	}//!scope0
 	emit secHeadersModified();
 }
 
