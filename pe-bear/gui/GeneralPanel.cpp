@@ -195,8 +195,7 @@ GeneralPanel::GeneralPanel(PeHandler *peHndl, QWidget *parent)
 	: QSplitter(Qt::Horizontal, parent), PeViewItem(peHndl),
 	packersModel(peHndl, this), packersTree(this),
 	generalInfoModel(peHndl, this), generalInfo(this),
-	packersDock(NULL),
-	stringsBrowseWindow(peHndl, this)
+	packersDock(NULL)
 {
 	if (!this->myPeHndl) return;
 	if (!this->myPeHndl->getPe()) return;
@@ -224,22 +223,8 @@ void GeneralPanel::init()
 	packersDock->setWindowTitle(tr("Found signatures"));
 	this->addWidget(packersDock);
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
-
-	stringsDock = new QDockWidget(this);
-	stringsDock->setFeatures(QDockWidget::DockWidgetClosable);
-	stringsDock->setWidget(&stringsBrowseWindow);
-	showExtractedStrCount();
-	
-	this->addWidget(stringsDock);
-	this->stringsDock->setVisible(true);
 }
 
-void GeneralPanel::showExtractedStrCount()
-{
-	if (this->myPeHndl) {
-		stringsDock->setWindowTitle(tr("Extracted Strings: ") + QString::number(this->myPeHndl->stringsMap.size()));
-	}
-}
 
 void GeneralPanel::connectSignals()
 {
@@ -248,7 +233,6 @@ void GeneralPanel::connectSignals()
 	connect(myPeHndl, SIGNAL(modified()), this, SLOT(refreshView()));
 	connect(myPeHndl, SIGNAL(foundSignatures(int, int)), this, SLOT(refreshView()));
 	connect(myPeHndl, SIGNAL(hashChanged()), &generalInfoModel, SLOT(onNeedReset()));
-	connect(myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(showExtractedStrCount()));
 }
 
 void GeneralPanel::refreshView()

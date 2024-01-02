@@ -77,7 +77,7 @@ void DetailsTab::createViews()
 DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 	: PeViewItem(peHndl), QTabWidget(parent),
 	winAddSec(this),
-	generalPanel(peHndl, this),
+	generalPanel(peHndl, this), stringsBrowseWindow(peHndl, this),
 	dosHdrTree(this), richHdrTree(NULL),
 	fileHdrTree(this), optionalHdrTree(this), disasmView(this),
 	hdrsSplitter(this), secHdrTreeView(&hdrsSplitter), secDiagramSplitter(&hdrsSplitter),
@@ -196,7 +196,8 @@ DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 
 	cDisasmTab = addTab(&disasmView, tr("Disasm"));
 	cGeneralTab = addTab(&generalPanel, tr("General"));
-
+	cStringsTab = addTab(&stringsBrowseWindow, tr("Strings"));
+	
 	cDOSHdrTab = addTab(&dosHdrTree, tr("DOS Hdr"));
 	if (peHndl && peHndl->getPe() && peHndl->getPe()->getRichHeaderSign()) {
 		cRichHdrTab = addTab(&richHdrTree, tr("Rich Hdr"));

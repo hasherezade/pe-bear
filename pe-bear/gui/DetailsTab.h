@@ -108,6 +108,7 @@ protected:
 	WrapperTableModel* dirDownModels[pe::DIR_ENTRIES_COUNT];
 
 	GeneralPanel generalPanel;
+	StringsBrowseWindow stringsBrowseWindow;
 
 	/* views */
 	FollowablePeTreeView dosHdrTree;
@@ -133,6 +134,6 @@ protected:
 	QMutex fontMutex;
 
 	/* tabs indexes */
-	int cDisasmTab, cDOSHdrTab, cRichHdrTab, cFileHdrsTab, cOptHdrsTab, cSecHdrsTab, cGeneralTab;
+	int cDisasmTab, cDOSHdrTab, cRichHdrTab, cFileHdrsTab, cOptHdrsTab, cSecHdrsTab, cGeneralTab, cStringsTab;
 	int dirTabIds[pe::DIR_ENTRIES_COUNT];
 };
