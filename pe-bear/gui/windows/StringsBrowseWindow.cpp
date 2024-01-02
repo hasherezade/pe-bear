@@ -130,22 +130,26 @@ void StringsBrowseWindow::initLayout()
 	setCentralWidget(widget);
 	saveButton.setText(tr("Save"));
 
-	propertyLayout0.addWidget(&saveButton);
+	infoStrings.setText(tr("Loading strings..."));
+	propertyLayout0.addWidget(&infoStrings);
+	propertyLayout1.addWidget(&saveButton);
 
-	propertyLayout0.addWidget(new QLabel(tr("Page"), this));
-	propertyLayout0.addWidget(&pageSelectBox);
+	propertyLayout1.addWidget(new QLabel(tr("Page"), this));
+	propertyLayout1.addWidget(&pageSelectBox);
 
-	propertyLayout0.addWidget(new QLabel(tr("Max per page"), this));
-	propertyLayout0.addWidget(&maxPerPageSelectBox);
+	propertyLayout1.addWidget(new QLabel(tr("Max per page"), this));
+	propertyLayout1.addWidget(&maxPerPageSelectBox);
 	maxPerPageSelectBox.setMinimum(MIN_STR_PER_PAGE);
 	maxPerPageSelectBox.setMaximum(MAX_STR_PER_PAGE);
 	maxPerPageSelectBox.setValue(DEFAULT_STR_PER_PAGE);
 	maxPerPageSelectBox.setSingleStep(MIN_STR_PER_PAGE);
 
 	filterLabel.setText(tr("Search string"));
-	propertyLayout0.addWidget(&filterLabel);
-	propertyLayout0.addWidget(&filterEdit);
+	propertyLayout1.addWidget(&filterLabel);
+	propertyLayout1.addWidget(&filterEdit);
+	
 	topLayout.addLayout(&propertyLayout0);
+	topLayout.addLayout(&propertyLayout1);
 	topLayout.addWidget(&stringsTable);
 
 	connect(&saveButton, SIGNAL(clicked()), this, SLOT(onSave()) );

@@ -205,6 +205,9 @@ private slots:
 	{
 		refreshView();
 		resetPageSelection();
+		if (myPeHndl){
+			infoStrings.setText(tr("Extracted strings") + ": " + QString::number(this->myPeHndl->stringsMap.size()));
+		}
 	}
 	
 	void onSave();
@@ -222,7 +225,8 @@ private:
 	StringsSortFilterProxyModel* stringsProxyModel;
 
 	QVBoxLayout topLayout;
-	QHBoxLayout propertyLayout0;
+	QHBoxLayout propertyLayout0, propertyLayout1;
+	QLabel infoStrings;
 	QPushButton saveButton;
 	QLabel filterLabel;
 	QLineEdit filterEdit;
