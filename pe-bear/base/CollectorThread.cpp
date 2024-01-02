@@ -81,7 +81,9 @@ QString CalcThread::makeRichHdrHash()
 void CalcThread::run()
 {
 	QMutexLocker lock(&myMutex);
-
+	if (this->stopRequested) {
+		return;
+	}
 	QString fileHash = "Cannot calculate!";
 	if (!m_PE || !m_PE->getContent()) {
 		emit gotHash(fileHash, hashType);
@@ -128,7 +130,7 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 
 	offset_t step = 0;
 	size_t maxSize = m_PE->getContentSize();
-	for (step = 0; step < maxSize; step++) {
+	for (step = 0; step < maxSize && !this->stopRequested; step++) {
 		bool isWide = false;
 		char *ptr = (char*) m_PE->getContentAt(step, 1);
 		if (!IS_PRINTABLE(*ptr) || isspace(*ptr) ) {
@@ -162,7 +164,10 @@ void StringExtThread::run()
 	}
 	const size_t minLen = this->minStrLen > 2 ? this->minStrLen : 2;
 	extractStrings(*mapToFill, minLen, 0, true);
-	emit gotStrings(mapToFill);
+	if (!this->stopRequested) {
+		// emit strings only if the thread finished
+		emit gotStrings(mapToFill);
+	}
 }
 
 //-------------------------------------------------

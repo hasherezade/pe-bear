@@ -129,6 +129,7 @@ void PeHandler::deleteThreads()
 {
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
 		if (calcThread[hType]) {
+			calcThread[hType]->stop();
 			while (calcThread[hType]->isFinished() == false) {
 				calcThread[hType]->wait();
 			}
@@ -138,6 +139,7 @@ void PeHandler::deleteThreads()
 	}
 	// delete strign extraction threads
 	if (this->stringThread) {
+		this->stringThread->stop();
 		while (stringThread->isFinished() == false) {
 			stringThread->wait();
 		}
@@ -149,6 +151,7 @@ void PeHandler::deleteThreads()
 bool PeHandler::runStringsExtraction()
 {
 	if (this->stringThread) {
+		this->stringThread->stop();
 		stringExtractQueued = true;
 		return false; //previous thread didn't finished
 	}
@@ -187,6 +190,7 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 	if (type >= CalcThread::HASHES_NUM) return;
 	
 	if (calcThread[type]) {
+		calcThread[type]->stop();
 		calcQueued[type] = true;
 		return; //previous thread didn't finished
 	}
