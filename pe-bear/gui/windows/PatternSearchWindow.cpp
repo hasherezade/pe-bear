@@ -52,5 +52,5 @@ void PatternSearchWindow::fetchSignature()
 void PatternSearchWindow::accept()
 {
 	fetchSignature();
-	this->close();
+	QDialog::accept();
 }
