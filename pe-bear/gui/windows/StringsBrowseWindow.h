@@ -171,17 +171,20 @@ public:
 		stringsTable.verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 #endif
 		initLayout();
-		refreshView();
-		if (myPeHndl) {
-			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(updateStringsView()) );
-			connect( myPeHndl, SIGNAL(stringsLoadingProgress(int)), this, SLOT(showProgress(int)) );
-		}
+		
 		connect( &pageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setPage(int)) );
 		connect( &pageSelectBox, SIGNAL(valueChanged(int)), this, SLOT(refreshHdr()) );
 		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), stringsModel, SLOT(setMaxPerPage(int)) );
 		connect( &maxPerPageSelectBox, SIGNAL(valueChanged(int)), this, SLOT(resetPageSelection()) );
-
 		connect( &stringsTable, SIGNAL(targetClicked(offset_t, Executable::addr_type)), this, SLOT(offsetClicked(offset_t, Executable::addr_type)) );
+		
+		if (myPeHndl) {
+			connect( myPeHndl, SIGNAL(stringsUpdated()), this, SLOT(updateStringsView()) );
+			connect( myPeHndl, SIGNAL(stringsLoadingProgress(int)), this, SLOT(showProgress(int)) );
+			if (this->myPeHndl->stringsMap.size()) {
+				updateStringsView();
+			}
+		}
 	}
 
 private slots:
