@@ -41,6 +41,7 @@ set (pebear_base_srcs
 	base/PeHandler.cpp
 	base/PeHandlerFactory.cpp
 	base/PeHandlersManager.cpp
+	base/CollectorThread.cpp
 	base/RegKeyManager.cpp
 )
 
@@ -53,6 +54,8 @@ set (pebear_base_hdrs
 	base/PeHandler.h
 	base/PeHandlerFactory.h
 	base/PeHandlersManager.h
+	base/StringsCollection.h
+	base/CollectorThread.h
 	base/RegKeyManager.h
 	base/ImportsAutoadderSettings.h
 )
@@ -66,7 +69,6 @@ set (pebear_gui_base_srcs
 	gui_base/PeTreeView.cpp
 	gui_base/PeTableModel.cpp
 	gui_base/FollowablePeTreeView.cpp
-	gui_base/HexSpinBox.cpp
 	gui_base/HexInputDialog.cpp
 	gui_base/AddressInputDialog.cpp
 	gui_base/OffsetDependentAction.cpp
@@ -83,7 +85,6 @@ set (pebear_gui_base_hdrs
 	gui_base/PeTreeView.h
 	gui_base/PeTableModel.h
 	gui_base/FollowablePeTreeView.h
-	gui_base/HexSpinBox.h
 	gui_base/HexInputDialog.h
 	gui_base/AddressInputDialog.h
 	gui_base/OffsetDependentAction.h
@@ -188,7 +189,19 @@ set (pebear_gui_hdrs
 	gui/pe_models.h
 )
 
+set (pebear_followable_srcs
+	gui/followable_table/OffsetedView.cpp
+)
+
+set (pebear_followable_hdrs
+	gui/followable_table/MouseTrackingTableView.h
+	gui/followable_table/FollowableOffsetedView.h
+	gui/followable_table/OffsetedView.h
+)
+
 set (pebear_windows_srcs
+	gui/windows/PatternSearchWindow.cpp
+	gui/windows/StringsBrowseWindow.cpp
 	gui/windows/OffsetsBrowseWindow.cpp
 	gui/windows/SignaturesBrowseWindow.cpp
 	gui/windows/SectionAddWindow.cpp
@@ -199,6 +212,8 @@ set (pebear_windows_srcs
 )
 
 set (pebear_windows_hdrs
+	gui/windows/PatternSearchWindow.h
+	gui/windows/StringsBrowseWindow.h
 	gui/windows/OffsetsBrowseWindow.h
 	gui/windows/SignaturesBrowseWindow.h
 	gui/windows/SectionAddWindow.h
@@ -214,6 +229,7 @@ set (pebear_srcs
 	${pebear_gui_srcs}
 	${pebear_gui_pe_mod_srcs}
 	${pebear_windows_srcs}
+	${pebear_followable_srcs}
 	main.cpp
 )
 
@@ -224,6 +240,7 @@ set (pebear_hdrs
 	${pebear_gui_hdrs}
 	${pebear_gui_pe_mod_hdrs}
 	${pebear_windows_hdrs}
+	${pebear_followable_hdrs}
 )
 
 set (pebear_rcc application.qrc )

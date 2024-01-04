@@ -5,137 +5,13 @@
 #include <bearparser/bearparser.h>
 #include "../disasm/PeDisasm.h"
 
+#define MIN_STRING_LEN 5
+
 using namespace sig_ma;
 using namespace pe;
 
-inline QString stripExtension(const QString & fileName)
-{
-    return fileName.left(fileName.lastIndexOf("."));
-}
-
-enum operation_ids { SIMPLE = 0, OP_ADD_SECTION = 1 };
-
-
-CalcThread::CalcThread(CalcThread::hash_type hType, PEFile* pe, offset_t checksumOffset)
-	: m_PE(pe), hashType(hType), checksumOff(checksumOffset)
-{
-}
-
-QString CalcThread::makeImpHash()
-{
-	static CommonOrdinalsLookup lookup;
-	ImportDirWrapper* imports = m_PE->getImports();
-	if (!imports) return QString();
-
-	QStringList exts;
-	exts.append(".ocx");
-	exts.append(".sys");
-	exts.append(".dll");
-
-	const size_t librariesCount = imports->getEntriesCount();
-
-	QList<offset_t> thunks = imports->getThunksList();
-	const size_t functionsCount = thunks.size();
-
-	QStringList impsBlock;
-	for (int i = 0; i < thunks.size(); i++) {
-		offset_t thunk = thunks[i];
-		if (thunk == 0 || thunk == INVALID_ADDR) continue;
-
-		QString lib =  imports->thunkToLibName(thunk).toLower();
-		for (QStringList::iterator itr = exts.begin(); itr != exts.end(); ++itr) {
-			if (lib.endsWith(*itr)) {
-				lib = stripExtension(lib);
-				break;
-			}
-		}
-		ImportBaseFuncWrapper* func = imports->thunkToFunction(thunk);
-		if (!func) continue;
-		QString funcName;
-		if (!func->isByOrdinal()) {
-			funcName = func->getShortName();
-		} else {
-			int ord = func->getOrdinal();
-			funcName = lookup.findFuncName(lib, ord);
-			if (!funcName.length()) {
-				funcName = "ord" + QString::number(ord, 10);
-			}
-		}
-		impsBlock << QString(lib + "." + funcName.toLower());
-	}
-
-	const QString allImps = impsBlock.join(",");
-	//std::cout << allImps.toStdString() << "\n";
-	QCryptographicHash calcHash(QCryptographicHash::Md5);
-	calcHash.addData((char*) allImps.toStdString().c_str(), allImps.length());
-	return QString(calcHash.result().toHex());
-}
-
-QString CalcThread::makeRichHdrHash()
-{
-	pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
-	pe::RICH_DANS_HEADER* dans = NULL;
-	if (sign) {
-		dans = m_PE->getRichHeaderBgn(sign);
-	}
-	if (!dans) {
-		return QString();
-	}
-	const size_t diff = (ULONGLONG)sign - (ULONGLONG)dans;
-	ByteBuffer tmpBuf((BYTE*)dans, diff, true);
-	DWORD* dw_ptr = (DWORD*)tmpBuf.getContent();
-	size_t dw_size = tmpBuf.getContentSize() / sizeof(DWORD);
-	for (int i = 0; i < dw_size; i++) {
-		dw_ptr[i] ^= sign->checksum;
-	}
-	QCryptographicHash calcHash(QCryptographicHash::Md5);
-	calcHash.addData((char*) tmpBuf.getContent(), tmpBuf.getContentSize());
-	return QString(calcHash.result().toHex());
-}
-
-void CalcThread::run()
-{
-	QMutexLocker lock(&m_arrMutex);
-
-	QString fileHash = "Cannot calculate!";
-	if (!m_PE || !m_PE->getContent()) {
-		emit gotHash(fileHash, hashType);
-		return;
-	}
-	QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
-	if (hashType == MD5) {
-		qHashType = QCryptographicHash::Md5;
-	} else if (hashType == SHA1) {
-		qHashType = QCryptographicHash::Sha1;
-	} 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) //the feature was introduced in Qt5.0
-	else if (hashType == SHA256) {
-		qHashType = QCryptographicHash::Sha256;
-	}
-#endif
-	try {
-		if (hashType == CHECKSUM) {
-			long checksum = PEFile::computeChecksum((BYTE*) m_PE->getContent(), m_PE->getContentSize(), checksumOff);
-			fileHash = QString::number(checksum, 16);
-		}
-		else if (hashType == RICH_HDR_MD5) {
-			fileHash = makeRichHdrHash();
-		}
-		else if (hashType == IMP_MD5) {
-			fileHash = makeImpHash();
-		}
-		else {
-			QCryptographicHash calcHash(qHashType);
-			calcHash.addData((char*) m_PE->getContent(), m_PE->getContentSize());
-			fileHash = QString(calcHash.result().toHex());
-		}
-	} catch (...) {
-		fileHash = "Cannot calculate!";
-	}
-	emit gotHash(fileHash, hashType);
-}
-
 //-------------------------------------------------
+
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	: QObject(), 
 	m_fileModDate(QDateTime()), // init with empty
@@ -147,8 +23,9 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	delayImpDirWrapper(pe), debugDirWrapper(pe), exceptDirWrapper(pe), clrDirWrapper(pe),
 	resourcesAlbum(pe),
 	resourcesDirWrapper(pe, &resourcesAlbum),
-	signFinder(NULL), 
-	modifHndl(pe->getFileBuffer(), this)
+	signFinder(nullptr), 
+	modifHndl(pe->getFileBuffer(), this),
+	stringThread(nullptr), stringExtractQueued(false)
 {
 	if (!pe) return;
 
@@ -181,6 +58,9 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	//---
 	this->runHashesCalculation();
 	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
+	
+	this->runStringsExtraction();
+	connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
 }
 
 void PeHandler::associateWrappers()
@@ -234,9 +114,9 @@ void PeHandler::onHashReady(QString hash, int hType)
 void PeHandler::onCalcThreadFinished()
 {
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
-		if (calcThread[hType] != NULL && calcThread[hType]->isFinished()) {
+		if (calcThread[hType] && calcThread[hType]->isFinished()) {
 			delete calcThread[hType];
-			calcThread[hType] = NULL;
+			calcThread[hType] = nullptr;
 			if (calcQueued[hType]) {
 				//printf("starting queued\n");
 				calculateHash((CalcThread::hash_type) hType);
@@ -248,13 +128,61 @@ void PeHandler::onCalcThreadFinished()
 void PeHandler::deleteThreads()
 {
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
-		if (calcThread[hType] != NULL) {
+		if (calcThread[hType]) {
+			calcThread[hType]->stop();
 			while (calcThread[hType]->isFinished() == false) {
 				calcThread[hType]->wait();
 			}
 			delete calcThread[hType];
-			calcThread[hType] = NULL;
+			calcThread[hType] = nullptr;
 		}
+	}
+	// delete strign extraction threads
+	if (this->stringThread) {
+		this->stringThread->stop();
+		while (stringThread->isFinished() == false) {
+			stringThread->wait();
+		}
+		delete stringThread;
+		stringThread = nullptr;
+	}
+}
+
+bool PeHandler::runStringsExtraction()
+{
+	if (this->stringThread) {
+		this->stringThread->stop();
+		stringExtractQueued = true;
+		return false; //previous thread didn't finished
+	}
+	this->stringThread = new StringExtThread(m_PE, MIN_STRING_LEN);
+	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
+	QObject::connect(stringThread, SIGNAL(loadingStrings(int)), this, SLOT(onStringsLoadingProgress(int)));
+	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
+	stringThread->start();
+	stringExtractQueued = false;
+	return true;
+}
+
+void PeHandler::onStringsReady(StringsCollection* mapToFill)
+{
+	if (!mapToFill) {
+		return;
+	}
+	mapToFill->incRefCntr();
+	this->stringsMap.fill(*mapToFill);
+	mapToFill->release();
+	stringsUpdated();
+}
+
+void PeHandler::stringExtractionFinished()
+{
+	if (stringThread && stringThread->isFinished()) {
+		delete stringThread;
+		stringThread = nullptr;
+	}
+	if (stringExtractQueued) {
+		runStringsExtraction();
 	}
 }
 
@@ -262,7 +190,8 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 {
 	if (type >= CalcThread::HASHES_NUM) return;
 	
-	if (calcThread[type] != NULL) {
+	if (calcThread[type]) {
+		calcThread[type]->stop();
 		calcQueued[type] = true;
 		return; //previous thread didn't finished
 	}
@@ -272,15 +201,15 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 
 	if (!content || !size || !isSizeAcceptable) {
 		hash[type] = "Cannot calculate!";
-	} else {
-		hash[type] = "Calculating...";
-		offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
-		QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
-		QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
-		calcThread[type]->start();
-		calcQueued[type] = false;
+		return;
 	}
+	hash[type] = "Calculating...";
+	offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
+	this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
+	QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
+	QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
+	calcThread[type]->start();
+	calcQueued[type] = false;
 }
 
 void PeHandler::setPackerSignFinder(SigFinder *sFinder)
@@ -330,7 +259,6 @@ PckrSign* PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT
 	return packer;
 }
 
-
 PckrSign* PeHandler::findPackerInArea(offset_t rawOff, size_t areaSize, sig_ma::match_direction md)
 {
 	if (!signFinder || !m_PE) return NULL;
@@ -377,6 +305,42 @@ PckrSign* PeHandler::findPackerInArea(offset_t rawOff, size_t areaSize, sig_ma::
 
 	emit foundSignatures(foundCount, 1);
 	return packer;
+}
+
+size_t PeHandler::findSignatureInArea(offset_t rawOff, size_t areaSize, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch)
+{
+	if (!m_PE) return 0;
+	
+	for (size_t step = 0; step < areaSize; step++) {
+
+		size_t size = areaSize - step;
+		BYTE * content = m_PE->getContentAt(rawOff + step, Executable::RAW, size);
+		if (!content) break;
+
+		sig_ma::matched matchedSet = localSignFinder.getMatching(content, size, 0, sig_ma::FIXED);
+		if (matchedSet.signs.size() == 0) continue;
+
+		PckrSign *packer = *(matchedSet.signs.begin());
+		if (!packer) continue;
+		
+		offset_t foundOffset = step + matchedSet.match_offset + rawOff;
+		//printf("Found %s, at %x searching next...\n", packer->get_name().c_str(), foundOffset);
+
+		step += matchedSet.match_offset;
+		
+		FoundPacker pckr(foundOffset , packer);
+		std::vector<FoundPacker>::iterator itr = std::find(signAtOffset.begin(), signAtOffset.end(), pckr);
+		if (itr != signAtOffset.end()) {
+			//already exist
+			FoundPacker &found = *itr;
+			packer = found.signaturePtr;
+			continue;
+		} else {
+			signAtOffset.push_back(pckr);
+		}
+		if (isDeepSearch == false) break;
+	}
+	return signAtOffset.size();
 }
 
 
@@ -563,23 +527,52 @@ bool PeHandler::resize(bufsize_t newSize, bool continueLastOperation)
 
 bool PeHandler::resizeImage(bufsize_t newSize)
 {
-	if (m_PE->getImageSize() == newSize) return false; //nothing to change
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!m_PE || m_PE->getImageSize() == newSize) return false; //nothing to change
 
-	offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
-	bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
-	this->modifHndl.backupModification(modOffset, modSize, false);
-	m_PE->setImageSize(newSize);
-
+		offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
+		bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
+		this->modifHndl.backupModification(modOffset, modSize, false);
+		m_PE->setImageSize(newSize);
+	} //!scope0
+	
 	updatePeOnResized();
 	emit modified();
 	return true;
 }
 
+bool PeHandler::setByte(offset_t offset, BYTE val)
+{
+	{//scope0
+		QMutexLocker lock(&m_UpdateMutex);
+
+		BYTE* contentPtr = m_PE->getContentAt(offset, 1);
+		if (!contentPtr) {
+			return false;
+		}
+		BYTE prev_val = contentPtr[0];
+		if (prev_val == val) {
+			return false; // nothing has changed
+		}
+		this->backupModification(offset, 1);
+		contentPtr[0] = val;
+	}//!scope0
+	this->setBlockModified(offset, 1);
+	return true;
+}
+
+#include <iostream>
 bool PeHandler::isVirtualFormat()
 {
+	ImportDirWrapper* imp = m_PE->getImports();
+	if (imp && imp->isValid()) {
+		return false;
+	}
 	const size_t count = this->m_PE->getSectionsCount();
 	if (!count) return false;
 	
+	bool isDump = false;
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(0);
 	offset_t v = sec->getVirtualPtr();
 	offset_t r = sec->getRawPtr();
@@ -587,9 +580,9 @@ bool PeHandler::isVirtualFormat()
 	if (v == r) return false;
 	offset_t diff = v - r;
 	if (m_PE->isAreaEmpty(r, diff)) {
-		return true;
+		isDump = true;
 	}
-	return false;
+	return isDump;
 }
 
 bool PeHandler::isVirtualEqualRaw()
@@ -677,21 +670,27 @@ SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_
 
 offset_t PeHandler::loadSectionContent(SectionHdrWrapper* sec, QFile &fIn, bool continueLastOperation)
 {
-	if (!m_PE || !sec) return 0;
+	if (!sec) return 0;
+	offset_t loaded = 0;
+	offset_t modifOffset = INVALID_ADDR;
+	bufsize_t modifSize = 0;
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!m_PE) return 0;
 
-	offset_t modifOffset = sec->getRawPtr();
-	bufsize_t modifSize = sec->getContentSize(Executable::RAW, true);
-	if (modifOffset == INVALID_ADDR|| modifSize == 0) {
-		return 0;
-	}
-	AbstractByteBuffer *buf = m_PE->getFileBuffer();
-	if (!buf) return 0;
-	
-	backupModification(modifOffset, modifSize, continueLastOperation);
-	offset_t loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
-
-	setDisplayed(false, modifOffset, modifSize);
+		AbstractByteBuffer *buf = m_PE->getFileBuffer();
+		if (!buf) return 0;
+		
+		modifOffset = sec->getRawPtr();
+		modifSize = sec->getContentSize(Executable::RAW, true);
+		if (modifOffset == INVALID_ADDR|| modifSize == 0) {
+			return 0;
+		}
+		backupModification(modifOffset, modifSize, continueLastOperation);
+		loaded = buf->substFragmentByFile(modifOffset, modifSize, fIn);
+	} //!scope0
 	setBlockModified(modifOffset, loaded);
+	setDisplayed(false, modifOffset, modifSize);
 	return loaded;
 }
 
@@ -819,7 +818,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// get a new entry to be filled:
 	ImportEntryWrapper* libWr = dynamic_cast<ImportEntryWrapper*> (imports->addEntry(NULL));
 	if (libWr == NULL) {
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to add a DLL entry!");
 		return NULL;
 	}
@@ -833,7 +832,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	while (true) {
 		BYTE *ptr = m_PE->getContentAt(nameOffset, nameTotalSize + kNameRecordPadding);
 		if (!ptr) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Failed to get a free space to fill the entry!");
 			return NULL;
 		}
@@ -846,7 +845,7 @@ ImportEntryWrapper* PeHandler::_autoAddLibrary(const QString &name, size_t impor
 	// fill in the name
 	backupModification(nameOffset, nameTotalSize, true);
 	if (m_PE->setStringValue(nameOffset, name) == false) {
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to fill library name!");
 		return NULL;
 	}
@@ -885,7 +884,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 	backupModification(fWr->getOffset(), fWr->getSize(), true);
 	if (name.length()) {
 		if (!pe_util::validateFuncName(name.toStdString().c_str(), name.length())) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Invalid function name supplied!");
 		}
 		const offset_t thunkRVA = m_PE->convertAddr(storageOffset, Executable::RAW, Executable::RVA);
@@ -900,7 +899,7 @@ bool PeHandler::_autoFillFunction(ImportEntryWrapper* libWr, ImportedFuncWrapper
 		const size_t nameTotalLen = name.length() + 1;
 		backupModification(storageOffset, nameTotalLen, true);
 		if (m_PE->setStringValue(storageOffset, name) == false) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Failed to fill the function name");
 			return false;
 		}
@@ -990,12 +989,12 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 		const DWORD oldCharact = stubHdr->getCharacteristics();
 		const DWORD requiredCharact = SCN_MEM_READ | SCN_MEM_WRITE;
 		if (!stubHdr->setCharacteristics(oldCharact | requiredCharact)) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Cannot modify the section characteristics");
 			return false;
 		}
 		if (!this->_moveDataDirEntry(pe::DIR_IMPORT, newImpOffset, continueLastOperation)) {
-			this->unModify();
+			this->undoLastModification();
 			throw CustomException("Cannot move the data dir");
 			return false;
 		}
@@ -1101,7 +1100,7 @@ ImportedFuncWrapper* PeHandler::_addImportFunc(ImportEntryWrapper *lib, bool con
 	
 	if (!isSet) {
 		delete nextFunc; nextFunc = NULL;
-		this->unModify();
+		this->undoLastModification();
 		throw CustomException("Failed to add imported function!");
 		return NULL;
 	}
@@ -1204,6 +1203,11 @@ void PeHandler::unbackupLastModification()
 	modifHndl.unStoreLast();
 }
 
+bool PeHandler::undoLastModification()
+{
+	return modifHndl.undoLastOperation();
+}
+
 bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 {
 	bool isOk = false;
@@ -1212,7 +1216,7 @@ bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 		isOk = true;
 
 	} catch (CustomException &e) {
-		this->unModify();
+		this->undoLastModification();
 		std::cerr << "Unacceptable modification: " << e.what() << "\n";
 		isOk = false;
 	}
@@ -1265,36 +1269,38 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 {
 	if (!m_PE) return false;
 
-	m_PE->wrap();
-
 	bool isSecHdrModified = false;
 	bool baseHdrModified = false;
 
-	if (modO != INVALID_ADDR && modSize) { // if modification offset is specified
-		if (isBaseHdrModif(modO, modSize)) {
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		m_PE->wrap();
+		if (modO != INVALID_ADDR && modSize) { // if modification offset is specified
+			if (isBaseHdrModif(modO, modSize)) {
+				baseHdrModified = true;
+				isSecHdrModified = true;
+			}
+			if (this->m_PE->getSectionsCount() != m_PE->hdrSectionsNum()) {
+				isSecHdrModified = true;
+			}
+			if (isSectionsHeadersModified(modO, modSize)) {
+				isSecHdrModified = true;
+			}
+		}
+		else {
+			// if the modification offset is unknown, assume modified:
 			baseHdrModified = true;
 			isSecHdrModified = true;
 		}
-		if (this->m_PE->getSectionsCount() != m_PE->hdrSectionsNum()) {
-			isSecHdrModified = true;
+
+		if (baseHdrModified) {
+			fileHdrWrapper.wrap();
+			optHdrWrapper.wrap();
 		}
-		if (isSectionsHeadersModified(modO, modSize)) {
-			isSecHdrModified = true;
-		}
-	}
-	else {
-		// if the modification offset is unknown, assume modified:
-		baseHdrModified = true;
-		isSecHdrModified = true;
-	}
 
-	if (baseHdrModified) {
-		fileHdrWrapper.wrap();
-		optHdrWrapper.wrap();
-	}
-
-	rewrapDataDirs();
-
+		rewrapDataDirs();
+	}//!scope0
+	
 	if (isSecHdrModified) {
 		emit secHeadersModified();
 	}
@@ -1303,8 +1309,10 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 
 void PeHandler::updatePeOnResized()
 {
-	rewrapDataDirs();
-
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		rewrapDataDirs();
+	}//!scope0
 	emit secHeadersModified();
 }
 
@@ -1319,16 +1327,20 @@ void PeHandler::runHashesCalculation()
 
 void PeHandler::unModify()
 {
-	if (this->modifHndl.undoLastOperation()) {
-		try {
-			updatePeOnModified();
+	{ //scope0
+		QMutexLocker lock(&m_UpdateMutex);
+		if (!undoLastModification()) {
+			return;
 		}
-		catch (CustomException &e)
-		{
-			std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
-		}
-		emit modified();
+	} //!scope0
+	try {
+		updatePeOnModified();
 	}
+	catch (CustomException &e)
+	{
+		std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
+	}
+	emit modified();
 }
 
 bool PeHandler::markedBranching(offset_t cRva, offset_t tRva)

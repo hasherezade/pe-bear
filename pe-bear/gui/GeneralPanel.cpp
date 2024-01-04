@@ -2,6 +2,7 @@
 #include <QtGlobal>
 #include <bearparser/bearparser.h>
 
+class stringsModel;
 enum InfoFieldId {
 	INFO_NONE = -1,
 	INFO_NAME = 0,
@@ -189,6 +190,7 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 }
 
 //--------------------------
+
 GeneralPanel::GeneralPanel(PeHandler *peHndl, QWidget *parent)
 	: QSplitter(Qt::Horizontal, parent), PeViewItem(peHndl),
 	packersModel(peHndl, this), packersTree(this),
@@ -222,6 +224,7 @@ void GeneralPanel::init()
 	this->addWidget(packersDock);
 	this->packersDock->setVisible(this->myPeHndl->isPacked());
 }
+
 
 void GeneralPanel::connectSignals()
 {

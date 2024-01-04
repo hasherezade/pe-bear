@@ -11,6 +11,7 @@
 #include "../gui_base/ExtTableView.h"
 
 #include "PackersTableModel.h"
+#include "windows/StringsBrowseWindow.h"
 
 
 class InfoTableModel : public PeTableModel
@@ -38,6 +39,8 @@ public:
 	QModelIndex parent(const QModelIndex &index) const { return QModelIndex(); } // no parent
 };
 
+//----
+
 class GeneralPanel : public QSplitter, public PeViewItem
 {
 	Q_OBJECT
@@ -46,11 +49,11 @@ public:
 
 protected slots:
 	void refreshView();
-
+	
 protected:
 	void init();
 	void connectSignals();
-	
+
 	QDockWidget *packersDock;
 	QTextEdit md5Text;
 	QTextEdit pathText;
@@ -58,5 +61,6 @@ protected:
 	ExtTableView generalInfo;
 	InfoTableModel generalInfoModel;
 	FollowablePeTreeView packersTree;
+
 	PackersTableModel packersModel;
 };

@@ -138,7 +138,7 @@ void SignaturesBrowseWindow::openSignatures()
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
-		int i = vSign->loadSignatures(filename);
+		int i = vSign->loadSignaturesFromFile(filename);
 		emit signaturesUpdated();
 		//---
 		QMessageBox msgBox;

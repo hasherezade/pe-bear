@@ -6,6 +6,7 @@
 #include "../../HexView.h"
 #include "../../base/RegKeyManager.h"
 
+
 #ifdef _DEBUG
 	#include <iostream>
 #endif
@@ -42,7 +43,8 @@ protected:
 MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent) 
 	: QMainWindow(parent), mainSettings(_mainSettings),
 	m_PeHndl(NULL), m_Timer(this),
-	diffWindow(this->m_PEHandlers, this), secAddWindow(this), userConfigWindow(this),
+	diffWindow(this->m_PEHandlers, this),
+	secAddWindow(this), userConfigWindow(this), patternSearchWindow(this),
 	sectionsTree(this), sectionMenu(mainSettings, this),
 	peFileModel(NULL),
 	rightPanel(this), 
@@ -76,10 +78,10 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 
 	// try to load from alternative files:
 	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
-	vSign.loadSignatures(sigFile1.toStdString());
+	vSign.loadSignaturesFromFile(sigFile1.toStdString());
 
 	const QString sigFile2 = QDir::currentPath() + QDir::separator() + SIG_FILE;
-	vSign.loadSignatures(sigFile2.toStdString());
+	vSign.loadSignaturesFromFile(sigFile2.toStdString());
 
 	signWindow.onSigListUpdated();
 }
@@ -156,7 +158,7 @@ bool MainWindow::checkFileChanges(const QString &path)
 	}
 	bool shouldReload = (rMode == RELOAD_AUTO);
 	if (!shouldReload || isFileDeleted) {
-		const QString wndTitle = (!isFileDeleted) ?tr("File changed!") : tr("File deleted!");
+		const QString wndTitle = (!isFileDeleted) ? tr("File changed!") : tr("File deleted!");
 		const QString wndInfo = (!isFileDeleted) 
 			? tr("The file:")+"\n" + path + "\n"+tr("- has changed.") + "\n" + tr("Do you want to reload ? " )
 			: tr("The file:") +"\n" + path + "\n"+tr("- has been deleted.")+"\n"+tr("Do you want to unload?");
@@ -207,8 +209,8 @@ bool MainWindow::checkFileChanges(const QString &path)
 bool MainWindow::readPersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	restoreGeometry(settings.value(tr("geometry")).toByteArray());
-	restoreState(settings.value(tr("windowState")).toByteArray());
+	restoreGeometry(settings.value("geometry").toByteArray());
+	restoreState(settings.value("windowState").toByteArray());
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -219,8 +221,8 @@ bool MainWindow::readPersistent()
 bool MainWindow::writePersistent()
 {
 	QSettings settings(COMPANY_NAME, APP_NAME);
-	settings.setValue(tr("geometry"), saveGeometry());
-	settings.setValue(tr("windowState"), saveState());
+	settings.setValue("geometry", saveGeometry());
+	settings.setValue("windowState", saveState());
 
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -269,6 +271,9 @@ void MainWindow::createTreeActions()
 	QIcon saveIco(":/icons/Save.ico");
 	this->saveAction = new ExeDependentAction(saveIco, tr("&Save the executable as..."), this);
 	connect(this->saveAction, SIGNAL(triggered(PeHandler*)), this, SLOT(savePE(PeHandler*)));
+	
+	this->searchSignature = new ExeDependentAction(QIcon(":/icons/Preview.ico"), tr("Find signature"), this);
+	connect(this->searchSignature, SIGNAL(triggered(PeHandler*)), this, SLOT(searchPattern(PeHandler*)));
 
 	reloadAction = new ExeDependentAction(QIcon(":/icons/reload.ico"), tr("&Reload"), this);
 	connect(reloadAction, SIGNAL(triggered(PeHandler*)), this, SLOT(reload(PeHandler*)) );
@@ -288,6 +293,8 @@ void MainWindow::createTreeActions()
 	sectionsTreeMenu.addAction(this->addSecAction);
 	sectionsTreeMenu.addAction(this->dumpAllSecAction);
 	sectionsTreeMenu.addAction(this->saveAction);
+	sectionsTreeMenu.addSeparator();
+	sectionsTreeMenu.addAction(this->searchSignature);
 	sectionsTreeMenu.addSeparator();
 	sectionsTreeMenu.addAction(this->reloadAction);
 	sectionsTreeMenu.addAction(this->unloadAction);
@@ -316,6 +323,9 @@ void MainWindow::createActions()
 	
 	exportAllPEsDisasmAction = new QAction(QIcon(":/icons/disasm.ico"), tr("Export disassembly to..."), this);
 	connect(this->exportAllPEsDisasmAction, SIGNAL(triggered()), this, SLOT(exportDisasmFromAllPEs()));
+	
+	exportAllPEsStrings = new QAction(tr("Export strings to..."), this);
+	connect(this->exportAllPEsStrings, SIGNAL(triggered()), this, SLOT(exportStringsFromAllPEs()));
 	
 	setRegKeyAction = new QAction(tr("Add to Explorer"), this);
 	this->setRegKeyAction->setCheckable(true);
@@ -426,6 +436,7 @@ void MainWindow::createMenus()
 	this->fromLoadedPEsMenu = this->fileMenu->addMenu(tr("From all loaded..."));
 	this->fromLoadedPEsMenu->addAction(this->dumpAllPEsSecAction);
 	this->fromLoadedPEsMenu->addAction(this->exportAllPEsDisasmAction);
+	this->fromLoadedPEsMenu->addAction(this->exportAllPEsStrings);
 }
 
 void MainWindow::startTimer()
@@ -696,6 +707,37 @@ void MainWindow::exportDisasmFromAllPEs()
 	}
 	if (dumped > 0) {
 		QMessageBox::information(this, tr("Done!"), tr("Exported disasm from: ") + QString::number(dumped)
+			+ tr(" PEs into:") + "\n" + dirPath);
+	}
+}
+
+void MainWindow::exportStringsFromAllPEs()
+{
+	std::map<PEFile*, PeHandler*> &handlers = m_PEHandlers.getHandlersMap();
+	const size_t count = handlers.size();
+	if (count == 0) return;
+ 
+ 	QString dirPath = chooseDumpOutDir(NULL);
+	if (!dirPath.length()) return;
+	
+	size_t dumped = 0;
+	UniqueNameHelper uniquePeHelper;
+	
+	std::map<PEFile*, PeHandler*>::iterator iter;
+	for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
+		PeHandler *hndl = iter->second;
+		if (!hndl) continue;
+		const QString peName = uniquePeHelper.getUniqueFromName(hndl->getShortName()); //protect against duplicated names
+		const QString fileName = dirPath + QDir::separator() + peName + ".strings.txt";
+		if (hndl->stringsMap.saveToFile(fileName)) {
+			dumped++;
+		}
+	}
+	if (dumped != count) {
+		QMessageBox::warning(this, tr("Error"), tr("Exporting strings from some of the PEs failed!"));
+	}
+	if (dumped > 0) {
+		QMessageBox::information(this, tr("Done!"), tr("Exported strings from: ") + QString::number(dumped)
 			+ tr(" PEs into:") + "\n" + dirPath);
 	}
 }
@@ -1030,7 +1072,7 @@ void MainWindow::openSignatures()
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
-		int i = vSign.loadSignatures(filename);
+		int i = vSign.loadSignaturesFromFile(filename);
 		signWindow.onSigListUpdated();
 		QMessageBox msgBox;
 		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
@@ -1134,7 +1176,7 @@ void MainWindow::addSection(PeHandler* selectedPeHndl)
 void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 {
 	if (!selectedPeHndl) return;
-
+	
 	offset_t offset = selectedPeHndl->getDisplayedOffset();
 	SectionHdrWrapper *sec = selectedPeHndl->getPe()->getSecHdrAtOffset(offset, Executable::RAW, false);
 	if (sec == NULL) {
@@ -1148,4 +1190,48 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 	}
 	size = size - (offset - secBgn);
 	selectedPeHndl->findPackerInArea(offset, size, sig_ma::FRONT_TO_BACK);
+}
+
+void MainWindow::searchPattern(PeHandler* selectedPeHndl)
+{
+	if (!selectedPeHndl || !selectedPeHndl->getPe()) return;
+	
+	offset_t maxOffset = selectedPeHndl->getPe()->getContentSize();
+	offset_t offset = selectedPeHndl->getDisplayedOffset();
+	int ret = patternSearchWindow.exec(offset, maxOffset);
+	if ((QDialog::DialogCode) ret != QDialog::Accepted) {
+		return;
+	}
+	QString text = patternSearchWindow.getSignature();
+	if (!text.length()) {
+		return;
+	}
+	size_t fullSize = selectedPeHndl->getPe()->getContentSize();
+	if (offset >= fullSize) return;
+
+	sig_ma::SigFinder localSignFinder;
+	if (!localSignFinder.loadSignature("Searched", text.toStdString())) {
+		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
+		return;
+	}
+
+	while (offset < fullSize){
+		std::vector<sig_ma::FoundPacker> signAtOffset;
+		size_t areaSize = fullSize - offset;
+		selectedPeHndl->findSignatureInArea(offset, areaSize, localSignFinder, signAtOffset, false);
+		if (signAtOffset.size()) {
+			sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
+			selectedPeHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
+			selectedPeHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
+			if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
+					tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+			{
+				break;
+			}
+			offset = pckr.offset + 1;
+		} else {
+			QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
+			break;
+		}
+	}
 }

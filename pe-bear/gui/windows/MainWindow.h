@@ -13,6 +13,7 @@
 
 #include "DiffWindow.h"
 #include "SectionAddWindow.h"
+#include "PatternSearchWindow.h"
 #include "SignaturesBrowseWindow.h"
 #include "UserConfigWindow.h"
 
@@ -47,8 +48,10 @@ public slots:
 	void onSigSearchResult(int foundCount, int reqType);
 	void runNewInstance();
 	void unloadAllPEs();
+
 	void dumpSectionsFromAllPEs();
 	void exportDisasmFromAllPEs();
+	void exportStringsFromAllPEs();
 	void open();
 	void closePE(PeHandler*);
 	void reload(PeHandler*);
@@ -56,6 +59,7 @@ public slots:
 	void dumpAllSections(PeHandler* );
 	void addSection(PeHandler* );
 	void sigSearch(PeHandler* );
+	void searchPattern(PeHandler*);
 
 	void openSignatures();
 
@@ -171,6 +175,7 @@ private:
 
 	DiffWindow diffWindow;
 	SectionAddWindow secAddWindow;
+	PatternSearchWindow patternSearchWindow;
 
 	QStatusBar statusBar;
 	QGridLayout cntntLayout;
@@ -207,7 +212,9 @@ private:
 		*zoomInAction, *zoomOutAction, *zoomDefault,
 		*darkStyle, *defaultStyle,
 		*dumpAllPEsSecAction,
-		*exportAllPEsDisasmAction;
+		*searchSignature,
+		*exportAllPEsDisasmAction,
+		*exportAllPEsStrings;
 
 	ExeDependentAction *dumpAllSecAction,
 		*addSecAction,

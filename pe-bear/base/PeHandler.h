@@ -11,43 +11,12 @@
 #include "Modification.h"
 #include "CommentHandler.h"
 #include "ImportsAutoadderSettings.h"
+#include "StringsCollection.h"
+#include "CollectorThread.h"
 
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
 
-class CalcThread : public QThread
-{
-	Q_OBJECT
-public:
-	enum hash_type {
-		MD5 = 0,
-		SHA1 = 1,
-		SHA256,
-		CHECKSUM,
-		RICH_HDR_MD5,
-		IMP_MD5,
-		HASHES_NUM
-	};
-
-	CalcThread(hash_type hType, PEFile* pe, offset_t checksumOffset = 0);
-	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
-
-signals:
-	void gotHash(QString hash, int type);
-
-private:
-	void run();
-	QString makeImpHash();
-	QString makeRichHdrHash();
-
-	PEFile* m_PE;
-	QMutex m_arrMutex;
-
-	hash_type hashType;
-	offset_t checksumOff;
-};
-
-//---
 class PeHandler : public QObject, public Releasable
 {
 	Q_OBJECT
@@ -176,6 +145,7 @@ public:
 	bool isPacked();
 	sig_ma::PckrSign* findPackerSign(offset_t startOff, Executable::addr_type addrType, sig_ma::match_direction md = sig_ma::FIXED);
 	sig_ma::PckrSign* findPackerInArea(offset_t rawOff, size_t size, sig_ma::match_direction md);
+	size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
 
 	void calculateHash(CalcThread::hash_type type);
 
@@ -186,6 +156,8 @@ public:
 	/* resize */
 	bool resize(bufsize_t newSize, bool continueLastOperation = false);
 	bool resizeImage(bufsize_t newSize);
+	
+	bool setByte(offset_t offset, BYTE val);
 
 	bool isVirtualFormat();
 	bool isVirtualEqualRaw();
@@ -217,7 +189,9 @@ public:
 	void backupModification(offset_t  modOffset, bufsize_t modSize, bool continueLastOp = false);
 	void backupResize(bufsize_t newSize, bool continueLastOperation = false);
 	void unbackupLastModification();
+	bool undoLastModification();
 	bool setBlockModified(offset_t  modOffset, bufsize_t modSize);
+
 	void unModify();
 	bool isPEModified() { return this->modifHndl.countOperations() ? true : false;  }
 
@@ -295,7 +269,8 @@ public:
 	bufsize_t pageSize;
 	std::stack<offset_t> prevOffsets;
 	std::vector<sig_ma::FoundPacker> packerAtOffset;
-
+	StringsCollection stringsMap;
+	
 signals:
 	void pageOffsetModified(offset_t pageStart, bufsize_t pageSize);
 
@@ -306,11 +281,24 @@ signals:
 
 	void foundSignatures(int count, int requestType);
 	void hashChanged();
+	void stringsUpdated();
+	void stringsLoadingProgress(int progress);
 
 protected slots:
+	// hashes:
 	void onHashReady(QString hash, int hType);
 	void onCalcThreadFinished();
 	void runHashesCalculation();
+	
+	// strings extraction:
+	bool runStringsExtraction();
+	void onStringsReady(StringsCollection *mapToFill);
+	void stringExtractionFinished();
+
+	void onStringsLoadingProgress(int progress)
+	{
+		emit stringsLoadingProgress(progress); // forward the signal
+	}
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException
@@ -341,12 +329,15 @@ protected:
 	void associateWrappers();
 
 	bool isBaseHdrModif(offset_t modifOffset, bufsize_t size);
+	
 	bool rewrapDataDirs();
+
 	bool updatePeOnModified(offset_t modOffset = INVALID_ADDR, bufsize_t modSize = 0);// throws exception
 	void updatePeOnResized();
 
 	PEFile* m_PE;
 	FileBuffer *m_fileBuffer;
+	QMutex m_UpdateMutex;
 
 	QDateTime m_fileModDate; //modification time of the corresponding file on the disk
 	QDateTime m_loadedFileModDate; //modification time of the version that is currently loaded
@@ -355,6 +346,10 @@ protected:
 	QString hash[CalcThread::HASHES_NUM];
 	QMutex m_hashMutex[CalcThread::HASHES_NUM];
 	bool calcQueued[CalcThread::HASHES_NUM];
+	
+	StringExtThread *stringThread;
+	bool stringExtractQueued;
+	QMutex m_StringMutex;
 
 	sig_ma::SigFinder *signFinder;
 };
