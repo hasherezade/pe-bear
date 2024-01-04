@@ -15,7 +15,6 @@ public:
 	BoundImpTreeModel(PeHandler *peHndl, QObject *parent = 0) 
 		: WrapperTableModel(peHndl, parent)
 	{
-		connectSignals();
 	}
 	
 	virtual int columnCount(const QModelIndex &parent) const;

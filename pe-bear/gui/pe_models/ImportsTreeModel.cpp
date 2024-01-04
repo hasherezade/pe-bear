@@ -129,7 +129,6 @@ ImportedFuncModel::ImportedFuncModel(PeHandler *peHndl, QObject *parent)
 	:  WrapperTableModel(peHndl, parent), 
 	libraryId(0)
 {
-	connect(peHndl, SIGNAL(modified()), this, SLOT(onNeedReset()));
 }
 
 ImportEntryWrapper* ImportedFuncModel::wrapper() const

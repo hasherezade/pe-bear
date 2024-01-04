@@ -15,7 +15,6 @@ public:
 	ImportsTreeModel(PeHandler *peHndl, QObject *parent = 0)
 		: WrapperTableModel(peHndl, parent)
 	{
-		this->connectSignals();
 	}
 
 	virtual int columnCount(const QModelIndex &parent) const;

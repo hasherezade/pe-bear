@@ -70,6 +70,8 @@ PeTreeModel::PeTreeModel(PeHandler *peHndl, QObject *parent, bool isExpandable )
 	offsetFontColor.setRgb(100, 100,100);
 	errColor.setRgb(255, 0, 0);
 	errColor.setAlpha(addrColors.flagsAlpha());
+	
+	connectSignals();
 }
 
 void PeTreeModel::connectSignals()

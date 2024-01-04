@@ -14,7 +14,6 @@ public:
 	RelocsTreeModel(PeHandler *peHndl, QObject *parent = 0)
 		: WrapperTableModel(peHndl, parent)
 	{
-		connectSignals();
 	}
 
 	virtual int columnCount(const QModelIndex &parent) const;
@@ -57,7 +56,6 @@ public:
 	RelocEntriesModel(PeHandler *peHndl, QObject *parent = 0)
 		: WrapperTableModel(peHndl, parent), parentId(0)
 	{
-		connectSignals();
 	}
 
 	int rowCount(const QModelIndex &parent) const;

@@ -168,8 +168,6 @@ bufsize_t RichHdrTreeItem::getContentSize() const
 RichHdrTreeModel::RichHdrTreeModel(PeHandler* peHndl, QObject *parent)
 	: WrapperTableModel(peHndl, parent)
 {
-	if (!peHndl) return;
-	connect(peHndl, SIGNAL(modified()), this, SLOT(onNeedReset()));
 }
 
 void RichHdrTreeModel::onNeedReset()

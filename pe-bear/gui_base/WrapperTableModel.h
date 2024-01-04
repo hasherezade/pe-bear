@@ -19,7 +19,10 @@ public slots:
 
 public:
 	WrapperTableModel(PeHandler *peHndl, QObject *parent = 0) 
-		: PeTableModel(peHndl, parent), WrapperInterface() { WrapperTableModel::counter++; }
+		: PeTableModel(peHndl, parent), WrapperInterface()
+	{
+		WrapperTableModel::counter++;
+	}
 
 	virtual ~WrapperTableModel() { WrapperTableModel::counter--; }
 	//---

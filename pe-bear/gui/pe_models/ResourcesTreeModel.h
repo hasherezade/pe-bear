@@ -15,7 +15,6 @@ public:
 	ResourcesTreeModel(PeHandler *peHndl, QObject *parent = 0) 
 		: WrapperTableModel(peHndl, parent)
 	{
-		this->connectSignals();
 	}
 	
 	virtual Executable::addr_type addrTypeAt(QModelIndex index) const;
@@ -73,7 +72,6 @@ public:
 	ResourceLeafModel(PeHandler *peHndl, QObject *parent = 0) 
 		: WrapperTableModel(peHndl, parent), parentId(0), leafId(0)
 	{
-		this->connectSignals();
 	}
 
 	virtual int columnCount(const QModelIndex &parent) const { return COLS_NUM; }

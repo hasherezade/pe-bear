@@ -103,7 +103,6 @@ DelayImpFuncModel::DelayImpFuncModel(PeHandler *peHndl, QObject *parent)
 	:  WrapperTableModel(peHndl, parent), 
 	libraryId(0)
 {
-	connectSignals();
 }
 
 ExeNodeWrapper* DelayImpFuncModel::wrapper() const

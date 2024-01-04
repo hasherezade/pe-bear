@@ -14,7 +14,6 @@ public:
 	TLSTreeModel(PeHandler *peHndl, QObject *parent = 0)
 		: WrapperTableModel(peHndl, parent)
 	{
-		connectSignals();
 	}
 
 	int columnCount(const QModelIndex &parent) const { return MAX_COL; }
@@ -50,7 +49,6 @@ public:
 	TLSCallbacksModel(PeHandler *peHndl, QObject *parent = 0)
 		: WrapperTableModel(peHndl, parent)
 	{
-		connectSignals();
 	}
 
 	int rowCount(const QModelIndex &parent) const;
