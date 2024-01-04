@@ -12,7 +12,10 @@ class RelocsTreeModel  : public WrapperTableModel
 
 public:
 	RelocsTreeModel(PeHandler *peHndl, QObject *parent = 0)
-		: WrapperTableModel(peHndl, parent) {}
+		: WrapperTableModel(peHndl, parent)
+	{
+		connectSignals();
+	}
 
 	virtual int columnCount(const QModelIndex &parent) const;
 
@@ -52,7 +55,10 @@ public slots:
 
 public:
 	RelocEntriesModel(PeHandler *peHndl, QObject *parent = 0)
-		: WrapperTableModel(peHndl, parent), parentId(0) {}
+		: WrapperTableModel(peHndl, parent), parentId(0)
+	{
+		connectSignals();
+	}
 
 	int rowCount(const QModelIndex &parent) const;
 	int columnCount(const QModelIndex &parent) const { return MAX_COL; }
