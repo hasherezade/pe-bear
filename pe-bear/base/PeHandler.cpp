@@ -565,24 +565,24 @@ bool PeHandler::setByte(offset_t offset, BYTE val)
 #include <iostream>
 bool PeHandler::isVirtualFormat()
 {
-	ImportDirWrapper* imp = m_PE->getImports();
-	if (imp && imp->isValid()) {
-		return false;
-	}
 	const size_t count = this->m_PE->getSectionsCount();
 	if (!count) return false;
 	
-	bool isDump = false;
 	SectionHdrWrapper *sec = this->m_PE->getSecHdr(0);
 	offset_t v = sec->getVirtualPtr();
 	offset_t r = sec->getRawPtr();
 	if (r > v) return false; //this is an anomaly...
 	if (v == r) return false;
 	offset_t diff = v - r;
-	if (m_PE->isAreaEmpty(r, diff)) {
-		isDump = true;
+	if (!m_PE->isAreaEmpty(r, diff)) {
+		return false;
 	}
-	return isDump;
+	// check if has valid imports
+	ImportDirWrapper* imp = this->m_PE->getImports();
+	if (imp && imp->isValid()) {
+		return false;
+	}
+	return true;
 }
 
 bool PeHandler::isVirtualEqualRaw()
