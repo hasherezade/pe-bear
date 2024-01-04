@@ -5,7 +5,7 @@
 #include <set>
 
 #include "../../gui_base/WrapperTableModel.h"
-
+#include <iostream>
 
 class DelayImpTreeModel  : public WrapperTableModel
 {
@@ -13,7 +13,10 @@ class DelayImpTreeModel  : public WrapperTableModel
 
 public:
 	DelayImpTreeModel(PeHandler *peHndl, QObject *parent = 0) 
-		: WrapperTableModel(peHndl, parent) {}
+		: WrapperTableModel(peHndl, parent)
+	{
+		connectSignals();
+	}
 	
 	virtual int columnCount(const QModelIndex &parent) const;
 
