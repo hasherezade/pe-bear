@@ -562,7 +562,6 @@ bool PeHandler::setByte(offset_t offset, BYTE val)
 	return true;
 }
 
-#include <iostream>
 bool PeHandler::isVirtualFormat()
 {
 	const size_t count = this->m_PE->getSectionsCount();
