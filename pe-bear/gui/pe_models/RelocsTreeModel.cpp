@@ -50,7 +50,9 @@ QVariant RelocsTreeModel::data(const QModelIndex &index, int role) const
 
 	RelocBlockWrapper* block =  dynamic_cast<RelocBlockWrapper*>(wrapperAt(index));
 	if (!block) return QVariant();
-
+	if (role == Qt::BackgroundRole) {
+		if (!block->isValid()) return errColor;
+	}
 	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
 
 	switch (column) {
@@ -124,10 +126,13 @@ QVariant RelocEntriesModel::data(const QModelIndex &index, int role) const
 	
 	int fId = this->getFID(index);
 
-	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
 	RelocEntryWrapper* w = dynamic_cast<RelocEntryWrapper*>(wrapperAt(index));
 	if (!w) return QVariant(); // NO WRAPPER!
-
+	if (role == Qt::BackgroundRole) {
+		if (!w->isValid()) return errColor;
+	}
+	if (role != Qt::DisplayRole && role != Qt::EditRole) return QVariant();
+    
 	bool isOk = false;
 	uint64_t val = w->getNumValue(RelocEntryWrapper::RELOC_ENTRY_VAL, &isOk);
 	if (!isOk) return "UNK"; // NO VALUE

@@ -67,9 +67,9 @@ PeTreeModel::PeTreeModel(PeHandler *peHndl, QObject *parent, bool isExpandable )
 	PeTreeModel::counter++;
 	
 	offsetFont.setCapitalization(QFont::AllUppercase);
-	offsetFontColor.setRgb(100, 100,100);
+	offsetFontColor.setRgb(100, 100, 100);
 	errColor.setRgb(255, 0, 0);
-	errColor.setAlpha(addrColors.flagsAlpha());
+	errColor.setAlpha(130);
 	
 	connectSignals();
 }
