@@ -472,9 +472,13 @@ void MainWindow::onHandlerSelected(PeHandler* peHndl)
 	this->unloadAction->setEnabled(isPe);
 	
 	const offset_t offset = (peHndl) ? peHndl->getDisplayedOffset() : INVALID_ADDR;
-	SectionHdrWrapper* sec = (peHndl) ? pePtr->getSecHdrAtOffset(offset, Executable::RAW) : NULL;
-
+	SectionHdrWrapper* sec = (peHndl) ? pePtr->getSecHdrAtOffset(offset, Executable::RAW) : nullptr;
 	this->sectionMenu.sectionSelected(peHndl, sec);
+	
+	if (!sec) {
+		ExeElementWrapper* selectedWrapper = (peHndl) ? pePtr->getWrapperContaining(offset) : nullptr;
+		this->sectionMenu.wrapperSelected(peHndl, selectedWrapper);
+	}
 
 	if (!isPe) {
 		this->setWindowTitle(this->winDesc);

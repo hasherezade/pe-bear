@@ -275,7 +275,8 @@ void PEDockedWidget::goToAddress(bool isRaw)
 
 SectionMenu::SectionMenu(MainSettings &settings, QWidget *parent) 
 	: QMenu(parent), 
-	mainSettings(settings), peHndl(NULL), selectedSection(NULL)
+	mainSettings(settings),
+	peHndl(NULL), selectedSection(NULL), selectedWrapper(NULL)
 {
 	createActions();
 }
@@ -303,19 +304,43 @@ void SectionMenu::createActions()
 	addAction(this->dumpDisasmAction);
 }
 
+void SectionMenu::enableSecActions(bool actionsEnabled)
+{
+	if (this->clearSelSecAction) this->clearSelSecAction->setVisible(actionsEnabled);
+	if (this->dumpDisasmAction) this->dumpDisasmAction->setVisible(actionsEnabled);
+	if (this->loadSelSecAction) this->loadSelSecAction->setVisible(actionsEnabled);
+}
+
+void SectionMenu::wrapperSelected(PeHandler *pe, ExeElementWrapper* wrapper)
+{
+	this->peHndl = pe;
+	this->selectedSection = nullptr;
+	this->selectedWrapper = wrapper;
+	bool isEnabled = (pe && wrapper) ? true : false;
+
+	this->setEnabled(isEnabled);
+	this->setTitle(tr("No wrapper selected"));
+	if (!isEnabled) {
+		return;
+	}
+	this->setTitle(wrapper->getName());
+	enableSecActions(false);
+}
+
 void SectionMenu::sectionSelected(PeHandler *pe, SectionHdrWrapper *sec)
 {
 	this->peHndl = pe;
 	this->selectedSection = sec;
-	bool isEnabled = sec != NULL ? true : false;
-	if (!pe) isEnabled = false;
+	this->selectedWrapper = nullptr;
+	bool isEnabled = (pe && sec) ? true : false;
 
 	this->setEnabled(isEnabled);
 	this->setTitle(tr("No section selected"));
-
-	if (!isEnabled) return;
-
+	if (!isEnabled) {
+		return;
+	}
 	this->setTitle(tr("Section: [") + sec->mappedName + "]");
+	enableSecActions(true);
 }
 
 void SectionMenu::dumpSelectedSection()
@@ -323,20 +348,35 @@ void SectionMenu::dumpSelectedSection()
 	if (!peHndl) return;
 	PEFile *pe = peHndl->getPe();
 	if (!pe) return;
-	if (!selectedSection) return;
+	if (!selectedSection && !selectedWrapper) return;
 
 	QString outDir = mainSettings.dirDump;
 	if (outDir == "") outDir = peHndl->getDirPath();
+	
+	QString mappedName = (selectedSection) ? selectedSection->mappedName : selectedWrapper->getName();
 
-	QString defaultPath = outDir + QDir::separator() + peHndl->getShortName() + "[" + selectedSection->mappedName + "]";
+	QString defaultPath = outDir + QDir::separator() + peHndl->getShortName() + "[" + mappedName + "]";
 	QString path = QFileDialog::getSaveFileName(this, tr("Save as..."), defaultPath);
 	if (path.size() == 0) return;
-
-	if (pe->dumpSection(selectedSection, path)) {
-		QMessageBox::information(this, tr("Done!"), tr("Dumped section: ")+ selectedSection->mappedName +"\n"+ tr("into: ") + path);
-		return;
+	if (selectedSection) {
+		if (pe->dumpSection(selectedSection, path)) {
+			QMessageBox::information(this, tr("Done!"), tr("Dumped section: ") + mappedName +"\n"+ tr("into: ") + path);
+			return;
+		} else {
+			QMessageBox::warning(this, tr("Error"), tr("Dumping section failed!"));
+		}
 	}
-	QMessageBox::warning(this, tr("Error"), tr("Dumping section failed!"));
+	if (selectedWrapper) {
+		size_t wSize = selectedWrapper->getContentSize();
+		BufferView wView(selectedWrapper, 0, wSize);
+
+		bufsize_t dumpedSize = FileBuffer::dump(path, wView, false);
+		if (dumpedSize) {
+			QMessageBox::information(this, tr("Done!"), tr("Dumped wrapper: ") + mappedName +"\n"+ tr("into: ") + path);
+		} else {
+			QMessageBox::warning(this, tr("Error"), tr("Dumping wrapper failed!"));
+		}
+	}
 }
 
 void SectionMenu::exportSectionDisasm()

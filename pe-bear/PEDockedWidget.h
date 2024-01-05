@@ -107,6 +107,7 @@ public:
 
 public slots:
 	void sectionSelected(PeHandler *pe, SectionHdrWrapper *sec);
+	void wrapperSelected(PeHandler *pe, ExeElementWrapper* wrapper);
 
 	void dumpSelectedSection();
 	void clearSelectedSection();
@@ -115,10 +116,12 @@ public slots:
 
 protected:
 	void createActions();
+	void enableSecActions(bool enable);
 
 	MainSettings &mainSettings;
 	PeHandler *peHndl;
 	SectionHdrWrapper *selectedSection;
+	ExeElementWrapper* selectedWrapper;
 	QAction *dumpSecAction, 
 		*dumpSelSecAction, 
 		*clearSelSecAction, 
