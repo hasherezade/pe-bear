@@ -13,11 +13,15 @@ using namespace pe;
 class StringThreadManager : public CollectorThreadManager
 {
 public:
-	StringThreadManager(PeHandler *peHndl) : m_peHndl(peHndl) { }
+	StringThreadManager(PeHandler *peHndl)
+		: m_peHndl(peHndl)
+	{
+	}
 	
 	bool setupThread()
 	{
 		if (!m_peHndl) return false;
+		
 		StringExtThread *stringThread = new StringExtThread(m_peHndl->getPe(), MIN_STRING_LEN);
 		this->myThread = stringThread;
 		QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), m_peHndl, SLOT(onStringsReady(StringsCollection* )));
@@ -28,6 +32,30 @@ protected:
 	PeHandler *m_peHndl;
 };
 
+//-------------------------------------------------
+class HashCalcThreadManager : public CollectorThreadManager
+{
+public:
+	HashCalcThreadManager(PeHandler *peHndl, CalcThread::hash_type hType)
+		: m_peHndl(peHndl), m_hashType(hType)
+	{
+	}
+	
+	bool setupThread()
+	{
+		if (!m_peHndl) return false;
+		
+		offset_t checksumOffset = m_peHndl->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
+		CalcThread *calcThread = new CalcThread(m_hashType, m_peHndl->getPe(), checksumOffset);
+		this->myThread = calcThread;
+		QObject::connect(calcThread, SIGNAL(gotHash(QString, int)), m_peHndl, SLOT(onHashReady(QString, int)));
+		return true;
+	}
+	
+protected:
+	CalcThread::hash_type m_hashType;
+	PeHandler *m_peHndl;
+};
 
 //-------------------------------------------------
 
@@ -71,8 +99,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	this->wrapAlbum();
 	
 	for (int i = 0; i < CalcThread::HASHES_NUM; i++) {
-		calcThread[i] = NULL;
-		calcQueued[i] = false;
+		hashCalcMgrs[i] = nullptr;
 	}
 	//---
 	this->runHashesCalculation();
@@ -130,20 +157,6 @@ void PeHandler::onHashReady(QString hash, int hType)
 	emit hashChanged();
 }
 
-void PeHandler::onCalcThreadFinished()
-{
-	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
-		if (calcThread[hType] && calcThread[hType]->isFinished()) {
-			delete calcThread[hType];
-			calcThread[hType] = nullptr;
-			if (calcQueued[hType]) {
-				//printf("starting queued\n");
-				calculateHash((CalcThread::hash_type) hType);
-			}
-		}
-	}
-}
-
 void PeHandler::deleteThreads()
 {
 	if (stringThreadMgr) {
@@ -151,14 +164,8 @@ void PeHandler::deleteThreads()
 		stringThreadMgr = nullptr;
 	}
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
-		if (calcThread[hType]) {
-			calcThread[hType]->stop();
-			while (calcThread[hType]->isFinished() == false) {
-				calcThread[hType]->wait();
-			}
-			delete calcThread[hType];
-			calcThread[hType] = nullptr;
-		}
+		delete this->hashCalcMgrs[hType];
+		this->hashCalcMgrs[hType] = nullptr;
 	}
 }
 
@@ -180,7 +187,7 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 	mapToFill->release();
 	stringsUpdated();
 }
-
+/*
 void PeHandler::calculateHash(CalcThread::hash_type type)
 {
 	if (type >= CalcThread::HASHES_NUM) return;
@@ -203,10 +210,10 @@ void PeHandler::calculateHash(CalcThread::hash_type type)
 	this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
 	QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
 	QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
-	calcThread[type]->start();
+	//calcThread[type]->start();
 	calcQueued[type] = false;
 }
-
+*/
 void PeHandler::setPackerSignFinder(SigFinder *sFinder)
 {
 	this->signFinder = sFinder;
@@ -1314,8 +1321,12 @@ void PeHandler::updatePeOnResized()
 void PeHandler::runHashesCalculation()
 {
 	for (int i = 0; i < CalcThread::HASHES_NUM; i++) {
+	
 		CalcThread::hash_type hType = static_cast<CalcThread::hash_type>(i);
-		calculateHash(hType);
+		if (!this->hashCalcMgrs[i]) {
+			this->hashCalcMgrs[i] = new HashCalcThreadManager(this, hType);
+		}
+		this->hashCalcMgrs[i]->recreateThread();
 	}
 }
 

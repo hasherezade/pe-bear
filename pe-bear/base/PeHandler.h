@@ -149,7 +149,7 @@ public:
 	sig_ma::PckrSign* findPackerInArea(offset_t rawOff, size_t size, sig_ma::match_direction md);
 	size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
 
-	void calculateHash(CalcThread::hash_type type);
+	//void calculateHash(CalcThread::hash_type type);
 
 	/* fetch info about offset */
 	bool isInActiveArea(offset_t offset);
@@ -289,7 +289,7 @@ signals:
 protected slots:
 	// hashes:
 	void onHashReady(QString hash, int hType);
-	void onCalcThreadFinished();
+	//void onCalcThreadFinished();
 	void runHashesCalculation();
 	
 	// strings extraction:
@@ -343,10 +343,11 @@ protected:
 	QDateTime m_fileModDate; //modification time of the corresponding file on the disk
 	QDateTime m_loadedFileModDate; //modification time of the version that is currently loaded
 
-	CalcThread* calcThread[CalcThread::HASHES_NUM];
+	CollectorThreadManager *hashCalcMgrs[CalcThread::HASHES_NUM];
+	//CalcThread* calcThread[CalcThread::HASHES_NUM];
 	QString hash[CalcThread::HASHES_NUM];
 	QMutex m_hashMutex[CalcThread::HASHES_NUM];
-	bool calcQueued[CalcThread::HASHES_NUM];
+	//bool calcQueued[CalcThread::HASHES_NUM];
 	
 	CollectorThreadManager* stringThreadMgr;
 
