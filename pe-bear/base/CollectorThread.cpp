@@ -100,6 +100,7 @@ void CalcThread::run()
 		qHashType = QCryptographicHash::Sha256;
 	}
 #endif
+	emit gotHash("Calculating...", hashType);
 	try {
 		if (hashType == CHECKSUM) {
 			long checksum = PEFile::computeChecksum((BYTE*) m_PE->getContent(), m_PE->getContentSize(), checksumOff);
