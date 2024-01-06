@@ -25,6 +25,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	resourcesDirWrapper(pe, &resourcesAlbum),
 	signFinder(nullptr), 
 	modifHndl(pe->getFileBuffer(), this),
+	stringThreadMgr(pe),
 	stringThread(nullptr), stringExtractQueued(false)
 {
 	if (!pe) return;
@@ -57,10 +58,10 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	}
 	//---
 	this->runHashesCalculation();
-	connect(this, SIGNAL(modified()), this, SLOT(runHashesCalculation()));
+	connect( this, SIGNAL(modified()), this, SLOT(runHashesCalculation()) );
 	
 	this->runStringsExtraction();
-	connect(this, SIGNAL(modified()), this, SLOT(runStringsExtraction()));
+	connect( this, SIGNAL(modified()), this, SLOT(runStringsExtraction()) );
 }
 
 void PeHandler::associateWrappers()
@@ -150,12 +151,12 @@ void PeHandler::deleteThreads()
 
 bool PeHandler::runStringsExtraction()
 {
-	if (this->stringThread) {
-		this->stringThread->stop();
-		stringExtractQueued = true;
-		return false; //previous thread didn't finished
+	StringExtThread *stringThread = stringThreadMgr.getMyThread();
+	if (!stringThread) {
+		if (!stringThreadMgr.recreateThread()) return false;
+		stringThread = stringThreadMgr.getMyThread();
 	}
-	this->stringThread = new StringExtThread(m_PE, MIN_STRING_LEN);
+	if (!stringThread) return false;
 	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
 	QObject::connect(stringThread, SIGNAL(loadingStrings(int)), this, SLOT(onStringsLoadingProgress(int)));
 	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
@@ -177,11 +178,7 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 
 void PeHandler::stringExtractionFinished()
 {
-	if (stringThread && stringThread->isFinished()) {
-		delete stringThread;
-		stringThread = nullptr;
-	}
-	if (stringExtractQueued) {
+	if (stringThreadMgr.resetOnFinished()) {
 		runStringsExtraction();
 	}
 }

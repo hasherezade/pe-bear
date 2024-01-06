@@ -16,6 +16,30 @@
 
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
+class StringThreadManager : public CollectorThreadManager
+{
+public:
+	StringThreadManager(PEFile *_pe) : m_PE(_pe) { }
+	
+	void setupThread()
+	{
+		this->myThread = new StringExtThread(m_PE, 5);
+		/*QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
+		QObject::connect(stringThread, SIGNAL(loadingStrings(int)), this, SLOT(onStringsLoadingProgress(int)));
+		QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
+		stringThread->start();
+		stringExtractQueued = false;
+		return true;*/
+	}
+	
+	StringExtThread* getMyThread()
+	{
+		return dynamic_cast<StringExtThread*> (this->myThread);
+	}
+	
+protected:
+	PEFile *m_PE;
+};
 
 class PeHandler : public QObject, public Releasable
 {
@@ -299,6 +323,7 @@ protected slots:
 	{
 		emit stringsLoadingProgress(progress); // forward the signal
 	}
+	
 
 protected:
 	ImportEntryWrapper* _autoAddLibrary(const QString &name, size_t importedFuncsCount, size_t expectedDllsCount, offset_t &storageOffset, bool separateOFT, bool continueLastOperation = false); //throws CustomException
@@ -347,9 +372,10 @@ protected:
 	QMutex m_hashMutex[CalcThread::HASHES_NUM];
 	bool calcQueued[CalcThread::HASHES_NUM];
 	
+	StringThreadManager stringThreadMgr;
 	StringExtThread *stringThread;
 	bool stringExtractQueued;
 	QMutex m_StringMutex;
-
+	
 	sig_ma::SigFinder *signFinder;
 };

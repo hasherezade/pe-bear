@@ -28,6 +28,69 @@ protected:
 	bool stopRequested;
 };
 
+//--- 
+class CollectorThreadManager
+{
+public:
+	CollectorThreadManager() : myThread(nullptr), isQueued(false)
+	{
+	}
+	
+	~CollectorThreadManager()
+	{
+		deleteThread();
+	}
+	
+	void stopThread()
+	{
+		if (this->myThread) {
+			this->myThread->stop();
+		}
+	}
+	
+	void deleteThread()
+	{
+		if (this->myThread) {
+			this->myThread->stop();
+			while (myThread->isFinished() == false) {
+				myThread->wait();
+			}
+			delete myThread;
+			myThread = nullptr;
+		}
+	}
+	
+	bool recreateThread()
+	{
+		if (this->myThread) {
+			this->myThread->stop();
+			isQueued = true;
+			return false; //previous thread didn't finished
+		}
+		setupThread();
+		return true;
+	}
+	
+	bool resetOnFinished()
+	{
+		if (myThread && myThread->isFinished()) {
+			delete myThread;
+			myThread = nullptr;
+		}
+		if (isQueued) {
+			setupThread();
+			return true;
+		}
+		return false;
+	}
+	
+protected:
+	virtual void setupThread() = 0;
+	bool isQueued;
+	CollectorThread *myThread;
+	QMutex myMutex;
+};
+
 ///----
 
 class CalcThread : public CollectorThread
