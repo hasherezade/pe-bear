@@ -60,6 +60,8 @@ public slots:
 	void addSection(PeHandler* );
 	void sigSearch(PeHandler* );
 	void searchPattern(PeHandler*);
+	
+	void matchesFound(SignFinderThread *);
 
 	void openSignatures();
 
