@@ -29,10 +29,12 @@ protected:
 };
 
 //--- 
-class CollectorThreadManager
+class CollectorThreadManager : public QObject
 {
+	Q_OBJECT
+
 public:
-	CollectorThreadManager() : myThread(nullptr), isQueued(false)
+	CollectorThreadManager() : QObject(), myThread(nullptr), isQueued(false)
 	{
 	}
 	
@@ -67,10 +69,15 @@ public:
 			isQueued = true;
 			return false; //previous thread didn't finished
 		}
-		setupThread();
-		return true;
+		if (setupThread()) {
+			runThread();
+			return true;
+		}
+		return false;
 	}
 	
+	
+protected slots:
 	bool resetOnFinished()
 	{
 		if (myThread && myThread->isFinished()) {
@@ -78,14 +85,25 @@ public:
 			myThread = nullptr;
 		}
 		if (isQueued) {
-			setupThread();
-			return true;
+			if (setupThread()) {
+				runThread();
+				return true;
+			}
 		}
 		return false;
 	}
 	
 protected:
-	virtual void setupThread() = 0;
+	virtual bool setupThread() = 0;
+	
+	virtual void runThread()
+	{
+		if (!myThread) return;
+		QObject::connect(myThread, SIGNAL(finished()), this, SLOT(resetOnFinished()));
+		myThread->start();
+		this->isQueued = false;
+	}
+	
 	bool isQueued;
 	CollectorThread *myThread;
 	QMutex myMutex;

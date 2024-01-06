@@ -10,6 +10,25 @@
 using namespace sig_ma;
 using namespace pe;
 
+class StringThreadManager : public CollectorThreadManager
+{
+public:
+	StringThreadManager(PeHandler *peHndl) : m_peHndl(peHndl) { }
+	
+	bool setupThread()
+	{
+		if (!m_peHndl) return false;
+		StringExtThread *stringThread = new StringExtThread(m_peHndl->getPe(), MIN_STRING_LEN);
+		this->myThread = stringThread;
+		QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), m_peHndl, SLOT(onStringsReady(StringsCollection* )));
+		QObject::connect(stringThread, SIGNAL(loadingStrings(int)), m_peHndl, SLOT(onStringsLoadingProgress(int)));
+		return true;
+	}
+protected:
+	PeHandler *m_peHndl;
+};
+
+
 //-------------------------------------------------
 
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
@@ -25,8 +44,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	resourcesDirWrapper(pe, &resourcesAlbum),
 	signFinder(nullptr), 
 	modifHndl(pe->getFileBuffer(), this),
-	stringThreadMgr(pe),
-	stringThread(nullptr), stringExtractQueued(false)
+	stringThreadMgr(nullptr)
 {
 	if (!pe) return;
 
@@ -128,6 +146,10 @@ void PeHandler::onCalcThreadFinished()
 
 void PeHandler::deleteThreads()
 {
+	if (stringThreadMgr) {
+		delete stringThreadMgr;
+		stringThreadMgr = nullptr;
+	}
 	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
 		if (calcThread[hType]) {
 			calcThread[hType]->stop();
@@ -138,31 +160,14 @@ void PeHandler::deleteThreads()
 			calcThread[hType] = nullptr;
 		}
 	}
-	// delete strign extraction threads
-	if (this->stringThread) {
-		this->stringThread->stop();
-		while (stringThread->isFinished() == false) {
-			stringThread->wait();
-		}
-		delete stringThread;
-		stringThread = nullptr;
-	}
 }
 
 bool PeHandler::runStringsExtraction()
 {
-	StringExtThread *stringThread = stringThreadMgr.getMyThread();
-	if (!stringThread) {
-		if (!stringThreadMgr.recreateThread()) return false;
-		stringThread = stringThreadMgr.getMyThread();
+	if (!stringThreadMgr) {
+		stringThreadMgr = new StringThreadManager(this);
 	}
-	if (!stringThread) return false;
-	QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), this, SLOT(onStringsReady(StringsCollection* )));
-	QObject::connect(stringThread, SIGNAL(loadingStrings(int)), this, SLOT(onStringsLoadingProgress(int)));
-	QObject::connect(stringThread, SIGNAL(finished()), this, SLOT(stringExtractionFinished()));
-	stringThread->start();
-	stringExtractQueued = false;
-	return true;
+	return stringThreadMgr->recreateThread();
 }
 
 void PeHandler::onStringsReady(StringsCollection* mapToFill)
@@ -174,13 +179,6 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 	this->stringsMap.fill(*mapToFill);
 	mapToFill->release();
 	stringsUpdated();
-}
-
-void PeHandler::stringExtractionFinished()
-{
-	if (stringThreadMgr.resetOnFinished()) {
-		runStringsExtraction();
-	}
 }
 
 void PeHandler::calculateHash(CalcThread::hash_type type)
