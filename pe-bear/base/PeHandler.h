@@ -12,10 +12,13 @@
 #include "CommentHandler.h"
 #include "ImportsAutoadderSettings.h"
 #include "StringsCollection.h"
-#include "CollectorThread.h"
+#include "threads/CollectorThread.h"
+#include "threads/SupportedHashes.h"
+
 
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
+
 
 class PeHandler : public QObject, public Releasable
 {
@@ -133,13 +136,13 @@ public:
 
 	bool hasDirectory(pe::dir_entry dirNum) const;
 
-	QString getCurrentSHA256() { return getCurrentHash(CalcThread::SHA256); }
-	QString getCurrentMd5() { return getCurrentHash(CalcThread::MD5); }
-	QString getCurrentSHA1() { return getCurrentHash(CalcThread::SHA1); }
-	QString getCurrentChecksum() { return getCurrentHash(CalcThread::CHECKSUM); }
-	QString getRichHdrHash() { return getCurrentHash(CalcThread::RICH_HDR_MD5); }
-	QString getImpHash() { return getCurrentHash(CalcThread::IMP_MD5); }
-	QString getCurrentHash(CalcThread::hash_type type);
+	QString getCurrentSHA256() { return getCurrentHash(SupportedHashes::SHA256); }
+	QString getCurrentMd5() { return getCurrentHash(SupportedHashes::MD5); }
+	QString getCurrentSHA1() { return getCurrentHash(SupportedHashes::SHA1); }
+	QString getCurrentChecksum() { return getCurrentHash(SupportedHashes::CHECKSUM); }
+	QString getRichHdrHash() { return getCurrentHash(SupportedHashes::RICH_HDR_MD5); }
+	QString getImpHash() { return getCurrentHash(SupportedHashes::IMP_MD5); }
+	QString getCurrentHash(SupportedHashes::hash_type type);
 
 	void setPackerSignFinder(sig_ma::SigFinder* signFinder);
 	bool isPacked();
@@ -147,7 +150,7 @@ public:
 	sig_ma::PckrSign* findPackerInArea(offset_t rawOff, size_t size, sig_ma::match_direction md);
 	size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
 
-	void calculateHash(CalcThread::hash_type type);
+	//void calculateHash(CalcThread::hash_type type);
 
 	/* fetch info about offset */
 	bool isInActiveArea(offset_t offset);
@@ -287,13 +290,12 @@ signals:
 protected slots:
 	// hashes:
 	void onHashReady(QString hash, int hType);
-	void onCalcThreadFinished();
+	//void onCalcThreadFinished();
 	void runHashesCalculation();
 	
 	// strings extraction:
 	bool runStringsExtraction();
 	void onStringsReady(StringsCollection *mapToFill);
-	void stringExtractionFinished();
 
 	void onStringsLoadingProgress(int progress)
 	{
@@ -342,14 +344,12 @@ protected:
 	QDateTime m_fileModDate; //modification time of the corresponding file on the disk
 	QDateTime m_loadedFileModDate; //modification time of the version that is currently loaded
 
-	CalcThread* calcThread[CalcThread::HASHES_NUM];
-	QString hash[CalcThread::HASHES_NUM];
-	QMutex m_hashMutex[CalcThread::HASHES_NUM];
-	bool calcQueued[CalcThread::HASHES_NUM];
+	CollectorThreadManager *hashCalcMgrs[SupportedHashes::HASHES_NUM];
+
+	QString hash[SupportedHashes::HASHES_NUM];
+	QMutex m_hashMutex[SupportedHashes::HASHES_NUM];
 	
-	StringExtThread *stringThread;
-	bool stringExtractQueued;
-	QMutex m_StringMutex;
+	CollectorThreadManager* stringThreadMgr;
 
 	sig_ma::SigFinder *signFinder;
 };

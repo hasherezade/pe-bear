@@ -28,6 +28,87 @@ protected:
 	bool stopRequested;
 };
 
+//--- 
+class CollectorThreadManager : public QObject
+{
+	Q_OBJECT
+
+public:
+	CollectorThreadManager() : QObject(), myThread(nullptr), isQueued(false)
+	{
+	}
+	
+	~CollectorThreadManager()
+	{
+		deleteThread();
+	}
+	
+	void stopThread()
+	{
+		if (this->myThread) {
+			this->myThread->stop();
+		}
+	}
+	
+	void deleteThread()
+	{
+		if (this->myThread) {
+			this->myThread->stop();
+			while (myThread->isFinished() == false) {
+				myThread->wait();
+			}
+			delete myThread;
+			myThread = nullptr;
+		}
+	}
+	
+	bool recreateThread()
+	{
+		if (this->myThread) {
+			this->myThread->stop();
+			isQueued = true;
+			return false; //previous thread didn't finished
+		}
+		if (setupThread()) {
+			runThread();
+			return true;
+		}
+		return false;
+	}
+	
+	
+protected slots:
+	bool resetOnFinished()
+	{
+		if (myThread && myThread->isFinished()) {
+			delete myThread;
+			myThread = nullptr;
+		}
+		if (isQueued) {
+			if (setupThread()) {
+				runThread();
+				return true;
+			}
+		}
+		return false;
+	}
+	
+protected:
+	virtual bool setupThread() = 0;
+	
+	virtual void runThread()
+	{
+		if (!myThread) return;
+		QObject::connect(myThread, SIGNAL(finished()), this, SLOT(resetOnFinished()));
+		myThread->start();
+		this->isQueued = false;
+	}
+	
+	bool isQueued;
+	CollectorThread *myThread;
+	QMutex myMutex;
+};
+
 ///----
 
 class CalcThread : public CollectorThread
@@ -90,4 +171,55 @@ private:
 
 	StringsCollection *mapToFill;
 	size_t minStrLen;
+};
+
+///----
+
+#include <sig_finder.h>
+
+
+class MatchesCollection : public QObject, public Releasable
+{
+	Q_OBJECT
+
+public:
+	MatchesCollection() : Releasable() {}
+	
+	QList<sig_ma::FoundPacker> packerAtOffset;
+};
+
+#include <iostream>
+class SignFinderThread : public CollectorThread
+{
+	Q_OBJECT
+public:
+	SignFinderThread(PEFile* pe, offset_t offset)
+		: CollectorThread(pe), startOffset(offset)
+	{
+	}
+	
+	~SignFinderThread()
+	{
+		std::cout << __FUNCTION__ << std::endl;
+	}
+	
+	void setStartOffset(offset_t _startOffset)
+	{
+		QMutexLocker lock(&myMutex);
+		this->startOffset = _startOffset;
+	}
+	
+	sig_ma::SigFinder signFinder;
+	QList<sig_ma::FoundPacker> packerAtOffset;
+	
+signals:
+	void gotMatches(SignFinderThread* matched);
+
+private:
+	void run();
+	void findInBuffer();
+	void addFoundPackers(offset_t startingRaw, sig_ma::matched &matchedSet);
+	bool findPackerSign(offset_t startingRaw);
+
+	offset_t startOffset;
 };

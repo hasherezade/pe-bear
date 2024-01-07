@@ -9,43 +9,62 @@
 
 #include <bearparser/bearparser.h>
 
+#include "../../base/PeHandler.h"
+#include "../../base/threads/SignFinderThread.h"
+
 //---
 class PatternSearchWindow : public QDialog
 {
 	Q_OBJECT
 
 public:
-	PatternSearchWindow(QWidget *parent);
-	~PatternSearchWindow() { }
-
-	QString getSignature();
-
-	int exec(offset_t offset, offset_t maxOffset)
+	PatternSearchWindow(QWidget *parent, PeHandler* peHndl);
+	~PatternSearchWindow()
 	{
-		startOffset.setRange(0, maxOffset);
-		startOffset.setPrefix("0x");
-		startOffset.setValue(offset);
-		this->signPattern = "";
+		if (threadMngr) {
+			delete threadMngr;
+		}
+	}
+
+	int exec()
+	{
+		if (!m_peHndl) return QDialog::Rejected;
+
+		PEFile* peFile = this->m_peHndl->getPe();
+		if (!peFile) return QDialog::Rejected;
+
+		offset_t maxOffset = peFile->getContentSize();
+		offset_t offset = m_peHndl->getDisplayedOffset();
+
+		startOffsetBox.setRange(0, maxOffset);
+		startOffsetBox.setValue(offset);
 		return QDialog::exec();
 	}
 
 protected slots:
 	void accept();
 
+	void matchesFound(MatchesCollection *thread);
+	void onProgressUpdated(int progress);
+
 protected:
-	void fetchSignature();
+	QString fetchSignature();
 
 	QVBoxLayout topLayout;
 	QHBoxLayout secPropertyLayout2;
 	QHBoxLayout secPropertyLayout3;
+	QHBoxLayout secPropertyLayout4;
 	QHBoxLayout buttonLayout;
 
 	QLabel patternLabel;
 	QLineEdit patternEdit;
 
 	QLabel offsetLabel;
-	QSpinBox startOffset;
-
+	QSpinBox startOffsetBox;
+	QProgressBar progressBar;
+	
 	QDialogButtonBox buttonBox;
-	QString signPattern;
+
+	PeHandler* m_peHndl;
+	SignFinderThreadManager *threadMngr;
 };

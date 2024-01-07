@@ -33,6 +33,19 @@ include_directories( ${PARSER_INC} )
 include_directories( ${SIGFIND_DIR} )
 include_directories( ${DISASM_DIR} ${CAPSTONE_INC})
 
+set (pebear_threads_srcs
+	base/threads/CalcThread.cpp
+	base/threads/SignFinderThread.cpp
+	base/threads/StringExtThread.cpp
+)
+
+set (pebear_threads_hdrs
+	base/threads/CollectorThread.h
+	base/threads/CalcThread.h
+	base/threads/SignFinderThread.h
+	base/threads/StringExtThread.h
+)
+
 set (pebear_base_srcs
 	base/BearVers.cpp
 	base/MainSettings.cpp
@@ -41,7 +54,6 @@ set (pebear_base_srcs
 	base/PeHandler.cpp
 	base/PeHandlerFactory.cpp
 	base/PeHandlersManager.cpp
-	base/CollectorThread.cpp
 	base/RegKeyManager.cpp
 )
 
@@ -55,7 +67,6 @@ set (pebear_base_hdrs
 	base/PeHandlerFactory.h
 	base/PeHandlersManager.h
 	base/StringsCollection.h
-	base/CollectorThread.h
 	base/RegKeyManager.h
 	base/ImportsAutoadderSettings.h
 )
@@ -224,6 +235,7 @@ set (pebear_windows_hdrs
 )
 
 set (pebear_srcs
+	${pebear_threads_srcs}
 	${pebear_base_srcs}
 	${pebear_gui_base_srcs}
 	${pebear_gui_srcs}
@@ -235,6 +247,7 @@ set (pebear_srcs
 
 set (pebear_hdrs
 	REbear.h
+	${pebear_threads_hdrs}
 	${pebear_base_hdrs}
 	${pebear_gui_base_hdrs}
 	${pebear_gui_hdrs}
