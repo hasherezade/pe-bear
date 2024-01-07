@@ -26,8 +26,6 @@ public:
 		}
 	}
 
-	QString getSignature();
-
 	int exec()
 	{
 		if (!m_peHndl) return QDialog::Rejected;
@@ -38,15 +36,14 @@ public:
 		offset_t maxOffset = peFile->getContentSize();
 		offset_t offset = m_peHndl->getDisplayedOffset();
 
-		startOffset.setRange(0, maxOffset);
-		startOffset.setPrefix("0x");
-		startOffset.setValue(offset);
-		this->signPattern = "";
+		startOffsetBox.setRange(0, maxOffset);
+		startOffsetBox.setValue(offset);
 		return QDialog::exec();
 	}
 
 protected slots:
 	void accept();
+
 	void matchesFound(MatchesCollection *thread);
 	void onProgressUpdated(int progress);
 
@@ -63,13 +60,11 @@ protected:
 	QLineEdit patternEdit;
 
 	QLabel offsetLabel;
-	QSpinBox startOffset;
+	QSpinBox startOffsetBox;
 	QProgressBar progressBar;
 	
 	QDialogButtonBox buttonBox;
-	QString signPattern;
-	
-	
+
 	PeHandler* m_peHndl;
 	SignFinderThreadManager *threadMngr;
 };

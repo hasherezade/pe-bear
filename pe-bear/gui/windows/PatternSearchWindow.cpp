@@ -3,20 +3,19 @@
 PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	: QDialog(parent, Qt::Dialog),
 	m_peHndl(peHndl), threadMngr(nullptr),
-	buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
-	signPattern("")
+	buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)
 {
 	//setWindowFlags(Qt::Dialog);
 	setModal(true);
 	setWindowTitle(tr("Define search"));
 	offsetLabel.setText(tr("Starting from the offset:" ));
 	secPropertyLayout2.addWidget(&offsetLabel);
-	secPropertyLayout2.addWidget(&startOffset);
+	secPropertyLayout2.addWidget(&startOffsetBox);
 	
-	startOffset.setDisplayIntegerBase(16);
-	startOffset.setRange(0, 0);
-	startOffset.setPrefix("0x");
-	startOffset.setValue(0);
+	startOffsetBox.setDisplayIntegerBase(16);
+	startOffsetBox.setRange(0, 0);
+	startOffsetBox.setPrefix("0x");
+	startOffsetBox.setValue(0);
 
 	QRegExpValidator *validator = new QRegExpValidator(QRegExp("([0-9A-Fa-f\\?]{0,2} {0,1})*"), this);
 	patternEdit.setValidator(validator);
@@ -33,25 +32,21 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	topLayout.addLayout(&secPropertyLayout4);
 	topLayout.addLayout(&buttonLayout);
 
-	progressBar.setRange(0,1000);
+	progressBar.setRange(0, 1000);
+	progressBar.setVisible(false);
 	topLayout.addStretch();
 	setLayout(&topLayout);
 
 	buttonLayout.addWidget(&buttonBox);
 	connect(&buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(&buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-	patternEdit.setFocus();
-}
 
-QString PatternSearchWindow::getSignature()
-{
-	return this->signPattern;
+	patternEdit.setFocus();
 }
 
 QString PatternSearchWindow::fetchSignature()
 {
-	this->signPattern = patternEdit.text();
-	return this->signPattern;
+	return patternEdit.text();
 }
 
 void PatternSearchWindow::accept()
@@ -66,8 +61,8 @@ void PatternSearchWindow::accept()
 	if (!peFile) return;
 
 	offset_t maxOffset = peFile->getContentSize();
-	offset_t offset = startOffset.value();
-	
+	offset_t offset = startOffsetBox.value();
+
 	size_t fullSize = peFile->getContentSize();
 	if (offset >= fullSize) return;
 	
@@ -82,6 +77,7 @@ void PatternSearchWindow::accept()
 		this, SLOT(matchesFound(MatchesCollection *)), Qt::UniqueConnection);
 	connect(threadMngr, SIGNAL(progressUpdated(int )), 
 		this, SLOT(onProgressUpdated(int )), Qt::UniqueConnection);
+	progressBar.setVisible(true);
 	threadMngr->recreateThread();
 }
 
@@ -108,7 +104,7 @@ void PatternSearchWindow::matchesFound(MatchesCollection *matches)
 	const sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
 	m_peHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
 	m_peHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
-	startOffset.setValue(pckr.offset);
+	startOffsetBox.setValue(pckr.offset);
 	if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
 		tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
 	{
