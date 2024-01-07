@@ -66,7 +66,7 @@ void PatternSearchWindow::accept()
 	if (!peFile) return;
 
 	offset_t maxOffset = peFile->getContentSize();
-	offset_t offset = m_peHndl->getDisplayedOffset();
+	offset_t offset = startOffset.value();
 	
 	size_t fullSize = peFile->getContentSize();
 	if (offset >= fullSize) return;
