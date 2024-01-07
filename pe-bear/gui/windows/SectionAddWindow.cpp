@@ -11,12 +11,7 @@ SectionAddWindow::SectionAddWindow(QWidget *parent)
 	setModal(true);
 	
 	secVsizeEdit.setMaximum(0);
-	secVsizeEdit.setDisplayIntegerBase(16);
-	secVsizeEdit.setPrefix("0x");
-	
 	secRsizeEdit.setMaximum(0);
-	secRsizeEdit.setDisplayIntegerBase(16);
-	secRsizeEdit.setPrefix("0x");
 
 	this->fileButton.setText(tr("Choose a file"));
 	connect(&fileButton, SIGNAL(clicked()), this, SLOT(onFileChose()));

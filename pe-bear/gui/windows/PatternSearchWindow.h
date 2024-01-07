@@ -11,7 +11,7 @@
 
 #include "../../base/PeHandler.h"
 #include "../../base/threads/SignFinderThread.h"
-
+#include "../../gui_base/HexSpinBox.h"
 //---
 class PatternSearchWindow : public QDialog
 {
@@ -61,7 +61,7 @@ protected:
 	QLineEdit patternEdit;
 
 	QLabel offsetLabel;
-	QSpinBox startOffsetBox;
+	HexSpinBox startOffsetBox;
 	QProgressBar progressBar;
 	
 	QPushButton searchButton;

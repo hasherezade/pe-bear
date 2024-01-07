@@ -9,8 +9,7 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	offsetLabel.setText(tr("Starting from the offset:" ));
 	secPropertyLayout2.addWidget(&offsetLabel);
 	secPropertyLayout2.addWidget(&startOffsetBox);
-	
-	startOffsetBox.setDisplayIntegerBase(16);
+
 	startOffsetBox.setRange(0, 0);
 	startOffsetBox.setPrefix("0x");
 	startOffsetBox.setValue(0);
@@ -39,8 +38,8 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	searchButton.setText("Search");
 	buttonLayout.addWidget(&searchButton);
 	buttonLayout.addWidget(&stopButton);
-	connect(&searchButton, SIGNAL(clicked()), this,  SLOT(onSearchClicked()));
-	connect(&stopButton, SIGNAL(clicked()), this,  SLOT(onStopClicked()));
+	connect(&searchButton, SIGNAL(clicked()), this, SLOT(onSearchClicked()));
+	connect(&stopButton, SIGNAL(clicked()), this, SLOT(onStopClicked()));
 	patternEdit.setFocus();
 }
 

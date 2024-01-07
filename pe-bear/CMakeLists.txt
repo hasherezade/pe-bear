@@ -85,6 +85,7 @@ set (pebear_gui_base_srcs
 	gui_base/OffsetDependentAction.cpp
 	gui_base/WrapperTableModel.cpp
 	gui_base/WrapperInterface.cpp
+	gui_base/HexSpinBox.cpp	
 )
 
 set (pebear_gui_base_hdrs
@@ -101,6 +102,7 @@ set (pebear_gui_base_hdrs
 	gui_base/OffsetDependentAction.h
 	gui_base/WrapperTableModel.h
 	gui_base/WrapperInterface.h
+	gui_base/HexSpinBox.h
 )
 
 set (pebear_gui_pe_mod_srcs
