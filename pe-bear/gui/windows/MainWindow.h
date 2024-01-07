@@ -28,6 +28,7 @@
 
 #include "../../ViewSettings.h"
 
+#include "../../base/threads/SignFinderThread.h"
 //----------------------------------------------
 
 class MainWindow : public QMainWindow

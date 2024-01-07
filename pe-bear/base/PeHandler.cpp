@@ -5,57 +5,13 @@
 #include <bearparser/bearparser.h>
 #include "../disasm/PeDisasm.h"
 
+#include "../base/threads/StringExtThread.h"
+#include "../base/threads/CalcThread.h"
+
 #define MIN_STRING_LEN 5
 
 using namespace sig_ma;
 using namespace pe;
-
-class StringThreadManager : public CollectorThreadManager
-{
-public:
-	StringThreadManager(PeHandler *peHndl)
-		: m_peHndl(peHndl)
-	{
-	}
-	
-	bool setupThread()
-	{
-		if (!m_peHndl) return false;
-		
-		StringExtThread *stringThread = new StringExtThread(m_peHndl->getPe(), MIN_STRING_LEN);
-		this->myThread = stringThread;
-		QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), m_peHndl, SLOT(onStringsReady(StringsCollection* )));
-		QObject::connect(stringThread, SIGNAL(loadingStrings(int)), m_peHndl, SLOT(onStringsLoadingProgress(int)));
-		return true;
-	}
-protected:
-	PeHandler *m_peHndl;
-};
-
-//-------------------------------------------------
-class HashCalcThreadManager : public CollectorThreadManager
-{
-public:
-	HashCalcThreadManager(PeHandler *peHndl, CalcThread::hash_type hType)
-		: m_peHndl(peHndl), m_hashType(hType)
-	{
-	}
-	
-	bool setupThread()
-	{
-		if (!m_peHndl) return false;
-		
-		offset_t checksumOffset = m_peHndl->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		CalcThread *calcThread = new CalcThread(m_hashType, m_peHndl->getPe(), checksumOffset);
-		this->myThread = calcThread;
-		QObject::connect(calcThread, SIGNAL(gotHash(QString, int)), m_peHndl, SLOT(onHashReady(QString, int)));
-		return true;
-	}
-	
-protected:
-	CalcThread::hash_type m_hashType;
-	PeHandler *m_peHndl;
-};
 
 //-------------------------------------------------
 
@@ -98,7 +54,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	associateWrappers();
 	this->wrapAlbum();
 	
-	for (int i = 0; i < CalcThread::HASHES_NUM; i++) {
+	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
 		hashCalcMgrs[i] = nullptr;
 	}
 	//---
@@ -143,7 +99,7 @@ bool PeHandler::hasDirectory(dir_entry dirNum) const
 	return true;
 }
 
-QString PeHandler::getCurrentHash(CalcThread::hash_type type)
+QString PeHandler::getCurrentHash(SupportedHashes::hash_type type)
 {
 	QMutexLocker ml(&m_hashMutex[type]);
 	return hash[type];
@@ -151,7 +107,7 @@ QString PeHandler::getCurrentHash(CalcThread::hash_type type)
 
 void PeHandler::onHashReady(QString hash, int hType)
 {
-	if (hType >= CalcThread::HASHES_NUM) return;
+	if (hType >= SupportedHashes::HASHES_NUM) return;
 	QMutexLocker ml(&m_hashMutex[hType]);
 	this->hash[hType] = hash;
 	emit hashChanged();
@@ -163,7 +119,7 @@ void PeHandler::deleteThreads()
 		delete stringThreadMgr;
 		stringThreadMgr = nullptr;
 	}
-	for (int hType = 0; hType < CalcThread::HASHES_NUM; hType++) {
+	for (int hType = 0; hType < SupportedHashes::HASHES_NUM; hType++) {
 		delete this->hashCalcMgrs[hType];
 		this->hashCalcMgrs[hType] = nullptr;
 	}
@@ -172,7 +128,7 @@ void PeHandler::deleteThreads()
 bool PeHandler::runStringsExtraction()
 {
 	if (!stringThreadMgr) {
-		stringThreadMgr = new StringThreadManager(this);
+		stringThreadMgr = new StringThreadManager(this, MIN_STRING_LEN);
 	}
 	return stringThreadMgr->recreateThread();
 }
@@ -1320,9 +1276,8 @@ void PeHandler::updatePeOnResized()
 
 void PeHandler::runHashesCalculation()
 {
-	for (int i = 0; i < CalcThread::HASHES_NUM; i++) {
-	
-		CalcThread::hash_type hType = static_cast<CalcThread::hash_type>(i);
+	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+		SupportedHashes::hash_type hType = static_cast<SupportedHashes::hash_type>(i);
 		if (!this->hashCalcMgrs[i]) {
 			this->hashCalcMgrs[i] = new HashCalcThreadManager(this, hType);
 		}

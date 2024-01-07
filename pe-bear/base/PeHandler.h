@@ -12,7 +12,8 @@
 #include "CommentHandler.h"
 #include "ImportsAutoadderSettings.h"
 #include "StringsCollection.h"
-#include "CollectorThread.h"
+#include "threads/CollectorThread.h"
+#include "threads/SupportedHashes.h"
 
 
 #define SIZE_UNLIMITED (-1)
@@ -135,13 +136,13 @@ public:
 
 	bool hasDirectory(pe::dir_entry dirNum) const;
 
-	QString getCurrentSHA256() { return getCurrentHash(CalcThread::SHA256); }
-	QString getCurrentMd5() { return getCurrentHash(CalcThread::MD5); }
-	QString getCurrentSHA1() { return getCurrentHash(CalcThread::SHA1); }
-	QString getCurrentChecksum() { return getCurrentHash(CalcThread::CHECKSUM); }
-	QString getRichHdrHash() { return getCurrentHash(CalcThread::RICH_HDR_MD5); }
-	QString getImpHash() { return getCurrentHash(CalcThread::IMP_MD5); }
-	QString getCurrentHash(CalcThread::hash_type type);
+	QString getCurrentSHA256() { return getCurrentHash(SupportedHashes::SHA256); }
+	QString getCurrentMd5() { return getCurrentHash(SupportedHashes::MD5); }
+	QString getCurrentSHA1() { return getCurrentHash(SupportedHashes::SHA1); }
+	QString getCurrentChecksum() { return getCurrentHash(SupportedHashes::CHECKSUM); }
+	QString getRichHdrHash() { return getCurrentHash(SupportedHashes::RICH_HDR_MD5); }
+	QString getImpHash() { return getCurrentHash(SupportedHashes::IMP_MD5); }
+	QString getCurrentHash(SupportedHashes::hash_type type);
 
 	void setPackerSignFinder(sig_ma::SigFinder* signFinder);
 	bool isPacked();
@@ -343,11 +344,10 @@ protected:
 	QDateTime m_fileModDate; //modification time of the corresponding file on the disk
 	QDateTime m_loadedFileModDate; //modification time of the version that is currently loaded
 
-	CollectorThreadManager *hashCalcMgrs[CalcThread::HASHES_NUM];
-	//CalcThread* calcThread[CalcThread::HASHES_NUM];
-	QString hash[CalcThread::HASHES_NUM];
-	QMutex m_hashMutex[CalcThread::HASHES_NUM];
-	//bool calcQueued[CalcThread::HASHES_NUM];
+	CollectorThreadManager *hashCalcMgrs[SupportedHashes::HASHES_NUM];
+
+	QString hash[SupportedHashes::HASHES_NUM];
+	QMutex m_hashMutex[SupportedHashes::HASHES_NUM];
 	
 	CollectorThreadManager* stringThreadMgr;
 

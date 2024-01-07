@@ -6,7 +6,6 @@
 #include "../../HexView.h"
 #include "../../base/RegKeyManager.h"
 
-#include "../../base/CollectorThread.h"
 
 #ifdef _DEBUG
 	#include <iostream>
