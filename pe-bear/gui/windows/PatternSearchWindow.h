@@ -21,7 +21,7 @@ public:
 	PatternSearchWindow(QWidget *parent, PeHandler* peHndl);
 	~PatternSearchWindow()
 	{
-		if (!threadMngr) {
+		if (threadMngr) {
 			delete threadMngr;
 		}
 	}
@@ -48,6 +48,7 @@ public:
 protected slots:
 	void accept();
 	void matchesFound(MatchesCollection *thread);
+	void onProgressUpdated(int progress);
 
 protected:
 	QString fetchSignature();
@@ -55,6 +56,7 @@ protected:
 	QVBoxLayout topLayout;
 	QHBoxLayout secPropertyLayout2;
 	QHBoxLayout secPropertyLayout3;
+	QHBoxLayout secPropertyLayout4;
 	QHBoxLayout buttonLayout;
 
 	QLabel patternLabel;
@@ -62,9 +64,11 @@ protected:
 
 	QLabel offsetLabel;
 	QSpinBox startOffset;
-
+	QProgressBar progressBar;
+	
 	QDialogButtonBox buttonBox;
 	QString signPattern;
+	
 	
 	PeHandler* m_peHndl;
 	SignFinderThreadManager *threadMngr;

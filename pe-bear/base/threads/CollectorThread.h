@@ -18,12 +18,20 @@ public:
 	
 	void stop()
 	{
+		QMutexLocker lock(&stopMutex);
 		stopRequested = true;
+	}
+	
+	bool isStopRequested()
+	{
+		QMutexLocker lock(&stopMutex);
+		return stopRequested;
 	}
 	
 protected:
 	PEFile* m_PE;
 	QMutex myMutex;
+	QMutex stopMutex;
 	bool stopRequested;
 };
 
@@ -100,7 +108,9 @@ protected:
 	{
 		if (!myThread) return;
 		QObject::connect(myThread, SIGNAL(finished()), this, SLOT(resetOnFinished()));
-		myThread->start();
+		if (!myThread->isStopRequested()) {
+			myThread->start();
+		}
 		this->isQueued = false;
 	}
 	

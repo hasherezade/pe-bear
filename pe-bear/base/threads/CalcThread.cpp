@@ -81,7 +81,7 @@ QString CalcThread::makeRichHdrHash()
 void CalcThread::run()
 {
 	QMutexLocker lock(&myMutex);
-	if (this->stopRequested) {
+	if (this->isStopRequested()) {
 		return;
 	}
 	QString fileHash = "Cannot calculate!";

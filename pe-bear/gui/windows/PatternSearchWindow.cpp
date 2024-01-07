@@ -26,11 +26,14 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	patternLabel.setBuddy(&patternEdit);
 	secPropertyLayout3.addWidget(&patternLabel);
 	secPropertyLayout3.addWidget(&patternEdit);
-
+	secPropertyLayout4.addWidget(&progressBar);
+	
 	topLayout.addLayout(&secPropertyLayout2);
 	topLayout.addLayout(&secPropertyLayout3);
+	topLayout.addLayout(&secPropertyLayout4);
 	topLayout.addLayout(&buttonLayout);
 
+	progressBar.setRange(0,1000);
 	topLayout.addStretch();
 	setLayout(&topLayout);
 
@@ -77,7 +80,14 @@ void PatternSearchWindow::accept()
 	}
 	connect(threadMngr, SIGNAL(gotMatches(MatchesCollection* )), 
 		this, SLOT(matchesFound(MatchesCollection *)), Qt::UniqueConnection);
+	connect(threadMngr, SIGNAL(progressUpdated(int )), 
+		this, SLOT(onProgressUpdated(int )), Qt::UniqueConnection);
 	threadMngr->recreateThread();
+}
+
+void PatternSearchWindow::onProgressUpdated(int progress)
+{
+	progressBar.setValue(progress);
 }
 
 void PatternSearchWindow::matchesFound(MatchesCollection *matches)

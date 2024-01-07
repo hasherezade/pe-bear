@@ -17,13 +17,28 @@ void SignFinderThread::findInBuffer()
 	if (!m_PE || startOffset == INVALID_ADDR) return;
 	
 	offset_t offset = startOffset;
-	size_t fullSize = m_PE->getContentSize();
-
+	offset_t fullSize = m_PE->getContentSize();
+	int proc = 0;
+	int maxProgress = 1000;
+	bool found = false;
 	for (offset = startOffset; offset < fullSize; offset++) {
-		if (findPackerSign(offset)) {
-			break;
+		{ //scope0
+			QMutexLocker stopLock(&this->stopMutex);
+			if (this->stopRequested) break;
+			if (findPackerSign(offset)) {
+				found = true;;
+			}
+		} //!scope0
+		double curr = offset;
+		double max = fullSize;
+		const int progress = int((curr/max) * maxProgress);
+		if (progress > proc) {
+			proc = progress;
+			emit progressUpdated(proc);
 		}
+		if (found) return;
 	}
+	emit progressUpdated(maxProgress);
 }
 
 bool SignFinderThread::findPackerSign(offset_t startingRaw)
@@ -46,12 +61,11 @@ bool SignFinderThread::findPackerSign(offset_t startingRaw)
 
 void SignFinderThread::addFoundPackers(offset_t startingRaw, sig_ma::matched &matchedSet)
 {
-	using namespace sig_ma;
-	
 	size_t foundCount = matchedSet.signs.size();
-	if (!foundCount) return;
-	
-	std::cout << __FUNCTION__ << " : " << __LINE__ << std::endl;
+	if (!foundCount) {
+		return;
+	}
+	using namespace sig_ma;
 	PckrSign* packer = nullptr;
 	for (auto sItr = matchedSet.signs.begin(); sItr != matchedSet.signs.end(); ++sItr) {
 		packer = *sItr;

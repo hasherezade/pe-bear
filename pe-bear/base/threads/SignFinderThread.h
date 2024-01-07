@@ -34,11 +34,11 @@ public:
 		QMutexLocker lock(&myMutex);
 		this->startOffset = _startOffset;
 	}
-	
 
 signals:
 	void gotMatches(MatchesCollection* matched);
-
+	void progressUpdated(int progress);
+	
 private:
 	void run();
 	void findInBuffer();
@@ -77,17 +77,22 @@ public:
 
 		QObject::connect(thread, SIGNAL(gotMatches(MatchesCollection* )), 
 			this, SLOT(onGotMatches(MatchesCollection *)), Qt::UniqueConnection);
+
+		QObject::connect(thread, SIGNAL(progressUpdated(int)), 
+			this, SLOT(onProgressUpdated(int)), Qt::UniqueConnection);
+
 		return true;
 	}
 	
 	bool loadSignature(const QString &label, const QString &text)
 	{
+		m_signFinder.clear();
 		return m_signFinder.loadSignature("Searched", text.toStdString());
-		//QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
 	}
 	
 signals:
 	void gotMatches(MatchesCollection* matched);
+	void progressUpdated(int progress);
 	
 protected slots:
 
@@ -96,6 +101,11 @@ protected slots:
 		emit gotMatches(matched);
 	}
 	
+	void onProgressUpdated(int progress)
+	{
+		emit progressUpdated(progress);
+	}
+
 protected:
 
 	PEFile* m_PE;
