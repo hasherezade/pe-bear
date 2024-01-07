@@ -71,8 +71,6 @@ void PatternSearchWindow::accept()
 	if (!this->threadMngr) {
 		threadMngr = new SignFinderThreadManager(peFile, offset);
 	}
-
-	//SignFinderThread *thread = new SignFinderThread(peFile, offset);
 	if (!threadMngr->loadSignature("Searched", text)) {
 		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
 		return;
@@ -80,11 +78,6 @@ void PatternSearchWindow::accept()
 	connect(threadMngr, SIGNAL(gotMatches(MatchesCollection* )), 
 		this, SLOT(matchesFound(MatchesCollection *)), Qt::UniqueConnection);
 	threadMngr->recreateThread();
-
-/*
-	thread->start();
-	//QDialog::accept();
-	 **/
 }
 
 void PatternSearchWindow::matchesFound(MatchesCollection *matches)

@@ -18,8 +18,9 @@ class SignFinderThread : public CollectorThread
 {
 	Q_OBJECT
 public:
-	SignFinderThread(PEFile* pe, offset_t offset)
-		: CollectorThread(pe), startOffset(offset)
+	SignFinderThread(PEFile* pe, sig_ma::SigFinder &signFinder, MatchesCollection &matched, offset_t offset)
+		: CollectorThread(pe), 
+		m_signFinder(signFinder), m_matched(matched), startOffset(offset)
 	{
 	}
 	
@@ -34,11 +35,9 @@ public:
 		this->startOffset = _startOffset;
 	}
 	
-	sig_ma::SigFinder signFinder;
-	QList<sig_ma::FoundPacker> packerAtOffset;
-	
+
 signals:
-	void gotMatches(SignFinderThread* matched);
+	void gotMatches(MatchesCollection* matched);
 
 private:
 	void run();
@@ -47,5 +46,63 @@ private:
 	bool findPackerSign(offset_t startingRaw);
 
 	offset_t startOffset;
+	sig_ma::SigFinder &m_signFinder;
+	MatchesCollection &m_matched;
 };
+
+class SignFinderThreadManager : public CollectorThreadManager
+{
+	Q_OBJECT
+public:
+	SignFinderThreadManager(PEFile* pe, offset_t offset)
+		: m_PE(pe), startOffset(0)
+	{
+	}
+	
+	void setStartOffset(offset_t _startOffset)
+	{
+		this->startOffset = _startOffset;
+		SignFinderThread *thread = dynamic_cast<SignFinderThread*>(this->myThread);
+		if (thread) {
+			thread->setStartOffset(_startOffset);
+		}
+	}
+	
+	bool setupThread()
+	{
+		if (!m_PE) return false;
+		
+		SignFinderThread *thread = new SignFinderThread(m_PE, m_signFinder, m_matched, startOffset);
+		this->myThread = thread;
+
+		QObject::connect(thread, SIGNAL(gotMatches(MatchesCollection* )), 
+			this, SLOT(onGotMatches(MatchesCollection *)), Qt::UniqueConnection);
+		return true;
+	}
+	
+	bool loadSignature(const QString &label, const QString &text)
+	{
+		return m_signFinder.loadSignature("Searched", text.toStdString());
+		//QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
+	}
+	
+signals:
+	void gotMatches(MatchesCollection* matched);
+	
+protected slots:
+
+	void onGotMatches(MatchesCollection* matched)
+	{
+		emit gotMatches(matched);
+	}
+	
+protected:
+
+	PEFile* m_PE;
+	offset_t startOffset;
+	sig_ma::SigFinder m_signFinder;
+	MatchesCollection m_matched;
+};
+
+///----
 

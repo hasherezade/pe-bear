@@ -3,12 +3,12 @@
 void SignFinderThread::run()
 {
 	QMutexLocker lock(&myMutex);
-	this->packerAtOffset.clear();
+	this->m_matched.packerAtOffset.clear();
 	if (!isByteArrInit()) {
 		return;
 	}
 	findInBuffer();
-	emit gotMatches(this);
+	emit gotMatches(&m_matched);
 }
 
 void SignFinderThread::findInBuffer()
@@ -38,7 +38,7 @@ bool SignFinderThread::findPackerSign(offset_t startingRaw)
 		return false;
 	}
 	const size_t contentSize = m_PE->getRawSize();
-	sig_ma::matched matchedSet = signFinder.getMatching(content, contentSize, startingRaw, sig_ma::FIXED);
+	sig_ma::matched matchedSet = m_signFinder.getMatching(content, contentSize, startingRaw, sig_ma::FIXED);
 	addFoundPackers(startingRaw, matchedSet);
 	return matchedSet.signs.size() ? true : false;
 }
@@ -58,13 +58,13 @@ void SignFinderThread::addFoundPackers(offset_t startingRaw, sig_ma::matched &ma
 		if (!packer) continue;
 		
 		FoundPacker pckr(startingRaw + matchedSet.match_offset, packer);
-		auto itr = std::find(this->packerAtOffset.begin(), this->packerAtOffset.end(), pckr);
+		auto itr = std::find(this->m_matched.packerAtOffset.begin(), this->m_matched.packerAtOffset.end(), pckr);
 
-		if (itr != this->packerAtOffset.end()) { //already exist
+		if (itr != this->m_matched.packerAtOffset.end()) { //already exist
 			FoundPacker &found = *itr;
 			packer = found.signaturePtr;
 		} else {
-			this->packerAtOffset.append(pckr);
+			this->m_matched.packerAtOffset.append(pckr);
 		}
 	}
 }

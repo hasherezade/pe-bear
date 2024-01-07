@@ -21,7 +21,9 @@ public:
 	PatternSearchWindow(QWidget *parent, PeHandler* peHndl);
 	~PatternSearchWindow()
 	{
-		if (!threadMngr) delete threadMngr;
+		if (!threadMngr) {
+			delete threadMngr;
+		}
 	}
 
 	QString getSignature();
