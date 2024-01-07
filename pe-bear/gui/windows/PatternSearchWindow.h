@@ -9,19 +9,30 @@
 
 #include <bearparser/bearparser.h>
 
+#include "../../base/PeHandler.h"
+#include "../../base/threads/SignFinderThread.h"
+
 //---
 class PatternSearchWindow : public QDialog
 {
 	Q_OBJECT
 
 public:
-	PatternSearchWindow(QWidget *parent);
+	PatternSearchWindow(QWidget *parent, PeHandler* peHndl);
 	~PatternSearchWindow() { }
 
 	QString getSignature();
 
-	int exec(offset_t offset, offset_t maxOffset)
+	int exec()
 	{
+		if (!m_peHndl) return QDialog::Rejected;
+
+		PEFile* peFile = this->m_peHndl->getPe();
+		if (!peFile) return QDialog::Rejected;
+
+		offset_t maxOffset = peFile->getContentSize();
+		offset_t offset = m_peHndl->getDisplayedOffset();
+
 		startOffset.setRange(0, maxOffset);
 		startOffset.setPrefix("0x");
 		startOffset.setValue(offset);
@@ -31,9 +42,10 @@ public:
 
 protected slots:
 	void accept();
+	void matchesFound(SignFinderThread *thread);
 
 protected:
-	void fetchSignature();
+	QString fetchSignature();
 
 	QVBoxLayout topLayout;
 	QHBoxLayout secPropertyLayout2;
@@ -48,4 +60,6 @@ protected:
 
 	QDialogButtonBox buttonBox;
 	QString signPattern;
+	
+	PeHandler* m_peHndl;
 };

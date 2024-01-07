@@ -28,7 +28,6 @@
 
 #include "../../ViewSettings.h"
 
-#include "../../base/threads/SignFinderThread.h"
 //----------------------------------------------
 
 class MainWindow : public QMainWindow
@@ -61,8 +60,6 @@ public slots:
 	void addSection(PeHandler* );
 	void sigSearch(PeHandler* );
 	void searchPattern(PeHandler*);
-	
-	void matchesFound(SignFinderThread *);
 
 	void openSignatures();
 
@@ -178,7 +175,6 @@ private:
 
 	DiffWindow diffWindow;
 	SectionAddWindow secAddWindow;
-	PatternSearchWindow patternSearchWindow;
 
 	QStatusBar statusBar;
 	QGridLayout cntntLayout;

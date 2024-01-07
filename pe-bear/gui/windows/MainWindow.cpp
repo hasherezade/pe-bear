@@ -44,7 +44,7 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	: QMainWindow(parent), mainSettings(_mainSettings),
 	m_PeHndl(NULL), m_Timer(this),
 	diffWindow(this->m_PEHandlers, this),
-	secAddWindow(this), userConfigWindow(this), patternSearchWindow(this),
+	secAddWindow(this), userConfigWindow(this),
 	sectionsTree(this), sectionMenu(mainSettings, this),
 	peFileModel(NULL),
 	rightPanel(this), 
@@ -1195,79 +1195,7 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 {
 	if (!selectedPeHndl) return;
-	PEFile* peFile = selectedPeHndl->getPe();
-	if (!peFile) return;
-	
-	offset_t maxOffset = peFile->getContentSize();
-	offset_t offset = selectedPeHndl->getDisplayedOffset();
-	int ret = patternSearchWindow.exec(offset, maxOffset);
-	if ((QDialog::DialogCode)ret != QDialog::Accepted) {
-		return;
-	}
-	QString text = patternSearchWindow.getSignature();
-	if (!text.length()) {
-		return;
-	}
-	size_t fullSize = peFile->getContentSize();
-	if (offset >= fullSize) return;
 
-	SignFinderThread *thread = new SignFinderThread(peFile, offset);
-	if (!thread->signFinder.loadSignature("Searched", text.toStdString())) {
-		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
-		delete thread;
-		return;
-	}
-	connect(thread, SIGNAL(gotMatches(SignFinderThread* )), 
-		this, SLOT(matchesFound(SignFinderThread *)), Qt::UniqueConnection);
-	thread->start();
-	/*	
-	while (offset < fullSize){
-		std::vector<sig_ma::FoundPacker> signAtOffset;
-		size_t areaSize = fullSize - offset;
-		selectedPeHndl->findSignatureInArea(offset, areaSize, localSignFinder, signAtOffset, false);
-		if (signAtOffset.size()) {
-			sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
-			selectedPeHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
-			selectedPeHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
-			if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
-					tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
-			{
-				break;
-			}
-			offset = pckr.offset + 1;
-		} else {
-			QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
-			break;
-		}
-	}*/
-}
-
-void MainWindow::matchesFound(SignFinderThread *thread)
-{
-	if (!thread || !thread->packerAtOffset.size()) {
-		QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
-		delete thread;
-		return;
-	}
-	//size_t fullSize = thread->m_PE->getContentSize();
-
-	const QList<sig_ma::FoundPacker> &signAtOffset = thread->packerAtOffset;
-	//size_t areaSize = fullSize - offset;
-	//selectedPeHndl->findSignatureInArea(offset, areaSize, localSignFinder, signAtOffset, false);
-	if (!signAtOffset.size()) {
-		QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
-		delete thread;
-		return;
-	}
-	const sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
-	//selectedPeHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
-	//selectedPeHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
-	if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
-		tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
-	{
-		delete thread;
-		return;
-	}
-	thread->setStartOffset(pckr.offset + 1);
-	thread->start();
+	PatternSearchWindow patternSearchWindow(this, selectedPeHndl);
+	patternSearchWindow.exec();
 }

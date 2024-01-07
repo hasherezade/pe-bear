@@ -1,7 +1,7 @@
 #include "PatternSearchWindow.h"
 
-PatternSearchWindow::PatternSearchWindow(QWidget *parent)
-	: QDialog(0, Qt::Dialog),
+PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
+	: QDialog(parent, Qt::Dialog), m_peHndl(peHndl),
 	buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
 	signPattern("")
 {
@@ -44,13 +44,64 @@ QString PatternSearchWindow::getSignature()
 	return this->signPattern;
 }
 
-void PatternSearchWindow::fetchSignature()
+QString PatternSearchWindow::fetchSignature()
 {
 	this->signPattern = patternEdit.text();
+	return this->signPattern;
 }
 
 void PatternSearchWindow::accept()
 {
-	fetchSignature();
-	QDialog::accept();
+	QString text = fetchSignature();;
+	if (!text.length()) {
+		return;
+	}
+	
+	if (!this->m_peHndl) return;
+	PEFile* peFile = m_peHndl->getPe();
+	if (!peFile) return;
+	
+	offset_t maxOffset = peFile->getContentSize();
+	offset_t offset = m_peHndl->getDisplayedOffset();
+	
+	size_t fullSize = peFile->getContentSize();
+	if (offset >= fullSize) return;
+
+	SignFinderThread *thread = new SignFinderThread(peFile, offset);
+	if (!thread->signFinder.loadSignature("Searched", text.toStdString())) {
+		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
+		delete thread;
+		return;
+	}
+	connect(thread, SIGNAL(gotMatches(SignFinderThread* )), 
+		this, SLOT(matchesFound(SignFinderThread *)), Qt::UniqueConnection);
+	thread->start();
+	//QDialog::accept();
+}
+
+void PatternSearchWindow::matchesFound(SignFinderThread *thread)
+{
+	if (!thread || !thread->packerAtOffset.size()) {
+		QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
+		delete thread;
+		return;
+	}
+	const QList<sig_ma::FoundPacker> &signAtOffset = thread->packerAtOffset;
+	if (!signAtOffset.size()) {
+		QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
+		delete thread;
+		return;
+	}
+	const sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
+	m_peHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
+	m_peHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
+	startOffset.setValue(pckr.offset);
+	if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
+		tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+	{
+		delete thread;
+		return;
+	}
+	thread->setStartOffset(pckr.offset + 1);
+	thread->start();
 }
