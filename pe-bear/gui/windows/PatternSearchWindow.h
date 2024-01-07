@@ -19,7 +19,10 @@ class PatternSearchWindow : public QDialog
 
 public:
 	PatternSearchWindow(QWidget *parent, PeHandler* peHndl);
-	~PatternSearchWindow() { }
+	~PatternSearchWindow()
+	{
+		if (!threadMngr) delete threadMngr;
+	}
 
 	QString getSignature();
 
@@ -42,7 +45,7 @@ public:
 
 protected slots:
 	void accept();
-	void matchesFound(SignFinderThread *thread);
+	void matchesFound(MatchesCollection *thread);
 
 protected:
 	QString fetchSignature();
@@ -62,4 +65,5 @@ protected:
 	QString signPattern;
 	
 	PeHandler* m_peHndl;
+	SignFinderThreadManager *threadMngr;
 };
