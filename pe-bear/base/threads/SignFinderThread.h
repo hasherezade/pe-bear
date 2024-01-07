@@ -52,7 +52,7 @@ class SignFinderThreadManager : public CollectorThreadManager
 {
 	Q_OBJECT
 public:
-	SignFinderThreadManager(PEFile* pe, offset_t offset)
+	SignFinderThreadManager(PEFile* pe, offset_t offset=0)
 		: m_PE(pe), startOffset(offset)
 	{
 	}

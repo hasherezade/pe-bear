@@ -76,8 +76,9 @@ void PatternSearchWindow::onSearchClicked()
 	if (offset >= fullSize) return;
 	
 	if (!this->threadMngr) {
-		threadMngr = new SignFinderThreadManager(peFile, offset);
+		threadMngr = new SignFinderThreadManager(peFile);
 	}
+	threadMngr->setStartOffset(offset);
 	if (!threadMngr->loadSignature("Searched", text)) {
 		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
 		return;
@@ -87,6 +88,7 @@ void PatternSearchWindow::onSearchClicked()
 	connect(threadMngr, SIGNAL(progressUpdated(int )), 
 		this, SLOT(onProgressUpdated(int )), Qt::UniqueConnection);
 	progressBar.setVisible(true);
+	progressBar.setValue(0);
 	searchButton.setEnabled(false);
 	threadMngr->recreateThread();
 }
