@@ -2,8 +2,7 @@
 
 PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	: QDialog(parent, Qt::Dialog),
-	m_peHndl(peHndl), threadMngr(nullptr),
-	buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)
+	m_peHndl(peHndl), threadMngr(nullptr)
 {
 	setModal(true);
 	setWindowTitle(tr("Define search"));
@@ -36,10 +35,12 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	topLayout.addStretch();
 	setLayout(&topLayout);
 
-	buttonLayout.addWidget(&buttonBox);
-	connect(&buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-	connect(&buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
+	stopButton.setText("Stop");
+	searchButton.setText("Search");
+	buttonLayout.addWidget(&searchButton);
+	buttonLayout.addWidget(&stopButton);
+	connect(&searchButton, SIGNAL(clicked()), this,  SLOT(onSearchClicked()));
+	connect(&stopButton, SIGNAL(clicked()), this,  SLOT(onStopClicked()));
 	patternEdit.setFocus();
 }
 
@@ -48,7 +49,16 @@ QString PatternSearchWindow::fetchSignature()
 	return patternEdit.text();
 }
 
-void PatternSearchWindow::accept()
+
+void PatternSearchWindow::onStopClicked()
+{
+	if (!this->threadMngr) {
+		return;
+	}
+	this->threadMngr->stopThread();
+}
+
+void PatternSearchWindow::onSearchClicked()
 {
 	QString text = fetchSignature();;
 	if (!text.length()) {
@@ -77,6 +87,7 @@ void PatternSearchWindow::accept()
 	connect(threadMngr, SIGNAL(progressUpdated(int )), 
 		this, SLOT(onProgressUpdated(int )), Qt::UniqueConnection);
 	progressBar.setVisible(true);
+	searchButton.setEnabled(false);
 	threadMngr->recreateThread();
 }
 
@@ -87,6 +98,7 @@ void PatternSearchWindow::onProgressUpdated(int progress)
 
 void PatternSearchWindow::matchesFound(MatchesCollection *matches)
 {
+	searchButton.setEnabled(true);
 	if (!threadMngr) return; //should never happen
 	
 	if (!matches || !matches->packerAtOffset.size()) {

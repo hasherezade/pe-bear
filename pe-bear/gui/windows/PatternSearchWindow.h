@@ -42,7 +42,8 @@ public:
 	}
 
 protected slots:
-	void accept();
+	void onSearchClicked();
+	void onStopClicked();
 
 	void matchesFound(MatchesCollection *thread);
 	void onProgressUpdated(int progress);
@@ -63,8 +64,9 @@ protected:
 	QSpinBox startOffsetBox;
 	QProgressBar progressBar;
 	
-	QDialogButtonBox buttonBox;
-
+	QPushButton searchButton;
+	QPushButton stopButton;
+	
 	PeHandler* m_peHndl;
 	SignFinderThreadManager *threadMngr;
 };
