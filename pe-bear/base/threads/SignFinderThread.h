@@ -13,7 +13,6 @@ public:
 	QList<sig_ma::FoundPacker> packerAtOffset;
 };
 
-#include <iostream>
 class SignFinderThread : public CollectorThread
 {
 	Q_OBJECT
@@ -26,7 +25,6 @@ public:
 	
 	~SignFinderThread()
 	{
-		std::cout << __FUNCTION__ << std::endl;
 	}
 	
 	void setStartOffset(offset_t _startOffset)

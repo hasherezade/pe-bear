@@ -5,7 +5,6 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	m_peHndl(peHndl), threadMngr(nullptr),
 	buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel)
 {
-	//setWindowFlags(Qt::Dialog);
 	setModal(true);
 	setWindowTitle(tr("Define search"));
 	offsetLabel.setText(tr("Starting from the offset:" ));
