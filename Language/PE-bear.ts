@@ -298,22 +298,22 @@
 <context>
     <name>DelayImpFuncModel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="150"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="149"/>
         <source>Call via</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="151"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="150"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="152"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="151"/>
         <source>Ordinal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="153"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/DelayImpTreeModel.cpp" line="152"/>
         <source>Hint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -405,8 +405,8 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="197"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="446"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="470"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="447"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="471"/>
         <source>Disasm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -416,216 +416,221 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="200"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="199"/>
+        <source>Strings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="201"/>
         <source>DOS Hdr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="202"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="203"/>
         <source>Rich Hdr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="204"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="205"/>
         <source>File Hdr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="205"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="206"/>
         <source>Optional Hdr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="206"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="207"/>
         <source>Section Hdrs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="238"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="239"/>
         <source>No changes required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="238"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="239"/>
         <source>Virtual section layout is already the same as raw, no changes required!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="242"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="243"/>
         <source>The PE does not seem to be in the mapped (virtual) format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="243"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="244"/>
         <source>Changing the layout may corrupt the file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="244"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="245"/>
         <source>Do you really want copy virtual sections layout as raw?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="245"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="246"/>
         <source>Copy virtual to raw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="261"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="262"/>
         <source>Last mapped raw = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="261"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="262"/>
         <source> when File Size = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="262"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="263"/>
         <source>Last mapped RVA = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="262"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="263"/>
         <source> when Image Size = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="265"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="266"/>
         <source>No resizing required!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="269"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="270"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="271"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="272"/>
         <source> and </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="272"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="273"/>
         <source>Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="274"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="275"/>
         <source>Do you want to resize </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="274"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="275"/>
         <source> to fit?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="275"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="276"/>
         <source>Do you really want to resize?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="291"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="292"/>
         <source>Done!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="291"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="292"/>
         <source>Resizing succeeded!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="295"/>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="296"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="302"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="318"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="297"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="303"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="319"/>
         <source>Failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="295"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="296"/>
         <source>Failed resizing the File!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="296"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="297"/>
         <source>Failed resizing the Image!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="302"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="303"/>
         <source>No space to add a new entry!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="302"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="303"/>
         <source>You must move the table first!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="313"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="314"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="313"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="314"/>
         <source>No library selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="318"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="319"/>
         <source>No space to add a function entry!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="344"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="347"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="345"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="348"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="344"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="345"/>
         <source>Auto adding imports failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="409"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="410"/>
         <source>&amp;Add a section</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="412"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="413"/>
         <source>Copy &amp;virtual offsets/sizes as raw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="415"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="416"/>
         <source>&amp;Resize to fit sections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="429"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="430"/>
         <source>Add a &amp;library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="432"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="433"/>
         <source>Add a &amp;function to the library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="435"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="436"/>
         <source>Add imports via &amp;wizard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="463"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="464"/>
         <source>Headers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="529"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/DetailsTab.cpp" line="530"/>
         <source>Data Directory[</source>
         <translation type="unfinished"></translation>
     </message>
@@ -949,7 +954,7 @@
 <context>
     <name>GeneralPanel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="221"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="223"/>
         <source>Found signatures</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1074,17 +1079,17 @@
 <context>
     <name>ImportedFuncModel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/ImportsTreeModel.cpp" line="176"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/ImportsTreeModel.cpp" line="175"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/ImportsTreeModel.cpp" line="177"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/ImportsTreeModel.cpp" line="176"/>
         <source>Ordinal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/ImportsTreeModel.cpp" line="178"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/ImportsTreeModel.cpp" line="177"/>
         <source>Call via</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1173,117 +1178,117 @@
 <context>
     <name>InfoTableModel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="29"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="30"/>
         <source>File info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="32"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="33"/>
         <source>Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="33"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="34"/>
         <source>Is Truncated?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="34"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="35"/>
         <source>File Alignment Units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="35"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="36"/>
         <source>Loaded size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="36"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="37"/>
         <source>File size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="42"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="43"/>
         <source>Checksum</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="43"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="44"/>
         <source>Rich Header Hash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="71"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="72"/>
         <source>not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="76"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="77"/>
         <source>(decimal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="76"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="77"/>
         <source>edit to resize the file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="88"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="89"/>
         <source>Some files are too large and they must be loaded truncated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="91"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="92"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="91"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="92"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="143"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="144"/>
         <source>Do your really want to resize file?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="150"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="151"/>
         <source>Yes, continue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="151"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="152"/>
         <source>No, abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="158"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="159"/>
         <source>Incorrect new size supplied!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="161"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="162"/>
         <source>Choose the size that will not damage headers!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="163"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="164"/>
         <source>Too big!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="172"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="173"/>
         <source>bytes are going to be cropped!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="176"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="177"/>
         <source>bytes are going to be added!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="185"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/GeneralPanel.cpp" line="186"/>
         <source>Resizing failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1332,641 +1337,652 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="131"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="133"/>
         <source>File reloaded: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="147"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="149"/>
         <source>File deleted: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="149"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="151"/>
         <source>File changed: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="159"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="161"/>
         <source>File changed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="159"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="161"/>
         <source>File deleted!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="161"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="162"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1014"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="163"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="164"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1056"/>
         <source>The file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="161"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="163"/>
         <source>- has changed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="161"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="163"/>
         <source>Do you want to reload ? </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="162"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="164"/>
         <source>- has been deleted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="162"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="164"/>
         <source>Do you want to unload?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="173"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="175"/>
         <source>Remember the answer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="174"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="176"/>
         <source>Can be changed in: [Settings] -&gt; [Configure...]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="210"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="222"/>
-        <source>geometry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="211"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="223"/>
-        <source>windowState</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="253"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="255"/>
         <source>Check for updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="257"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="259"/>
         <source>Check if new version is available or</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="257"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="259"/>
         <source>write a comment about your user experience!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="262"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="314"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="264"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="321"/>
         <source>Dump all sections to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="266"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="268"/>
         <source>Add a new section</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="270"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="272"/>
         <source>&amp;Save the executable as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="273"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="275"/>
+        <source>Find signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="278"/>
         <source>&amp;Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="276"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="281"/>
         <source>&amp;Unload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="284"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="289"/>
         <source>Edit the section</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="301"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="308"/>
         <source>&amp;New Instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="306"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="313"/>
         <source>&amp;Load PEs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="311"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="318"/>
         <source>&amp;Unload All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="317"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="324"/>
         <source>Export disassembly to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="320"/>
-        <source>Add to Explorer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="325"/>
-        <source>&amp;List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="327"/>
-        <source>&amp;Load</source>
+        <source>Export strings to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="330"/>
+        <source>Add to Explorer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="335"/>
+        <source>&amp;List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="337"/>
+        <source>&amp;Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="340"/>
         <source>&amp;Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="333"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="343"/>
         <source>Compare</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="336"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="346"/>
         <source>HexView Font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="339"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="349"/>
         <source>DisasmView Font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="342"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="352"/>
         <source>Global Font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="345"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="355"/>
         <source>Reset to defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="348"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="358"/>
         <source>Zoom In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="353"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="363"/>
         <source>Zoom Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="358"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="368"/>
         <source>Default size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="367"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="377"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="368"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="378"/>
         <source>&amp;Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="369"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="379"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="371"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="381"/>
         <source>Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="377"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="387"/>
         <source>Fon&amp;t</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="386"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="396"/>
         <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="401"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="411"/>
         <source>Si&amp;gnatures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="417"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="427"/>
         <source>Configure...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="426"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="436"/>
         <source>From all loaded...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="489"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="500"/>
         <source>Loaded: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="536"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="547"/>
         <source>Loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="537"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="548"/>
         <source>Loaded </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="538"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="549"/>
         <source>Failed to load: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="540"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="575"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="655"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="698"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="902"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="904"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1119"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="551"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="586"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="666"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="709"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="740"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="944"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="946"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1161"/>
         <source>Done!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="552"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="563"/>
         <source>In order to do it you must run </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="552"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="563"/>
         <source>as administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="563"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="574"/>
         <source>Cannot set!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="570"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="581"/>
         <source>Cannot remove!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="575"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="586"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="652"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="695"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1123"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="663"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="706"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="737"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1165"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="652"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="663"/>
         <source>Dumping sections from some of the PEs failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="655"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="666"/>
         <source>Dumped sections from: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="656"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="699"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="667"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="710"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="741"/>
         <source> PEs into:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="695"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="706"/>
         <source>Exporting disasm from some of the PEs failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="698"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="709"/>
         <source>Exported disasm from: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="757"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="737"/>
+        <source>Exporting strings from some of the PEs failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="740"/>
+        <source>Exported strings from: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="799"/>
         <source>Portable Executable reversing tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="759"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="801"/>
         <source>version: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="761"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="803"/>
         <source>built on: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="766"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="808"/>
         <source>commit hash: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="769"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="811"/>
         <source>author: Hasherezade</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="769"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="811"/>
         <source>homepage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="770"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="812"/>
         <source>Source code &amp; more info:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="770"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="812"/>
         <source>here</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="772"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="814"/>
         <source>using:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="779"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="821"/>
         <source>bearparser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="780"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="786"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="822"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="828"/>
         <source>LICENSE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="785"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="827"/>
         <source>Capstone Engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="790"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="832"/>
         <source>This software is provided by the copyright holders and contributors &quot;as is&quot;, without any warranty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="794"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="836"/>
         <source>WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="800"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="842"/>
         <source>Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="819"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="861"/>
         <source>Pick a HexView font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="829"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="871"/>
         <source>Pick a DisasmView font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="839"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="881"/>
         <source>Pick a Global font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="875"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="917"/>
         <source>All Files </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="875"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1050"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="917"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1092"/>
         <source>Applications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="876"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1051"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="918"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1093"/>
         <source>Libraries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="876"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1051"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="918"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1093"/>
         <source>Drivers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="876"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1051"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="918"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1093"/>
         <source>Screensavers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="877"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="879"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="919"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="921"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="882"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="924"/>
         <source>No file chosen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="902"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="944"/>
         <source>Found: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="904"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="946"/>
         <source>Not found!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="944"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="957"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="990"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="986"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="999"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1032"/>
         <source>Open error!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="944"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="986"/>
         <source>File does not exist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="957"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="999"/>
         <source>Failed loading the file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="963"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1005"/>
         <source>Not supported filetype!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="967"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1009"/>
         <source>Not supported filetype: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="971"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1010"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1013"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1052"/>
         <source>Cannot load!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="971"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1013"/>
         <source>Cannot load:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="984"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1026"/>
         <source>File:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="984"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1026"/>
         <source>is already loaded!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="985"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1027"/>
         <source>This file is already loaded!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="990"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1032"/>
         <source>Invalid path or access rights:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1001"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1043"/>
         <source>File: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1008"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1050"/>
         <source>Error occured during loading the file: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1008"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1050"/>
         <source>Type: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1014"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1056"/>
         <source>is too big and was loaded truncated!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1015"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1057"/>
         <source>Too big file!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1020"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1062"/>
         <source>WARNING: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1021"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1063"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1028"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1070"/>
         <source>Text Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1028"/>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1050"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1070"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1092"/>
         <source>All Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1029"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1071"/>
         <source>Open file with signatures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1036"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1078"/>
         <source>Added new signatures: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1052"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1094"/>
         <source>Save as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1057"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1099"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1057"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1099"/>
         <source>Dumped PE to: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1059"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1101"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1059"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1101"/>
         <source>Dumping failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1119"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1161"/>
         <source>Dumped: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1120"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1162"/>
         <source>sections into:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1123"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1165"/>
         <source>Dumping sections failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1141"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1183"/>
         <source>Cannot search!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1141"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1183"/>
         <source>No section selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2238,59 +2254,106 @@
     </message>
 </context>
 <context>
+    <name>PatternSearchWindow</name>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="8"/>
+        <source>Define search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="9"/>
+        <source>Starting from the offset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="20"/>
+        <source>Signature to search:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="82"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="106"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="112"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="120"/>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="82"/>
+        <source>Could not parse the signature!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="106"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="112"/>
+        <source>Signature not found!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="120"/>
+        <source>Signature found at:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/PatternSearchWindow.cpp" line="121"/>
+        <source>Search next?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PeHandler</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="76"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="48"/>
         <source>The executable may not run: the ImageSize size doesn&apos;t fit sections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="80"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="52"/>
         <source>The executable has atypical ImageBase. It may be mapped at a default base:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="84"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="56"/>
         <source>The PE has no sections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="88"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="60"/>
         <source>The PE is a memory dump in a virtual format (may require unmapping)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="94"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="66"/>
         <source>The executable won&apos;t run: Machine ID not set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="99"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="71"/>
         <source>The executable won&apos;t run: Subsystem not set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="104"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="76"/>
         <source>The executable won&apos;t run: OptHdr Magic not set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="110"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="82"/>
         <source>Not all sections are mapped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="118"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="90"/>
         <source>The PE may be truncated. Some sections are outside the file scope.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="123"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="95"/>
         <source>Contains sections misaligned to FileAlignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="132"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/base/PeHandler.h" line="104"/>
         <source>This .NET file may contain native code.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2306,7 +2369,7 @@
 <context>
     <name>PeTreeModel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/PeTreeModel.cpp" line="102"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/PeTreeModel.cpp" line="104"/>
         <source>Right click to follow </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2327,27 +2390,27 @@
 <context>
     <name>RelocEntriesModel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="155"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="160"/>
         <source>Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="156"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="161"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="157"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="162"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="158"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="163"/>
         <source>Offset from Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="159"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RelocsTreeModel.cpp" line="164"/>
         <source>Reloc RVA</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2504,52 +2567,52 @@
 <context>
     <name>RichHdrTreeModel</name>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="210"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="208"/>
         <source>Calculated checksum</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="245"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="243"/>
         <source>Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="246"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="244"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="247"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="245"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="248"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="246"/>
         <source>Unmasked Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="249"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="247"/>
         <source>Meaning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="250"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="248"/>
         <source>ProductId</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="251"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="249"/>
         <source>BuildId</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="252"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="250"/>
         <source>Count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="253"/>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/RichHdrTreeModel.cpp" line="251"/>
         <source>VS version</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2968,6 +3031,112 @@
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/SignaturesBrowseWindow.cpp" line="145"/>
         <source>Added new signatures: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StringsBrowseWindow</name>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="116"/>
+        <source>Text Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="116"/>
+        <source>All Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="117"/>
+        <source>Save strings as...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="121"/>
+        <source>Strings save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="121"/>
+        <source>Saved strings to: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="131"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="133"/>
+        <source>Loading strings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="137"/>
+        <source>Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="140"/>
+        <source>Max per page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="147"/>
+        <source>Search string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.h" line="198"/>
+        <source>Total pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.h" line="235"/>
+        <source>Loading strings: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.h" line="237"/>
+        <source>Extracted strings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StringsTableModel</name>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="19"/>
+        <source>Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="20"/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="21"/>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="22"/>
+        <source>String</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="58"/>
+        <source>Right click to follow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="62"/>
+        <source>Wide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/StringsBrowseWindow.cpp" line="62"/>
+        <source>Ansi</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
