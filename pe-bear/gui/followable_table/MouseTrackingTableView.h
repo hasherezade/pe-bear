@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtGlobal>
-
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
 #else
@@ -27,6 +26,7 @@ public:
 
 	void mousePressEvent(QMouseEvent *ev)
 	{
+		if (!ev) return;
 		QModelIndex index = this->indexAt(ev->pos());
 		ev->accept();
 		emit mouseClicked(index);
@@ -36,6 +36,7 @@ public:
 
 	void mouseMoveEvent(QMouseEvent *ev)
 	{
+		if (!ev) return;
 		QModelIndex index = this->indexAt(ev->pos());
 		ev->accept();
 		emit mouseHovered(index);
@@ -45,6 +46,7 @@ public:
 
 	void leaveEvent(QEvent *ev)
 	{
+		if (!ev) return;
 		ev->accept();
 		emit mouseLeave();
 

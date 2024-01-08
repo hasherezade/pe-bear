@@ -14,6 +14,7 @@ void OffsetedView::setModel(QAbstractItemModel *model)
 
 void OffsetedView::mousePressEvent(QMouseEvent *ev)
 {
+    if (!ev) return;
     ev->accept();
     QModelIndex index = this->indexAt(ev->pos());
     if (index.isValid()) {

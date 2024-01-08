@@ -35,9 +35,12 @@ public:
 		m_ContextMenu(this),
 		m_isMenuEnabled(true)
 	{
-		connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(customMenuEvent(QPoint)) );
+		for (int i = 0; i < COUNT_ACTIONS; i++) {
+			m_contextActions[i] = nullptr;
+		}
 		initContextMenu();
 		enableMenu(true);
+		connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(customMenuEvent(QPoint)));
 	}
 
 	QMenu& getMenu() { return m_ContextMenu; }
@@ -54,10 +57,10 @@ public:
 
 	bool enableAction(enum FollowableOffsetedView::ACTIONS id, bool state)
 	{
-		if (id >= m_contextActions.size() || m_contextActions.at(id) == nullptr) {
+		if (id >= COUNT_ACTIONS || m_contextActions[id] == nullptr) {
 			return false;
 		}
-		m_contextActions.at(id)->setEnabled(state);
+		m_contextActions[id]->setEnabled(state);
 		return true;
 	}
 
@@ -66,12 +69,12 @@ protected slots:
 	{
 		offset_t currentOffset = getSelectedOffset();
 		if (currentOffset == INVALID_ADDR) {
-			m_contextActions.at(ACTION_FOLLOW)->setText("Cannot follow");
-			m_contextActions.at(ACTION_FOLLOW)->setEnabled(false);
+			m_contextActions[ACTION_FOLLOW]->setText("Cannot follow");
+			m_contextActions[ACTION_FOLLOW]->setEnabled(false);
 			return false;
 		}
-		m_contextActions.at(ACTION_FOLLOW)->setText("Follow "+ util::translateAddrTypeName(m_targetAddrType) +": "+ QString::number(currentOffset, 16));
-		m_contextActions.at(ACTION_FOLLOW)->setEnabled(true);
+		m_contextActions[ACTION_FOLLOW]->setText("Follow "+ util::translateAddrTypeName(m_targetAddrType) +": "+ QString::number(currentOffset, 16));
+		m_contextActions[ACTION_FOLLOW]->setEnabled(true);
 		return true;
 	}
 	
@@ -93,9 +96,10 @@ protected:
 
 	void initContextMenu()
 	{
+	
 		m_contextActions[ACTION_FOLLOW] = new QAction("Follow", &m_ContextMenu);
-		connect(m_contextActions[ACTION_FOLLOW], SIGNAL(triggered()), this, SLOT(followSelectedOffset()) );
 		m_ContextMenu.addAction(m_contextActions[ACTION_FOLLOW]);
+		connect(m_contextActions[ACTION_FOLLOW], SIGNAL(triggered()), this, SLOT(followSelectedOffset()));
 	}
 
 	virtual offset_t getSelectedOffset()
@@ -107,5 +111,5 @@ protected:
 
 	bool m_isMenuEnabled;
 	QMenu m_ContextMenu;
-	QList<QAction*> m_contextActions;
+	QAction* m_contextActions[COUNT_ACTIONS]; 
 };
