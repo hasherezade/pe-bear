@@ -77,6 +77,11 @@ void SectionAddWindow::onAddSectionToPe(PeHandler *peHndl)
 	int max = INT_MAX;
 	secRsizeEdit.setMaximum(max);
 	secVsizeEdit.setMaximum(max);
+	
+	const size_t rAlign = pe->getAlignment(Executable::RAW);
+	const size_t vAlign = pe->getAlignment(Executable::RVA);
+	secRsizeEdit.setSingleStep(rAlign);
+	secVsizeEdit.setSingleStep(vAlign);
 	this->show();
 }
 
