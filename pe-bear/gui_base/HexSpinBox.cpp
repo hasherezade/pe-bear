@@ -3,7 +3,7 @@
 HexSpinBox::HexSpinBox(QWidget *parent)
     : QSpinBox(parent)
 {
-	validator = new QRegExpValidator(QRegExp("[0-9A-Fa-f]{1,8}"), this);
+	validator = new QRegExpValidator(QRegExp("0x[0-9A-Fa-f]{1,8}"), this);
 	setPrefix("0x");
 }
 
