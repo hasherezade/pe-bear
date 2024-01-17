@@ -17,24 +17,20 @@ using namespace pe;
 
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	: QObject(), 
-	m_fileModDate(QDateTime()), // init with empty
-	m_loadedFileModDate(QDateTime()), // init with empty
+	m_PE(pe), m_fileBuffer(fileBuffer),
 	dosHdrWrapper(pe), 
 	fileHdrWrapper(pe), optHdrWrapper(pe), richHdrWrapper(pe), dataDirWrapper(pe),
-	exportDirWrapper(pe), importDirWrapper(pe), tlsDirWrapper(pe), relocDirWrapper(pe), 
-	securityDirWrapper(pe), ldConfDirWrapper(pe), boundImpDirWrapper(pe),
-	delayImpDirWrapper(pe), debugDirWrapper(pe), exceptDirWrapper(pe), clrDirWrapper(pe),
-	resourcesAlbum(pe),
-	resourcesDirWrapper(pe, &resourcesAlbum),
-	signFinder(nullptr), 
+	exportDirWrapper(*pe->getExportsDir()), importDirWrapper(*pe->getImportsDir()), tlsDirWrapper(*pe->getTlsDir()), relocDirWrapper(*pe->getRelocsDir()), 
+	securityDirWrapper(*pe->getSecurityDir()), ldConfDirWrapper(*pe->getLoadConfigDir()), boundImpDirWrapper(*pe->getBoundImportsDir()),
+	delayImpDirWrapper(*pe->getDelayedImportsDir()), debugDirWrapper(*pe->getDebugDir()), exceptDirWrapper(*pe->getExceptionsDir()), clrDirWrapper(*pe->getClsDir()),
+	resourcesAlbum(*pe->getResourcesAlbum()),
+	resourcesDirWrapper(*pe->getResourcesDir()),
 	modifHndl(pe->getFileBuffer(), this),
+	m_fileModDate(QDateTime()), // init with empty
+	m_loadedFileModDate(QDateTime()), // init with empty
+	signFinder(nullptr), 
 	stringThreadMgr(nullptr)
 {
-	if (!pe) return;
-
-	m_PE = pe;
-	m_fileBuffer = fileBuffer;
-
 	markedTarget = INVALID_ADDR;
 	markedOrigin = INVALID_ADDR;
 
@@ -47,13 +43,12 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	this->hilightedSize = 0;
 	pageStart = 0;
 	pageSize = PREVIEW_SIZE;
-	
+
+	associateWrappers();
+
 	updateFileModifTime();
 	m_loadedFileModDate = m_fileModDate; // init
-	
-	associateWrappers();
-	this->wrapAlbum();
-	
+
 	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
 		hashCalcMgrs[i] = nullptr;
 	}
@@ -535,7 +530,7 @@ bool PeHandler::isVirtualFormat()
 		return false;
 	}
 	// check if has valid imports
-	ImportDirWrapper* imp = this->m_PE->getImports();
+	ImportDirWrapper* imp = this->m_PE->getImportsDir();
 	if (imp && imp->isValid()) {
 		return false;
 	}

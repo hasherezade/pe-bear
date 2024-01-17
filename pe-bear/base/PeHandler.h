@@ -241,21 +241,21 @@ public:
 	OptHdrWrapper optHdrWrapper;
 	DataDirWrapper dataDirWrapper;
 
-	ResourcesAlbum resourcesAlbum;
+	ResourcesAlbum &resourcesAlbum;
 
 	/*Directory wrappers */
-	ExportDirWrapper exportDirWrapper;
-	ImportDirWrapper importDirWrapper;
-	TlsDirWrapper tlsDirWrapper;
-	RelocDirWrapper relocDirWrapper;
-	SecurityDirWrapper securityDirWrapper;
-	LdConfigDirWrapper ldConfDirWrapper;
-	BoundImpDirWrapper boundImpDirWrapper;
-	DelayImpDirWrapper delayImpDirWrapper;
-	DebugDirWrapper debugDirWrapper;
-	ClrDirWrapper clrDirWrapper;
-	ExceptionDirWrapper exceptDirWrapper;
-	ResourceDirWrapper resourcesDirWrapper;
+	ExportDirWrapper &exportDirWrapper;
+	ImportDirWrapper &importDirWrapper;
+	TlsDirWrapper &tlsDirWrapper;
+	RelocDirWrapper &relocDirWrapper;
+	SecurityDirWrapper &securityDirWrapper;
+	LdConfigDirWrapper &ldConfDirWrapper;
+	BoundImpDirWrapper &boundImpDirWrapper;
+	DelayImpDirWrapper &delayImpDirWrapper;
+	DebugDirWrapper &debugDirWrapper;
+	ClrDirWrapper &clrDirWrapper;
+	ExceptionDirWrapper &exceptDirWrapper;
+	ResourceDirWrapper &resourcesDirWrapper;
 
 	ExeElementWrapper* dataDirWrappers[pe::DIR_ENTRIES_COUNT]; // Pointers to above wrappers
 

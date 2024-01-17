@@ -9,7 +9,7 @@ inline QString stripExtension(const QString & fileName)
 QString CalcThread::makeImpHash()
 {
 	static CommonOrdinalsLookup lookup;
-	ImportDirWrapper* imports = m_PE->getImports();
+	ImportDirWrapper* imports = m_PE->getImportsDir();
 	if (!imports) return QString();
 
 	QStringList exts;
