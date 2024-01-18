@@ -34,7 +34,11 @@ DisasmScrollBar::DisasmScrollBar(QWidget *parent)
 	: QScrollBar(parent), myModel(NULL)
 {
 	this->setAutoFillBackground(true);
-	this->setBackgroundRole(QPalette::Dark);
+	QPalette *palette = new QPalette();
+	palette->setColor(QPalette::Text, Qt::red);
+	palette->setColor(QPalette::Window, Qt::yellow);
+	palette->setColor(QPalette::Base, Qt::white);
+	this->setPalette(*palette);
 
 	initMenu();
 	enableMenu(true);
