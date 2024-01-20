@@ -1105,9 +1105,9 @@ bool PeHandler::substBlock(offset_t offset, uint64_t size, BYTE* buf)
 	
 	this->backupModification(offset, size);
 	if (buf) {
-		memcpy(content + offset, buf, size);
+		::memcpy(content + offset, buf, size);
 	} else {
-		memset(content + offset, 0, size);
+		::memset(content + offset, 0, size);
 	}
 	return this->setBlockModified(offset, size);
 }

@@ -105,6 +105,8 @@ bool ResourcesDirSplitter::displayBitmap(ResourceContentWrapper *resContent)
 
 bool ResourcesDirSplitter::displayText(ResourceContentWrapper *resContent)
 {
+	if (!resContent) return false;
+
 	const char *content = (const char*)(resContent->getPtr());
 	const size_t contentSize = resContent->getSize();
 	if (!content || !contentSize) return false;
@@ -120,9 +122,25 @@ bool ResourcesDirSplitter::displayText(ResourceContentWrapper *resContent)
 	return true;
 }
 
+bool ResourcesDirSplitter::displayResStrings(ResourceStringsWrapper *strContent)
+{
+	if (!strContent) return false;
+	
+	QStringList stringsList;
+	const size_t count = strContent->getResStringsCount();
+	for (size_t i = 0; i < count; i++) {
+		stringsList << strContent->getQStringAt(i);
+	}
+	QString text = stringsList.join("\n");
+	this->contentText.setPlainText(text);
+	this->leafTab.setToolTip(tr("Resource strings listing"));
+	return true;
+}
 
 bool ResourcesDirSplitter::displayIcon(ResourceContentWrapper *resContent, const pe::resource_type &restype)
 {
+	if (!resContent) return false;
+	
 	const char *contentPtr = (const char*)(resContent->getPtr());
 	const size_t contentSize = resContent->getSize();
 	char *content = (char*)contentPtr;
@@ -296,6 +314,11 @@ void ResourcesDirSplitter::refreshLeafContent()
 				this->leafTab.setToolTip(tr("Image Preview"));
 			}
 			break;
+		}
+		case RESTYPE_STRING: {
+			ResourceStringsWrapper *strWrapper = dynamic_cast<ResourceStringsWrapper*>(resContent);
+			isOk = displayResStrings(strWrapper);
+			if (isOk) changeView(false);
 		}
 	}
 	if (isOk) {

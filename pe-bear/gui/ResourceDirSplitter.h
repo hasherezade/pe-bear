@@ -39,6 +39,7 @@ public slots:
 protected:
 	void changeView(bool isPix);
 	void clearContentDisplay();
+	bool displayResStrings(ResourceStringsWrapper *resContent);
 	bool displayText(ResourceContentWrapper *resContent);
 	bool displayBitmap(ResourceContentWrapper *resContent);
 	bool displayIcon(ResourceContentWrapper *resContent, const pe::resource_type &type);
