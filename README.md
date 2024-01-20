@@ -33,7 +33,7 @@ The **Linux** build requires appropriately **Qt_5.14 or Qt_5.15 to be installed*
 
 The **Windows** build with *vs13* suffix(built with Visual Studio 2013) has no external dependencies.
 
-The **Windows** build with *vs19* suffix (built with Visual Studio 2019) requires [Redistributable packages for Visual Studio 2015, 2017, 2019, and 2022](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170).
+The **Windows** build with *vs19* suffix (built with Visual Studio 2019) requires [Redistributable packages for Visual Studio 2015 - 2022](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170).
 
 The **Windows** build with *vs10* suffix is built with Qt4 (legacy) - in contrast to the other builds that are with Qt5 (recommended). It is prepared for the purpose of backward compatibility with old versions of Windows (i.e. XP).
 
