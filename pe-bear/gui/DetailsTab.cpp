@@ -82,7 +82,8 @@ DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 	fileHdrTree(this), optionalHdrTree(this), disasmView(this),
 	hdrsSplitter(this), secHdrTreeView(&hdrsSplitter), secDiagramSplitter(&hdrsSplitter),
 	fileHdrModel(NULL), optHdrModel(NULL), secHdrsModel(NULL), importsModel(NULL), exportsModel(NULL), expFuncModel(NULL), 
-	secDiagramModel(NULL), disasmModel(NULL), resourcesModel(NULL), clrModel(NULL)
+	secDiagramModel(NULL), disasmModel(NULL), resourcesModel(NULL), clrModel(NULL),
+	cRichHdrTab(-1)
 {
 	for (int i = 0; i < pe::DIR_ENTRIES_COUNT; i++)  {
 		dirSplitters[i] = NULL;
@@ -199,17 +200,15 @@ DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 	cStringsTab = addTab(&stringsBrowseWindow, tr("Strings"));
 	
 	cDOSHdrTab = addTab(&dosHdrTree, tr("DOS Hdr"));
-	if (peHndl && peHndl->getPe() && peHndl->getPe()->getRichHeaderSign()) {
-		cRichHdrTab = addTab(&richHdrTree, tr("Rich Hdr"));
-	}
+	cRichHdrTab = addTab(&richHdrTree, tr("Rich Hdr"));
 	cFileHdrsTab = addTab(&fileHdrTree, tr("File Hdr"));
 	cOptHdrsTab = addTab(&optionalHdrTree, tr("Optional Hdr"));
 	cSecHdrsTab = addTab(&hdrsSplitter, tr("Section Hdrs"));
 
 	setScaledIcons();
-	reloadDirView();
+	reloadTabsView();
 
-	connect(this->myPeHndl, SIGNAL(modified()), this, SLOT(reloadDirView()) );
+	connect(this->myPeHndl, SIGNAL(modified()), this, SLOT(reloadTabsView()) );
 	connect(this->myPeHndl, SIGNAL(pageOffsetModified(offset_t, bufsize_t)), this, SLOT(setDisasmTabText(offset_t)) );
 	connect(this->myPeHndl, SIGNAL(pageOffsetModified(offset_t, bufsize_t)), disasmModel, SLOT(setShownContent(offset_t, bufsize_t)) );
 
@@ -468,7 +467,7 @@ void DetailsTab::setDisasmTabText(offset_t raw)
 		if (sec2Name.size()) 
 			secName += " to " + sec2Name;
 	}
-	setTabText(this->cDisasmTab, tr( "Disasm") + secName);
+	setTabText(this->cDisasmTab, tr("Disasm") + secName);
 }
 
 void DetailsTab::shirtTabsAfter(pe::dir_entry dirNum, bool toTheLeft)
@@ -533,8 +532,32 @@ void DetailsTab::manageDirTab(pe::dir_entry dirNum)
 	}
 }
 
-void DetailsTab::reloadDirView()
+void DetailsTab::manageRichHdrTab()
 {
+	if (!myPeHndl || !m_PE) return;
+	
+	//add/remove Rich Header tab
+	if (m_PE->getRichHeaderSign()) {
+		if (cRichHdrTab == (-1)) {
+			int lastBefore = this->cDOSHdrTab;
+			int tabIndex = lastBefore + 1;
+			cRichHdrTab = this->insertTab(tabIndex, &richHdrTree, tr("Rich Hdr"));
+		}
+	}
+	else {
+		if (cRichHdrTab != (-1)) {
+			removeTab(cRichHdrTab);
+			cRichHdrTab = (-1);
+		}
+	}
+}
+
+void DetailsTab::reloadTabsView()
+{
+	if (!myPeHndl || !m_PE) return;
+
+	manageRichHdrTab();
+	
 	for (int i = 0; i < pe::DIR_ENTRIES_COUNT; i++) {
 		manageDirTab(pe::dir_entry(i));
 	}

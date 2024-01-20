@@ -126,6 +126,13 @@ bool ResourcesDirSplitter::displayText(ResourceContentWrapper *resContent)
 	return true;
 }
 
+bool ResourcesDirSplitter::displayResVersion(ResourceVersionWrapper *verContent)
+{
+	if (!verContent) return false;
+	//TODO: finish this
+	return false;
+}
+
 bool ResourcesDirSplitter::displayResStrings(ResourceStringsWrapper *strContent)
 {
 	if (!strContent) return false;
@@ -320,8 +327,12 @@ void ResourcesDirSplitter::refreshLeafContent()
 			break;
 		}
 		case RESTYPE_STRING: {
-			ResourceStringsWrapper *strWrapper = dynamic_cast<ResourceStringsWrapper*>(resContent);
-			isOk = displayResStrings(strWrapper);
+			isOk = displayResStrings(dynamic_cast<ResourceStringsWrapper*>(resContent));
+			if (isOk) changeView(RES_VIEW_RAW);
+			break;
+		}
+		case RESTYPE_VERSION: {
+			isOk = displayResVersion(dynamic_cast<ResourceVersionWrapper*>(resContent));
 			if (isOk) changeView(RES_VIEW_RAW);
 			break;
 		}

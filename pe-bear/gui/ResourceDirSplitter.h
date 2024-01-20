@@ -46,6 +46,7 @@ protected:
 	
 	void changeView(res_view_type viewType);
 	void clearContentDisplay();
+	bool displayResVersion(ResourceVersionWrapper *resContent);
 	bool displayResStrings(ResourceStringsWrapper *resContent);
 	bool displayText(ResourceContentWrapper *resContent);
 	bool displayBitmap(ResourceContentWrapper *resContent);

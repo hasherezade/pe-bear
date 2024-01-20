@@ -46,11 +46,11 @@ protected slots:
 	void onAutoAddImports();
 
 	void setDisasmTabText(offset_t raw);
-
-	void reloadDirView();
-	void manageDirTab(pe::dir_entry dirNum);
+	void reloadTabsView();
 
 protected:
+	void manageDirTab(pe::dir_entry dirNum);
+	void manageRichHdrTab();
 	void shirtTabsAfter(pe::dir_entry dirNum, bool toTheLeft);
 	void createModels();
 	void deleteModels();
