@@ -178,7 +178,7 @@ void StringsBrowseWindow::initLayout()
 	propertyLayout1.addWidget(&filterEdit);
 	propertyLayout1.addWidget(&regexCheckbox);
 	propertyLayout1.addWidget(&caseSensCheckbox);
-	regexCheckbox.setText(tr("Search by regex"));
+	regexCheckbox.setText(tr("By regex"));
 	caseSensCheckbox.setText(tr("Case sensitive"));
 	
 	topLayout.addLayout(&propertyLayout0);
