@@ -323,6 +323,7 @@ void ResourcesDirSplitter::refreshLeafContent()
 			ResourceStringsWrapper *strWrapper = dynamic_cast<ResourceStringsWrapper*>(resContent);
 			isOk = displayResStrings(strWrapper);
 			if (isOk) changeView(RES_VIEW_RAW);
+			break;
 		}
 	}
 	if (isOk) {
