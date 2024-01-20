@@ -91,28 +91,42 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 }
 
 //----
-void StringsBrowseWindow::onFilterCriteriaChanged(int isChecked)
+
+void StringsBrowseWindow::filterPatamsChanged(QString &str, bool isRegex, bool isCaseSens)
 {
 	if (!this->stringsProxyModel) return;
-	QString str = filterEdit.text();
+	
 	QRegExp::PatternSyntax filterType = QRegExp::FixedString;
-	if (isChecked) {
+	if (isRegex) {
 		filterType = QRegExp::RegExp;
 	}
-	QRegExp regExp(str, Qt::CaseInsensitive, filterType);
+	Qt::CaseSensitivity cs = Qt::CaseInsensitive;
+	if (isCaseSens) {
+		cs = Qt::CaseSensitive;
+	}
+	QRegExp regExp(str, cs, filterType);
 	stringsProxyModel->setFilterRegExp(regExp);
+}
+
+void StringsBrowseWindow::onFilterCriteriaChanged(int isRegex)
+{
+	QString str = filterEdit.text();
+	bool isCase = caseSensCheckbox.isChecked();
+	filterPatamsChanged(str, isRegex, isCase);
 }
 
 void StringsBrowseWindow::onFilterChanged(QString str)
 {
-	if (!this->stringsProxyModel) return;
-	QRegExp::PatternSyntax filterType = QRegExp::FixedString;
-	bool isChecked = regexCheckbox.isChecked();
-	if (isChecked) {
-		filterType = QRegExp::RegExp;
-	}
-	QRegExp regExp(str, Qt::CaseInsensitive, filterType);
-	stringsProxyModel->setFilterRegExp(regExp);
+	bool isRegex = regexCheckbox.isChecked();
+	bool isCase = caseSensCheckbox.isChecked();
+	filterPatamsChanged(str, isRegex, isCase);
+}
+
+void StringsBrowseWindow::onFilterCaseChanged(int isCase)
+{
+	QString str = filterEdit.text();
+	bool isRegex = regexCheckbox.isChecked();
+	filterPatamsChanged(str, isRegex, isCase);
 }
 
 void StringsBrowseWindow::offsetClicked(offset_t offset, Executable::addr_type type)
@@ -163,7 +177,9 @@ void StringsBrowseWindow::initLayout()
 	propertyLayout1.addWidget(&filterLabel);
 	propertyLayout1.addWidget(&filterEdit);
 	propertyLayout1.addWidget(&regexCheckbox);
+	propertyLayout1.addWidget(&caseSensCheckbox);
 	regexCheckbox.setText(tr("Search by regex"));
+	caseSensCheckbox.setText(tr("Case sensitive"));
 	
 	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&propertyLayout1);
@@ -172,4 +188,5 @@ void StringsBrowseWindow::initLayout()
 	connect(&saveButton, SIGNAL(clicked()), this, SLOT(onSave()) );
 	connect(&filterEdit, SIGNAL(textChanged(QString)), this, SLOT(onFilterChanged(QString)) );
 	connect(&regexCheckbox, SIGNAL(stateChanged(int)), this, SLOT(onFilterCriteriaChanged(int)) );
+	connect(&caseSensCheckbox, SIGNAL(stateChanged(int)), this, SLOT(onFilterCaseChanged(int)) );
 }

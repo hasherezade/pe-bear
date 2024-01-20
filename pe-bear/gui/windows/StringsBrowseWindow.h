@@ -115,28 +115,6 @@ protected:
 	int limitPerPage;
 };
 
-//----
-
-class StringsSortFilterProxyModel : public QSortFilterProxyModel
-{
-public:
-	StringsSortFilterProxyModel(QObject *parent)
-		: QSortFilterProxyModel(parent)
-	{
-	}
-	
-	bool filterAcceptsRow(int sourceRow,const QModelIndex &sourceParent) const
-	{
-		QAbstractItemModel *source = sourceModel();
-		if (!source) return false;
-		
-		QModelIndex index = source->index(sourceRow, StringsTableModel::COL_STRING, sourceParent);
-		if (source->data(index).toString().toLower().trimmed().contains(filterRegExp()))
-			return true;
-		return false;
-	}
-};
-
 //----------------------------------------------------
 
 class StringsBrowseWindow : public QMainWindow
@@ -148,7 +126,8 @@ public:
 		stringsTable(this, Executable::RAW), vHdr(Qt::Vertical, &stringsTable)
 	{
 		this->stringsModel = new StringsTableModel(myPeHndl, addrColors, DEFAULT_STR_PER_PAGE, this);
-		this->stringsProxyModel = new StringsSortFilterProxyModel(this);
+		this->stringsProxyModel = new QSortFilterProxyModel(this);
+		this->stringsProxyModel->setFilterKeyColumn(StringsTableModel::COL_STRING);
 		stringsProxyModel->setSourceModel( this->stringsModel );
 		stringsTable.setModel( this->stringsProxyModel );
 		stringsTable.setSortingEnabled(false);
@@ -222,10 +201,12 @@ private slots:
 	
 	void onSave();
 	void onFilterCriteriaChanged(int);
+	void onFilterCaseChanged(int);
 	void onFilterChanged(QString);
 	void offsetClicked(offset_t offset, Executable::addr_type type);
 
 private:
+	void filterPatamsChanged(QString &str, bool isRegex, bool isCaseSens);
 	
 	void _updateStringsView(bool isFinished, int progress = 0)
 	{
@@ -247,8 +228,8 @@ private:
 	ColorSettings addrColors;
 	FollowableOffsetedView stringsTable;
 	StringsTableModel *stringsModel;
-	StringsSortFilterProxyModel* stringsProxyModel;
-	QCheckBox regexCheckbox;
+	QSortFilterProxyModel* stringsProxyModel;
+	QCheckBox regexCheckbox, caseSensCheckbox;
 
 	QHeaderView vHdr;
 	QVBoxLayout topLayout;
