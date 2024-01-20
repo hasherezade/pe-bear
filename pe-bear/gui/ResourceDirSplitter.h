@@ -37,7 +37,14 @@ public slots:
 	void onSaveEntries();
 
 protected:
-	void changeView(bool isPix);
+	enum res_view_type
+	{
+		RES_VIEW_RAW = 0,
+		RES_VIEW_PIX = 1,
+		RES_VIEW_COUNT
+	};
+	
+	void changeView(res_view_type viewType);
 	void clearContentDisplay();
 	bool displayResStrings(ResourceStringsWrapper *resContent);
 	bool displayText(ResourceContentWrapper *resContent);

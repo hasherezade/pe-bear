@@ -77,8 +77,12 @@ void ResourcesDirSplitter::childIdSelected(int childId)
 	leafModel->setLeafId(childId);
 }
 
-void ResourcesDirSplitter::changeView(bool isPix)
+void ResourcesDirSplitter::changeView(res_view_type viewType)
 {
+	bool isPix = false;
+	if (viewType == RES_VIEW_PIX) {
+		isPix = true;
+	}
 	this->contentPixmap.setVisible(isPix);
 	this->contentText.setVisible(!isPix);
 }
@@ -291,10 +295,10 @@ void ResourcesDirSplitter::refreshLeafContent()
 		{
 			if (displayBitmap(resContent)) {
 				isOk = true;
-				changeView(true);
+				changeView(RES_VIEW_PIX);
 			} else {
 				isOk = displayText(resContent);
-				changeView(false);
+				changeView(RES_VIEW_RAW);
 			}
 			break;
 		}
@@ -303,11 +307,11 @@ void ResourcesDirSplitter::refreshLeafContent()
 		case RESTYPE_ICON: {
 			if (displayBitmap(resContent)) {
 				isOk = true;
-				changeView(true);
+				changeView(RES_VIEW_PIX);
 			}
 			else if (displayIcon(resContent, dirType)) {
 				isOk = true;
-				changeView(true);
+				changeView(RES_VIEW_PIX);
 			}
 			if (isOk) {
 				this->leafTab.setTabEnabled(this->contentTab, true);
@@ -318,7 +322,7 @@ void ResourcesDirSplitter::refreshLeafContent()
 		case RESTYPE_STRING: {
 			ResourceStringsWrapper *strWrapper = dynamic_cast<ResourceStringsWrapper*>(resContent);
 			isOk = displayResStrings(strWrapper);
-			if (isOk) changeView(false);
+			if (isOk) changeView(RES_VIEW_RAW);
 		}
 	}
 	if (isOk) {
