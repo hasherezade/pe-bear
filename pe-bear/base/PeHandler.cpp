@@ -138,33 +138,7 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 	mapToFill->release();
 	stringsUpdated();
 }
-/*
-void PeHandler::calculateHash(CalcThread::hash_type type)
-{
-	if (type >= CalcThread::HASHES_NUM) return;
-	
-	if (calcThread[type]) {
-		calcThread[type]->stop();
-		calcQueued[type] = true;
-		return; //previous thread didn't finished
-	}
-	const char* content = (char*) m_PE->getContent();
-	const offset_t size = m_PE->getRawSize();
-	const bool isSizeAcceptable = (offset_t(int(size)) == size) ? true : false;
 
-	if (!content || !size || !isSizeAcceptable) {
-		hash[type] = "Cannot calculate!";
-		return;
-	}
-	hash[type] = "Calculating...";
-	offset_t checksumOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-	this->calcThread[type] = new CalcThread(type, m_PE, checksumOffset);
-	QObject::connect(calcThread[type], SIGNAL(gotHash(QString, int)), this, SLOT(onHashReady(QString, int)));
-	QObject::connect(calcThread[type], SIGNAL(finished()), this, SLOT(onCalcThreadFinished()));
-	//calcThread[type]->start();
-	calcQueued[type] = false;
-}
-*/
 void PeHandler::setPackerSignFinder(SigFinder *sFinder)
 {
 	this->signFinder = sFinder;
@@ -379,7 +353,6 @@ void PeHandler::advanceOffset(int increment)
 		else 
 			page += increment;
 	}
-
 	setPageOffset(page);
 }
 
@@ -1193,29 +1166,14 @@ bool PeHandler::isBaseHdrModif(offset_t modO, bufsize_t modSize)
 		//std::cout << "Optional header affected[" << std::hex << modO << " - " << modO + modSize << "]!\n";
 		baseHdrsModified = true;
 	}
-
 	return baseHdrsModified;
 }
 
 bool PeHandler::rewrapDataDirs()
 {
-	bool anyModified = false;
-
-	//std::cout << "Rewrapped: ";
-	for (size_t i = 0; i < DIR_ENTRIES_COUNT; i++) {
-		if (!dataDirWrappers[i]) continue;
-
-		bool result = dataDirWrappers[i]->wrap();
-		if (result) {
-			//std::cout << i << " ";
-			anyModified = true;
-		}
-	}
-	//std::cout <<  "\n";
-	this->wrapAlbum();
-	return anyModified;
+	if (!m_PE) return false;
+	return m_PE->wrapDataDirs();
 }
-
 
 bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws exception
 {

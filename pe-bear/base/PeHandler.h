@@ -179,7 +179,6 @@ public:
 	bool autoAddImports(const ImportsAutoadderSettings &settings); //throws CustomException
 
 	void setEP(offset_t newEpRva);
-	void wrapAlbum() { resourcesAlbum.wrapLeafsContent(); }
 
 	/* content manipulation / substitution */
 	bool clearBlock(offset_t offset, uint64_t size);
@@ -290,7 +289,6 @@ signals:
 protected slots:
 	// hashes:
 	void onHashReady(QString hash, int hType);
-	//void onCalcThreadFinished();
 	void runHashesCalculation();
 	
 	// strings extraction:
