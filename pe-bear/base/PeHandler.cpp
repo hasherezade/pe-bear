@@ -651,7 +651,6 @@ bool PeHandler::_moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw, bool
 		}
 		return false;
 	}
-	dataDirWrappers[dirNum]->wrap();
 	return true;
 }
 
