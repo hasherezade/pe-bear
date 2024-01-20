@@ -221,6 +221,7 @@ private slots:
 	}
 	
 	void onSave();
+	void onFilterCriteriaChanged(int);
 	void onFilterChanged(QString);
 	void offsetClicked(offset_t offset, Executable::addr_type type);
 
@@ -247,6 +248,7 @@ private:
 	FollowableOffsetedView stringsTable;
 	StringsTableModel *stringsModel;
 	StringsSortFilterProxyModel* stringsProxyModel;
+	QCheckBox regexCheckbox;
 
 	QHeaderView vHdr;
 	QVBoxLayout topLayout;

@@ -91,12 +91,27 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 }
 
 //----
+void StringsBrowseWindow::onFilterCriteriaChanged(int isChecked)
+{
+	if (!this->stringsProxyModel) return;
+	QString str = filterEdit.text();
+	QRegExp::PatternSyntax filterType = QRegExp::FixedString;
+	if (isChecked) {
+		filterType = QRegExp::RegExp;
+	}
+	QRegExp regExp(str, Qt::CaseInsensitive, filterType);
+	stringsProxyModel->setFilterRegExp(regExp);
+}
 
 void StringsBrowseWindow::onFilterChanged(QString str)
 {
-
 	if (!this->stringsProxyModel) return;
-	QRegExp regExp(str.toLower(), Qt::CaseSensitive, QRegExp::FixedString);
+	QRegExp::PatternSyntax filterType = QRegExp::FixedString;
+	bool isChecked = regexCheckbox.isChecked();
+	if (isChecked) {
+		filterType = QRegExp::RegExp;
+	}
+	QRegExp regExp(str, Qt::CaseInsensitive, filterType);
 	stringsProxyModel->setFilterRegExp(regExp);
 }
 
@@ -147,6 +162,8 @@ void StringsBrowseWindow::initLayout()
 	filterLabel.setText(tr("Search string"));
 	propertyLayout1.addWidget(&filterLabel);
 	propertyLayout1.addWidget(&filterEdit);
+	propertyLayout1.addWidget(&regexCheckbox);
+	regexCheckbox.setText(tr("Search by regex"));
 	
 	topLayout.addLayout(&propertyLayout0);
 	topLayout.addLayout(&propertyLayout1);
@@ -154,4 +171,5 @@ void StringsBrowseWindow::initLayout()
 
 	connect(&saveButton, SIGNAL(clicked()), this, SLOT(onSave()) );
 	connect(&filterEdit, SIGNAL(textChanged(QString)), this, SLOT(onFilterChanged(QString)) );
+	connect(&regexCheckbox, SIGNAL(stateChanged(int)), this, SLOT(onFilterCriteriaChanged(int)) );
 }
