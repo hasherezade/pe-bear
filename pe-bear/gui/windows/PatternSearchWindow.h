@@ -12,6 +12,7 @@
 #include "../../base/PeHandler.h"
 #include "../../base/threads/SignFinderThread.h"
 #include "../../gui_base/HexSpinBox.h"
+
 //---
 class PatternSearchWindow : public QDialog
 {

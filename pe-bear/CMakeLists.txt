@@ -30,7 +30,7 @@ else()
 endif()
 
 include_directories( ${PARSER_INC} )
-include_directories( ${SIGFIND_DIR} )
+include_directories( ${SIGFIND_DIR}/include )
 include_directories( ${DISASM_DIR} ${CAPSTONE_INC})
 
 set (pebear_threads_srcs
