@@ -16,7 +16,7 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 
 	QRegExpValidator *validator = new QRegExpValidator(QRegExp("([0-9A-Fa-f\\?]{0,2} {0,1})*"), this);
 	patternEdit.setValidator(validator);
-	patternEdit.setToolTip("Hexadecimal with wild characters, i.e. \"55 8B ?? 8B 45 0C\"");
+	patternEdit.setToolTip(tr("Hexadecimal with wild characters, i.e.")+ "\"55 8B ?? 8B 45 0C\"");
 	patternLabel.setText(tr("Signature to search:"));
 
 	patternLabel.setBuddy(&patternEdit);
@@ -34,8 +34,8 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	topLayout.addStretch();
 	setLayout(&topLayout);
 
-	stopButton.setText("Stop");
-	searchButton.setText("Search");
+	stopButton.setText(tr("Stop"));
+	searchButton.setText(tr("Search"));
 	buttonLayout.addWidget(&searchButton);
 	buttonLayout.addWidget(&stopButton);
 	connect(&searchButton, SIGNAL(clicked()), this, SLOT(onSearchClicked()));
@@ -47,7 +47,6 @@ QString PatternSearchWindow::fetchSignature()
 {
 	return patternEdit.text();
 }
-
 
 void PatternSearchWindow::onStopClicked()
 {
@@ -78,7 +77,7 @@ void PatternSearchWindow::onSearchClicked()
 		threadMngr = new SignFinderThreadManager(peFile);
 	}
 	threadMngr->setStartOffset(offset);
-	if (!threadMngr->loadSignature("Searched", text)) {
+	if (!threadMngr->loadSignature(tr("Searched"), text)) {
 		QMessageBox::information(this, tr("Info"), tr("Could not parse the signature!"), QMessageBox::Ok);
 		return;
 	}
