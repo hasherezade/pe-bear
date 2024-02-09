@@ -1,6 +1,5 @@
 #pragma once
 #include "CollectorThread.h"
-#include <sig_finder.h>
 #include "../../pattern_tree.h"
 #include "../Releasable.h"
 

@@ -13,7 +13,6 @@ void SignFinderThread::run()
 
 void SignFinderThread::findInBuffer()
 {
-	using namespace sig_ma;
 	if (!m_PE || startOffset == INVALID_ADDR) return;
 	
 	offset_t offset = startOffset;
