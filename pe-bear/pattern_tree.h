@@ -244,8 +244,7 @@ namespace pattern_tree {
 			}
 		}
 
-#define SEARCH_BACK
-		size_t getMatching(const BYTE* data, size_t data_size, std::vector<Match> &matches, bool stopOnFirst)
+		size_t getMatching(const BYTE* data, size_t data_size, std::vector<Match> &matches, bool stopOnFirst, bool moveStart = true)
 		{
 			size_t processed = 0;
 			//
@@ -271,20 +270,20 @@ namespace pattern_tree {
 						}
 					}
 					_followAllMasked(level2_ptr, curr, data[i]);
-#ifdef SEARCH_BACK
-					if (curr != this) {
-						// the current value may also be a beginning of a new pattern:
-						_followAllMasked(level2_ptr, this, data[i]);
+					if (moveStart) {
+						if (curr != this) {
+							// the current value may also be a beginning of a new pattern:
+							_followAllMasked(level2_ptr, this, data[i]);
+						}
 					}
-#endif
 				}
 				if (!level2_ptr->size()) {
-#ifdef SEARCH_BACK
-					// restart search from the beginning
-					level2_ptr->push_back(this);
-#else
-					return results;
-#endif //SEARCH_BACK
+					if (moveStart) {
+						// if run out of the matches, restart search from the root
+						level2_ptr->push_back(this);
+					} else {
+						return results;
+					}
 				}
 				//swap:
 				auto tmp = level1_ptr;
