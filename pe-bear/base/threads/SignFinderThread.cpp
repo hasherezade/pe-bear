@@ -21,46 +21,45 @@ void SignFinderThread::findInBuffer()
 	int proc = 0;
 	int maxProgress = 1000;
 	bool found = false;
-
+	offset_t currOffset = offset;
 	{ //scope0
 		QMutexLocker stopLock(&this->stopMutex);
-		//if (this->stopRequested) break;
-		if (findPackerSign(offset)) {
-			found = true;;
-		}
+		if (this->stopRequested) return;
+		size_t processed = findPackerSign(offset);
+		currOffset += processed;
+
 	} //!scope0
-	double curr = offset;
-	double max = fullSize;
+	
+	if (currOffset == (fullSize - 1)) {
+		emit progressUpdated(maxProgress);
+		return;
+	}
+	const double max = fullSize;
+	const double curr = currOffset;
 	const int progress = int((curr/max) * maxProgress);
 	if (progress > proc) {
 		proc = progress;
 		emit progressUpdated(proc);
 	}
-	if (found) return;
-	emit progressUpdated(maxProgress);
 }
 
-bool SignFinderThread::findPackerSign(offset_t startingRaw)
+size_t SignFinderThread::findPackerSign(offset_t startingRaw)
 {
-	using namespace sig_ma;
-	
 	if (!m_PE && startingRaw == INVALID_ADDR) {
-		return false;
+		return 0;
 	}
 	BYTE* content = m_PE->getContent();
 	if (!content) {
-		return false;
+		return 0;
 	}
 	const size_t contentSize = m_PE->getRawSize();
 	if (startingRaw >= contentSize) {
-		return false;
+		return 0;
 	}
 	std::vector<pattern_tree::Match> matchedSet;
-	this->m_signFinder.getMatching(content + startingRaw, contentSize - startingRaw, matchedSet, true);
-	if (addFoundPackers(startingRaw, matchedSet)) {
-		return true;
-	}
-	return false;
+	size_t processed = this->m_signFinder.getMatching(content + startingRaw, contentSize - startingRaw, matchedSet, true);
+	addFoundPackers(startingRaw, matchedSet);
+	return processed;
 }
 
 size_t SignFinderThread::addFoundPackers(offset_t startingRaw, std::vector<pattern_tree::Match> &matchedSet)

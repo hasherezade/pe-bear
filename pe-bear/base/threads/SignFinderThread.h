@@ -52,7 +52,7 @@ private:
 	void run();
 	void findInBuffer();
 	size_t addFoundPackers(offset_t startingRaw, std::vector<pattern_tree::Match> &matchedSet);
-	bool findPackerSign(offset_t startingRaw);
+	size_t findPackerSign(offset_t startingRaw);
 
 	offset_t startOffset;
 	pattern_tree::Node &m_signFinder;
