@@ -219,6 +219,11 @@ namespace pattern_tree {
 
 		~Node()
 		{
+			clear();
+		}
+		
+		void clear()
+		{
 			_deleteChildren(immediates);
 			_deleteChildren(partials);
 			_deleteChildren(wildcards);
