@@ -282,7 +282,7 @@ namespace pattern_tree {
 						// if run out of the matches, restart search from the root
 						level2_ptr->push_back(this);
 					} else {
-						return results;
+						return processed;
 					}
 				}
 				//swap:
