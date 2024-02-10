@@ -77,13 +77,12 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	startTimer();
 
 	// try to load from alternative files:
-	std::cerr << "Loading signatures...\n";
 	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
 	pattern_tree::Signature::loadFromFile(sigFile1.toStdString(), this->signatures);
 
 	const QString sigFile2 = QDir::currentPath() + QDir::separator() + SIG_FILE;
 	pattern_tree::Signature::loadFromFile(sigFile2.toStdString(), this->signatures);
-	std::cerr << "Loaded: " << this->signatures.size() << std::endl;
+	
 	sigFinder.addPatterns(signatures);
 	signWindow.onSigListUpdated();
 }
@@ -1075,6 +1074,7 @@ void MainWindow::openSignatures()
 
 	if (filename.length() > 0) {
 		size_t i = pattern_tree::Signature::loadFromFile(filename, this->signatures);
+		sigFinder.addPatterns(signatures);
 		signWindow.onSigListUpdated();
 		QMessageBox msgBox;
 		msgBox.setText(tr("Added new signatures: ") + QString::number(i));

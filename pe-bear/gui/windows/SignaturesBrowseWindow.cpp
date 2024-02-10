@@ -1,6 +1,7 @@
 #include "SignaturesBrowseWindow.h"
 
 #include <bearparser/Util.h>
+#include "MainWindow.h"
 
 using namespace std;
 using namespace pattern_tree;
@@ -126,18 +127,7 @@ void SignaturesBrowseWindow::onSigListUpdated()
 
 void SignaturesBrowseWindow::openSignatures()
 {
-	QString filter = tr("Text Files (*.txt);;All Files (*)");
-	QString fName= QFileDialog::getOpenFileName(NULL, tr("Open file with signatures"), NULL, filter);
-	std::string filename = fName.toStdString();
-
-	if (filename.length() > 0) {
-		size_t i = pattern_tree::Signature::loadFromFile(filename, this->signatures);
-		emit signaturesUpdated();
-		//---
-		QMessageBox msgBox;
-		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
-		msgBox.exec();
-	}
-
-	//todo: emit -> signatures loaded
+	MainWindow *myWindow = dynamic_cast<MainWindow *>(this->parent());
+	if (!myWindow) return;
+	myWindow->openSignatures();
 }

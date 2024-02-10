@@ -173,7 +173,6 @@ size_t PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT)
 		
 		FoundPacker pckr(startingRaw + match.offset, match.sign->size(), match.sign->name, match.sign->toByteStr());
 		std::vector<FoundPacker>::iterator itr = std::find(this->packerAtOffset.begin(), this->packerAtOffset.end(), pckr);
-
 		if (itr == this->packerAtOffset.end()) {
 			this->packerAtOffset.push_back(pckr);
 		}

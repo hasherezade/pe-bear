@@ -24,24 +24,31 @@ namespace pattern_tree {
 		Signature(std::string _name, const BYTE* _pattern, size_t _pattern_size, const BYTE* _mask)
 			: name(_name), pattern(nullptr), pattern_size(0), mask(nullptr)
 		{
-			this->pattern = (BYTE*)::calloc(_pattern_size, 1);
-			if (!this->pattern) return;
-
-			::memcpy(this->pattern, _pattern, _pattern_size);
-			this->pattern_size = _pattern_size;
-
-			if (_mask) {
-				this->mask = (BYTE*)::calloc(_pattern_size, 1);
-				if (this->mask) {
-					::memcpy(this->mask, _mask, _pattern_size);
-				}
-			}
+			init(_name, _pattern, _pattern_size, _mask);
 		}
 
 		Signature(const Signature& _sign) // copy constructor
 			: pattern(nullptr), pattern_size(0), mask(nullptr)
 		{
 			init(_sign.name, _sign.pattern, _sign.pattern_size, _sign.mask);
+		}
+
+		bool operator==(const Signature& rhs) const
+		{
+			if (this->pattern_size != rhs.pattern_size) {
+				return false;
+			}
+			if (this->pattern && rhs.pattern) {
+				if (::memcmp(pattern, rhs.pattern, pattern_size) != 0) {
+					return false;
+				}
+			}
+			if (mask && rhs.mask) {
+				if (::memcmp(mask, rhs.mask, pattern_size) != 0) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		size_t size()
@@ -190,7 +197,11 @@ namespace pattern_tree {
 				next = next->addNext(pattern[i], mask);
 				if (!next) return false;
 			}
-			next->sign = new Signature(_name, pattern, pattern_size, pattern_mask);
+			if (!next->sign) {
+				next->sign = new Signature(_name, pattern, pattern_size, pattern_mask);
+			} else {
+				next->sign->name = _name;
+			}
 			return true;
 		}
 

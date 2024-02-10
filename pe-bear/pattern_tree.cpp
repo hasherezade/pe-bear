@@ -160,11 +160,26 @@ size_t Signature::loadFromFile(std::string fname, std::vector<Signature*>& signa
 	return num;
 }
 
+namespace pattern_tree {
+	bool hasSignature(const std::vector<Signature*> &signatures, const Signature& searchedSign)
+	{
+		for (auto itr = signatures.begin(); itr != signatures.end(); itr++) {
+			const Signature* sign = *itr;
+			if ((*sign) == searchedSign) {
+				return true;
+			}
+		}
+		return false;
+	}
+};
+
 size_t Signature::loadFromFileStream(std::ifstream& input, std::vector<Signature*> &signatures)
 {
 	const size_t SIGN_MAX = 1000;
 	
 	if (!input.is_open()) return 0;
+	
+	size_t addedSigns = 0;
 	
 	while (!input.eof()) {
 		std::string line;
@@ -211,13 +226,17 @@ size_t Signature::loadFromFileStream(std::ifstream& input, std::vector<Signature
 		if (indx != signSize) {
 			isOk = false;
 		}
-		Signature* sign = nullptr;
 		if (isOk) {
-			sign = new Signature(signName, pattern, indx, mask);
-			signatures.push_back(sign);
+			Signature* sign = new Signature(signName, pattern, indx, mask);
+			if (!hasSignature(signatures, *sign)) {
+				signatures.push_back(sign);
+				addedSigns++;
+			} else {
+				delete sign;
+			}
 		}
 		free(pattern);
 		free(mask);
 	}
-	return signatures.size();
+	return addedSigns;
 }
