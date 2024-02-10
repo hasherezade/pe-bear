@@ -30,7 +30,7 @@ else()
 endif()
 
 include_directories( ${PARSER_INC} )
-include_directories( ${SIGFIND_DIR}/include )
+include_directories( ${SIGFIND_INC} )
 include_directories( ${DISASM_DIR} ${CAPSTONE_INC})
 
 set (pebear_threads_srcs
@@ -159,7 +159,6 @@ set (pebear_gui_srcs
 	gui/TreeModel.cpp
 	gui/PeTreeModel.cpp
 	gui/PeWrapperModel.cpp
-	pattern_tree.cpp
 	DateDisplay.cpp
 	HexView.cpp
 	HexCompareView.cpp
@@ -188,7 +187,6 @@ set (pebear_gui_hdrs
 	gui/TreeModel.h
 	gui/PeTreeModel.h
 	gui/PeWrapperModel.h
-	pattern_tree.h
 	DateDisplay.h
 	HexView.h
 	HexCompareView.h

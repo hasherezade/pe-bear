@@ -5,7 +5,6 @@
 
 #include "../REbear.h"
 #include <bearparser/bearparser.h>
-#include <sig_finder.h>
 
 #include "Modification.h"
 #include "CommentHandler.h"

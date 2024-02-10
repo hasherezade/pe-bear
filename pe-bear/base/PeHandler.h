@@ -5,7 +5,7 @@
 
 #include "../REbear.h"
 #include <bearparser/bearparser.h>
-#include "../pattern_tree.h"
+#include <sig_finder.h>
 #include <string>
 
 #include "Releasable.h"

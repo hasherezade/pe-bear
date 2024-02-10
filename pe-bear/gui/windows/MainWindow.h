@@ -7,7 +7,7 @@
 #endif
 
 #include <bearparser/bearparser.h>
-#include "../../pattern_tree.h"
+#include <sig_finder.h>
 
 #include "../../base/BearVers.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "CollectorThread.h"
-#include "../../pattern_tree.h"
+#include <sig_finder.h>
 #include "../Releasable.h"
 
 struct MatchedSign
