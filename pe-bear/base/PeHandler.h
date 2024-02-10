@@ -173,10 +173,6 @@ public:
 	void setPackerSignFinder(pattern_tree::Node* signFinder);
 	bool isPacked();
 	size_t findPackerSign(offset_t startOff, Executable::addr_type addrType);
-	size_t findPackerInArea(offset_t rawOff, size_t size);
-	//size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
-
-	//void calculateHash(CalcThread::hash_type type);
 
 	/* fetch info about offset */
 	bool isInActiveArea(offset_t offset);
