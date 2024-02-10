@@ -170,7 +170,7 @@ public:
 	QString getImpHash() { return getCurrentHash(SupportedHashes::IMP_MD5); }
 	QString getCurrentHash(SupportedHashes::hash_type type);
 
-	void setPackerSignFinder(pattern_tree::Node* signFinder);
+	void setPackerSignFinder(sig_finder::Node* signFinder);
 	bool isPacked();
 	size_t findPackerSign(offset_t startOff, Executable::addr_type addrType);
 
@@ -371,5 +371,5 @@ protected:
 	
 	CollectorThreadManager* stringThreadMgr;
 
-	pattern_tree::Node *signFinder;
+	sig_finder::Node *signFinder;
 };

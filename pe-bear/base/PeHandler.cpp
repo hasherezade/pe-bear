@@ -12,7 +12,7 @@
 
 #include <iostream>
 using namespace pe;
-using namespace pattern_tree;
+using namespace sig_finder;
 //-------------------------------------------------
 
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
@@ -139,7 +139,7 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 	stringsUpdated();
 }
 
-void PeHandler::setPackerSignFinder(pattern_tree::Node* sFinder)
+void PeHandler::setPackerSignFinder(sig_finder::Node* sFinder)
 {
 	this->signFinder = sFinder;
 	findPackerSign(m_PE->getEntryPoint(), Executable::RVA);

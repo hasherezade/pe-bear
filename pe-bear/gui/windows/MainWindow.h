@@ -163,8 +163,8 @@ private:
 	PeHandler *m_PeHndl;
 	QTimer m_Timer;
 
-	std::vector<pattern_tree::Signature*> signatures;
-	pattern_tree::Node sigFinder;
+	std::vector<sig_finder::Signature*> signatures;
+	sig_finder::Node sigFinder;
 	MainSettings &mainSettings;
 	GuiSettings guiSettings;
 

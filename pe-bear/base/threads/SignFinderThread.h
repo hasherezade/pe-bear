@@ -1,7 +1,9 @@
 #pragma once
 #include "CollectorThread.h"
-#include <sig_finder.h>
 #include "../Releasable.h"
+
+#include <sig_finder.h>
+using namespace sig_finder;
 
 struct MatchedSign
 {
@@ -27,7 +29,7 @@ class SignFinderThread : public CollectorThread
 {
 	Q_OBJECT
 public:
-	SignFinderThread(PEFile* pe, pattern_tree::Node &signFinder, MatchesCollection &matched, offset_t offset)
+	SignFinderThread(PEFile* pe, sig_finder::Node &signFinder, MatchesCollection &matched, offset_t offset)
 		: CollectorThread(pe), 
 		m_signFinder(signFinder), m_matched(matched), startOffset(offset)
 	{
@@ -50,11 +52,11 @@ signals:
 private:
 	void run();
 	void findInBuffer();
-	size_t addFoundPackers(offset_t startingRaw, std::vector<pattern_tree::Match> &matchedSet);
+	size_t addFoundPackers(offset_t startingRaw, std::vector<sig_finder::Match> &matchedSet);
 	size_t findPackerSign(offset_t startingRaw);
 
 	offset_t startOffset;
-	pattern_tree::Node &m_signFinder;
+	sig_finder::Node &m_signFinder;
 	MatchesCollection &m_matched;
 };
 
@@ -95,7 +97,7 @@ public:
 	bool loadSignature(const QString &label, const QString &text)
 	{
 		m_patternFinder.clear();
-		pattern_tree::Signature *sign = pattern_tree::Signature::loadFromByteStr("Searched", text.toStdString());
+		Signature *sign = Signature::loadFromByteStr("Searched", text.toStdString());
 		if (!sign) {
 			return false;
 		}
@@ -124,7 +126,7 @@ protected:
 
 	PEFile* m_PE;
 	offset_t startOffset;
-	pattern_tree::Node m_patternFinder;
+	sig_finder::Node m_patternFinder;
 	MatchesCollection m_matched;
 };
 

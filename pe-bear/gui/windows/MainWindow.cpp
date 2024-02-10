@@ -7,9 +7,9 @@
 #include "../../base/RegKeyManager.h"
 
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	#include <iostream>
-//#endif
+#endif
 
 #define PE_TREE_WIDTH 220
 #define MIN_HEIGHT 600
@@ -17,8 +17,7 @@
 
 #define CHANGE_CHECK_INTERVAL 1000
 
-using namespace std;
-using namespace pattern_tree;
+using namespace sig_finder;
 //-----------------------------------------------------------
 
 class UniqueNameHelper
@@ -78,10 +77,10 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 
 	// try to load from alternative files:
 	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
-	pattern_tree::Signature::loadFromFile(sigFile1.toStdString(), this->signatures);
+	Signature::loadFromFile(sigFile1.toStdString(), this->signatures);
 
 	const QString sigFile2 = QDir::currentPath() + QDir::separator() + SIG_FILE;
-	pattern_tree::Signature::loadFromFile(sigFile2.toStdString(), this->signatures);
+	Signature::loadFromFile(sigFile2.toStdString(), this->signatures);
 	
 	sigFinder.addPatterns(signatures);
 	signWindow.onSigListUpdated();
@@ -1073,7 +1072,7 @@ void MainWindow::openSignatures()
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
-		size_t i = pattern_tree::Signature::loadFromFile(filename, this->signatures);
+		size_t i = Signature::loadFromFile(filename, this->signatures);
 		sigFinder.addPatterns(signatures);
 		signWindow.onSigListUpdated();
 		QMessageBox msgBox;

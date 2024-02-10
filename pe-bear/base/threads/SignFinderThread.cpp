@@ -55,22 +55,21 @@ size_t SignFinderThread::findPackerSign(offset_t startingRaw)
 	if (startingRaw >= contentSize) {
 		return 0;
 	}
-	std::vector<pattern_tree::Match> matchedSet;
+	std::vector<sig_finder::Match> matchedSet;
 	size_t processed = this->m_signFinder.getMatching(content + startingRaw, contentSize - startingRaw, matchedSet, true);
 	addFoundPackers(startingRaw, matchedSet);
 	return processed;
 }
 
-size_t SignFinderThread::addFoundPackers(offset_t startingRaw, std::vector<pattern_tree::Match> &matchedSet)
+size_t SignFinderThread::addFoundPackers(offset_t startingRaw, std::vector<sig_finder::Match> &matchedSet)
 {
 	size_t foundCount = matchedSet.size();
 	if (!foundCount) {
 		return 0;
 	}
 	size_t count = 0;
-	using namespace pattern_tree;
 	for (auto sItr = matchedSet.begin(); sItr != matchedSet.end(); ++sItr) {
-		pattern_tree::Match match = *sItr;
+		sig_finder::Match match = *sItr;
 		if (!match.sign) {
 			continue;
 		}

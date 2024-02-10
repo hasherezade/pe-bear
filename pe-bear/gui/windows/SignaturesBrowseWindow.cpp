@@ -4,9 +4,9 @@
 #include "MainWindow.h"
 
 using namespace std;
-using namespace pattern_tree;
+using namespace sig_finder;
 
-SignaturesBrowseModel::SignaturesBrowseModel(std::vector<pattern_tree::Signature*>& _signatures, QObject *parent)
+SignaturesBrowseModel::SignaturesBrowseModel(std::vector<Signature*>& _signatures, QObject *parent)
 	: QAbstractTableModel(parent), signatures(_signatures)
 {
 }
@@ -66,7 +66,7 @@ QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
 
 //------------------------------------------------------------------------------------
 
-SignaturesBrowseWindow::SignaturesBrowseWindow(std::vector<pattern_tree::Signature*>& _signatures, QWidget *parent)
+SignaturesBrowseWindow::SignaturesBrowseWindow(std::vector<Signature*>& _signatures, QWidget *parent)
 	: QMainWindow(parent), signsTree(this), signatures(_signatures)
 {
 	//---
