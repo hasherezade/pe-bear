@@ -7,9 +7,9 @@
 #include "../../base/RegKeyManager.h"
 
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	#include <iostream>
-#endif
+//#endif
 
 #define PE_TREE_WIDTH 220
 #define MIN_HEIGHT 600
@@ -18,7 +18,7 @@
 #define CHANGE_CHECK_INTERVAL 1000
 
 using namespace std;
-using namespace sig_ma;
+using namespace pattern_tree;
 //-----------------------------------------------------------
 
 class UniqueNameHelper
@@ -48,7 +48,7 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	sectionsTree(this), sectionMenu(mainSettings, this),
 	peFileModel(NULL),
 	rightPanel(this), 
-	signWindow(&vSign, this),
+	signWindow(signatures, this),
 	currentVer(V_MAJOR, V_MINOR, V_PATCH, V_PATCH_SUB, V_DESC),
 	guiSettings()
 {
@@ -77,12 +77,14 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	startTimer();
 
 	// try to load from alternative files:
+	std::cerr << "Loading signatures...\n";
 	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
-	vSign.loadSignaturesFromFile(sigFile1.toStdString());
+	pattern_tree::Signature::loadFromFile(sigFile1.toStdString(), this->signatures);
 
 	const QString sigFile2 = QDir::currentPath() + QDir::separator() + SIG_FILE;
-	vSign.loadSignaturesFromFile(sigFile2.toStdString());
-
+	pattern_tree::Signature::loadFromFile(sigFile2.toStdString(), this->signatures);
+	std::cerr << "Loaded: " << this->signatures.size() << std::endl;
+	sigFinder.addPatterns(signatures);
 	signWindow.onSigListUpdated();
 }
 
@@ -1042,7 +1044,7 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 		if (hndl) {
 			this->statusBar.showMessage(tr("File: ") + fName);
 			this->mainSettings.setLastExePath(fName);
-			hndl->setPackerSignFinder(&this->vSign);
+			hndl->setPackerSignFinder(&this->sigFinder);
 			connect(hndl, SIGNAL(foundSignatures(int, int)), this, SLOT(onSigSearchResult(int, int)));
 		}
 	}
@@ -1072,7 +1074,7 @@ void MainWindow::openSignatures()
 	std::string filename = fName.toStdString();
 
 	if (filename.length() > 0) {
-		int i = vSign.loadSignaturesFromFile(filename);
+		size_t i = pattern_tree::Signature::loadFromFile(filename, this->signatures);
 		signWindow.onSigListUpdated();
 		QMessageBox msgBox;
 		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
@@ -1172,7 +1174,7 @@ void MainWindow::addSection(PeHandler* selectedPeHndl)
 	emit addSectionRequested(selectedPeHndl);
 	return;
 }
-
+/*
 void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 {
 	if (!selectedPeHndl) return;
@@ -1191,7 +1193,7 @@ void MainWindow::sigSearch(PeHandler* selectedPeHndl)
 	size = size - (offset - secBgn);
 	selectedPeHndl->findPackerInArea(offset, size, sig_ma::FRONT_TO_BACK);
 }
-
+*/
 void MainWindow::searchPattern(PeHandler* selectedPeHndl)
 {
 	if (!selectedPeHndl) return;

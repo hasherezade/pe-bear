@@ -7,7 +7,7 @@
 #endif
 
 #include <bearparser/bearparser.h>
-#include <sig_finder.h>
+#include "../../pattern_tree.h"
 
 #include "../../base/BearVers.h"
 
@@ -58,7 +58,7 @@ public slots:
 	void savePE(PeHandler* selectedPeHndl);
 	void dumpAllSections(PeHandler* );
 	void addSection(PeHandler* );
-	void sigSearch(PeHandler* );
+	//void sigSearch(PeHandler* );
 	void searchPattern(PeHandler*);
 
 	void openSignatures();
@@ -163,7 +163,8 @@ private:
 	PeHandler *m_PeHndl;
 	QTimer m_Timer;
 
-	sig_ma::SigFinder vSign;
+	std::vector<pattern_tree::Signature*> signatures;
+	pattern_tree::Node sigFinder;
 	MainSettings &mainSettings;
 	GuiSettings guiSettings;
 

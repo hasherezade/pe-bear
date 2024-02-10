@@ -110,6 +110,7 @@ std::string Signature::toByteStr()
 }
 //---
 
+
 Signature* Signature::loadFromByteStr(const std::string& signName, const std::string& content)
 {
 	if (!content.length()) return nullptr;
@@ -146,11 +147,25 @@ Signature* Signature::loadFromByteStr(const std::string& signName, const std::st
 	return sign;
 }
 
-
-size_t Signature::loadFromFile(std::ifstream& input, std::vector<Signature*> &signatures)
+size_t Signature::loadFromFile(std::string fname, std::vector<Signature*>& signatures)
 {
-	if (!input.is_open()) return 0;
+	std::ifstream input;
+	input.open(fname);
+	if (!input.is_open()) {
+		std::cerr << "File not found: " << fname << std::endl;
+		return 0;
+	}
+	const size_t num = Signature::loadFromFileStream(input, signatures);
+	input.close();
+	return num;
+}
 
+size_t Signature::loadFromFileStream(std::ifstream& input, std::vector<Signature*> &signatures)
+{
+	const size_t SIGN_MAX = 1000;
+	
+	if (!input.is_open()) return 0;
+	
 	while (!input.eof()) {
 		std::string line;
 
@@ -158,21 +173,26 @@ size_t Signature::loadFromFile(std::ifstream& input, std::vector<Signature*> &si
 		if (!std::getline(input, line)) break;
 
 		std::string signName = util::trim(line);
-
+		if (!signName.length()) {
+			continue;
+		}
 		// read signature size
 		if (!std::getline(input, line)) break;
 		int signSize = 0;
 		std::stringstream iss1;
 		iss1 << std::dec << line;
 		iss1 >> signSize; //read the expected size
-		if (signSize == 0) continue;
-
-		const size_t buf_max = signSize;
+		if (signSize == 0) {
+			continue;
+		}
+		const size_t buf_max = signSize > SIGN_MAX ? SIGN_MAX  : signSize;
+		if (signSize > SIGN_MAX) {
+			std::cerr << "Too long signature: " << signSize << std::endl;
+		}
 		BYTE* pattern = (BYTE*)::calloc(buf_max, 1);
 		BYTE* mask = (BYTE*)::calloc(buf_max, 1);
 		if (!pattern || !mask) return false;
-
-		bool isOk = false;
+		bool isOk = true;
 		size_t indx = 0;
 		// parse all the nodes one by one
 		while (!input.eof() && indx < buf_max) {
@@ -180,14 +200,12 @@ size_t Signature::loadFromFile(std::ifstream& input, std::vector<Signature*> &si
 			// parse all chunks from the line
 			char chunk[3] = { 0, 0, 0 };
 			input >> chunk[0];
-			if (input.eof()) {
-				break;
-			}
 			input >> chunk[1];
 			if (!parseSigNode(chunk, pattern[indx], mask[indx])) {
 				isOk = false;
 				break;
 			}
+			indx++;
 		}
 		// check if the signature is valid:
 		if (indx != signSize) {

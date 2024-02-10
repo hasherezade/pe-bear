@@ -5,7 +5,8 @@
 
 #include "../REbear.h"
 #include <bearparser/bearparser.h>
-#include <sig_finder.h>
+#include "../pattern_tree.h"
+#include <string>
 
 #include "Releasable.h"
 #include "Modification.h"
@@ -19,6 +20,31 @@
 #define SIZE_UNLIMITED (-1)
 //-------------------------------------------------
 
+struct FoundPacker
+{
+	FoundPacker(offset_t _offset, size_t _size, const std::string& _packerBytes, const std::string& _packerName)
+		: offset(_offset), size(_size), packerName(_packerName), packerBytes(_packerBytes)
+	{
+	}
+
+	FoundPacker(const FoundPacker& p)
+	{
+		offset = p.offset;
+		size = p.size;
+		packerName = p.packerName;
+		packerBytes = p.packerBytes;
+	}
+	
+	bool operator==(const FoundPacker& rhs) const
+	{
+		return (offset == rhs.offset && packerBytes == rhs.packerBytes);
+	}
+	
+	offset_t offset;
+	size_t size;
+	std::string packerName;
+	std::string packerBytes;
+};
 
 class PeHandler : public QObject, public Releasable
 {
@@ -144,11 +170,11 @@ public:
 	QString getImpHash() { return getCurrentHash(SupportedHashes::IMP_MD5); }
 	QString getCurrentHash(SupportedHashes::hash_type type);
 
-	void setPackerSignFinder(sig_ma::SigFinder* signFinder);
+	void setPackerSignFinder(pattern_tree::Node* signFinder);
 	bool isPacked();
-	sig_ma::PckrSign* findPackerSign(offset_t startOff, Executable::addr_type addrType, sig_ma::match_direction md = sig_ma::FIXED);
-	sig_ma::PckrSign* findPackerInArea(offset_t rawOff, size_t size, sig_ma::match_direction md);
-	size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
+	size_t findPackerSign(offset_t startOff, Executable::addr_type addrType);
+	size_t findPackerInArea(offset_t rawOff, size_t size);
+	//size_t findSignatureInArea(offset_t rawOff, size_t size, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch);
 
 	//void calculateHash(CalcThread::hash_type type);
 
@@ -270,7 +296,7 @@ public:
 	offset_t pageStart;
 	bufsize_t pageSize;
 	std::stack<offset_t> prevOffsets;
-	std::vector<sig_ma::FoundPacker> packerAtOffset;
+	std::vector<FoundPacker> packerAtOffset;
 	StringsCollection stringsMap;
 	
 signals:
@@ -349,5 +375,5 @@ protected:
 	
 	CollectorThreadManager* stringThreadMgr;
 
-	sig_ma::SigFinder *signFinder;
+	pattern_tree::Node *signFinder;
 };

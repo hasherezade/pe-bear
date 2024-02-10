@@ -18,7 +18,8 @@ namespace pattern_tree {
 	{
 	public:
 		static Signature* loadFromByteStr(const std::string& signName, const std::string& content);
-		size_t loadFromFile(std::ifstream& input, std::vector<Signature*>& signatures);
+		static size_t loadFromFile(std::string filename, std::vector<Signature*>& signatures);
+		static size_t loadFromFileStream(std::ifstream& input, std::vector<Signature*>& signatures);
 
 		Signature(std::string _name, const BYTE* _pattern, size_t _pattern_size, const BYTE* _mask)
 			: name(_name), pattern(nullptr), pattern_size(0), mask(nullptr)
