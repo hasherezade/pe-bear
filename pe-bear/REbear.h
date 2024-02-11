@@ -6,7 +6,7 @@
 #define V_MAJOR 0
 #define V_MINOR 6
 #define V_PATCH 7
-#define V_PATCH_SUB 3
+#define V_PATCH_SUB 4
 #define V_DESC ""
 
 #define DISASMDMP_BG "black"

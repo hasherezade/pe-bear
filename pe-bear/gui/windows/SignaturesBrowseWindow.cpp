@@ -1,14 +1,14 @@
 #include "SignaturesBrowseWindow.h"
 
 #include <bearparser/Util.h>
+#include "MainWindow.h"
 
 using namespace std;
+using namespace sig_finder;
 
-
-SignaturesBrowseModel::SignaturesBrowseModel(sig_ma::SigFinder *signs, QObject *parent)
-	: QAbstractTableModel(parent)
+SignaturesBrowseModel::SignaturesBrowseModel(std::vector<Signature*>& _signatures, QObject *parent)
+	: QAbstractTableModel(parent), signatures(_signatures)
 {
-	this->signs = signs;
 }
 
 QVariant SignaturesBrowseModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -34,8 +34,7 @@ Qt::ItemFlags SignaturesBrowseModel::flags(const QModelIndex &index) const
 
 int SignaturesBrowseModel::rowCount(const QModelIndex &parent) const 
 {
-	if (!signs) return 0;
-	return this->signs->signaturesVec().size();
+	return this->signatures.size();
 }
 
 QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
@@ -45,35 +44,33 @@ QVariant SignaturesBrowseModel::data(const QModelIndex &index, int role) const
 	
 	if (role != Qt::DisplayRole && role != Qt::EditRole && role != Qt::ToolTipRole) return QVariant();
 
-	std::vector<sig_ma::PckrSign*> &vec = this->signs->signaturesVec();
+	auto &vec = this->signatures;
 
 	if ((size_t)row >= vec.size()) return QVariant();
 
-	sig_ma::PckrSign* sign = vec[row];
+	Signature* sign = vec[row];
 	if (sign == NULL) return QVariant();
 
 	switch (column) {
 		case COL_ID:
 			return row;
 		case COL_NAME : 
-			return QString::fromStdString(sign->getName());
+			return QString::fromStdString(sign->name);
 		case COL_SIZE: 
-			return (qulonglong)sign->length();
+			return (qulonglong)sign->size();
 		case COL_PREVIEW:
-			return QString::fromStdString(sign->getContent());
+			return QString::fromStdString(sign->toByteStr());
 	}
 	return QVariant();
 }
 
 //------------------------------------------------------------------------------------
 
-SignaturesBrowseWindow::SignaturesBrowseWindow(sig_ma::SigFinder* vSign, QWidget *parent)
-	: QMainWindow(parent), signsTree(this), vSign(NULL)
+SignaturesBrowseWindow::SignaturesBrowseWindow(std::vector<Signature*>& _signatures, QWidget *parent)
+	: QMainWindow(parent), signsTree(this), signatures(_signatures)
 {
-	if (vSign == NULL) return;
-	this->vSign = vSign;
 	//---
-	this->sigModel = new SignaturesBrowseModel(vSign, this);
+	this->sigModel = new SignaturesBrowseModel(signatures, this);
 	this->proxyModel = new SigSortFilterProxyModel(this);
 
 	proxyModel->setSourceModel( sigModel );
@@ -124,27 +121,13 @@ void SignaturesBrowseWindow::onSigListUpdated()
 	sigModel->reset();
 	signsTree.reset();
 	
-	int sigCount = 0;
-	if (vSign) {
-		sigCount = vSign->signaturesVec().size();
-	}
+	int sigCount = signatures.size();
 	sigInfo.setText(tr("Total signatures: ") + QString::number(sigCount, 10));
 }
 
 void SignaturesBrowseWindow::openSignatures()
 {
-	QString filter = tr("Text Files (*.txt);;All Files (*)");
-	QString fName= QFileDialog::getOpenFileName(NULL, tr("Open file with signatures"), NULL, filter);
-	std::string filename = fName.toStdString();
-
-	if (filename.length() > 0) {
-		int i = vSign->loadSignaturesFromFile(filename);
-		emit signaturesUpdated();
-		//---
-		QMessageBox msgBox;
-		msgBox.setText(tr("Added new signatures: ") + QString::number(i));
-		msgBox.exec();
-	}
-
-	//todo: emit -> signatures loaded
+	MainWindow *myWindow = dynamic_cast<MainWindow *>(this->parent());
+	if (!myWindow) return;
+	myWindow->openSignatures();
 }

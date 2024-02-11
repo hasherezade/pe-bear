@@ -58,7 +58,7 @@ public slots:
 	void savePE(PeHandler* selectedPeHndl);
 	void dumpAllSections(PeHandler* );
 	void addSection(PeHandler* );
-	void sigSearch(PeHandler* );
+	//void sigSearch(PeHandler* );
 	void searchPattern(PeHandler*);
 
 	void openSignatures();
@@ -163,7 +163,8 @@ private:
 	PeHandler *m_PeHndl;
 	QTimer m_Timer;
 
-	sig_ma::SigFinder vSign;
+	std::vector<sig_finder::Signature*> signatures;
+	sig_finder::Node sigFinder;
 	MainSettings &mainSettings;
 	GuiSettings guiSettings;
 

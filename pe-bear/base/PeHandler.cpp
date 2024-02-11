@@ -10,9 +10,9 @@
 
 #define MIN_STRING_LEN 5
 
-using namespace sig_ma;
+#include <iostream>
 using namespace pe;
-
+using namespace sig_finder;
 //-------------------------------------------------
 
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
@@ -139,10 +139,10 @@ void PeHandler::onStringsReady(StringsCollection* mapToFill)
 	stringsUpdated();
 }
 
-void PeHandler::setPackerSignFinder(SigFinder *sFinder)
+void PeHandler::setPackerSignFinder(sig_finder::Node* sFinder)
 {
 	this->signFinder = sFinder;
-	findPackerSign(m_PE->getEntryPoint(), Executable::RVA, sig_ma::FIXED);
+	findPackerSign(m_PE->getEntryPoint(), Executable::RVA);
 }
 
 bool PeHandler::isPacked()
@@ -150,126 +150,36 @@ bool PeHandler::isPacked()
 	return (this->packerAtOffset.size() > 0);
 }
 
-PckrSign* PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT, match_direction md)
+size_t PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT)
 {
-	if (!signFinder || !m_PE) return NULL;
+	if (!signFinder || !m_PE) return 0;
 
 	BYTE* content = m_PE->getContent();
-	if (!content) return NULL;
+	if (!content) return 0;
 
 	const size_t contentSize = m_PE->getRawSize();
+	const offset_t startingRaw = m_PE->toRaw(startAddr, aT);
+	if (startingRaw == INVALID_ADDR || startingRaw >= contentSize) {
+		return 0;
+	}
+	std::vector<Match> matchedSet;
+	signFinder->getMatching(content + startingRaw, contentSize - startingRaw, matchedSet, false, false);
+	size_t foundCount = matchedSet.size();
+	if (foundCount == 0) return 0;
 
-	offset_t startingRaw = m_PE->toRaw(startAddr, aT);
-	if (startingRaw == INVALID_ADDR) return NULL;
-
-	sig_ma::matched matchedSet = signFinder->getMatching(content, contentSize, startingRaw, md);
-	size_t foundCount = matchedSet.signs.size();
-	if (foundCount == 0) return NULL;
-
-	PckrSign* packer = NULL;
-	for (auto sItr = matchedSet.signs.begin(); sItr != matchedSet.signs.end(); ++sItr) {
-		packer = *sItr;
-		if (!packer) continue;
+	for (auto sItr = matchedSet.begin(); sItr != matchedSet.end(); ++sItr) {
+		const Match &match = *sItr;
+		if (!match.sign) continue;
 		
-		FoundPacker pckr(startingRaw + matchedSet.match_offset, packer);
+		FoundPacker pckr(startingRaw + match.offset, match.sign->size(), match.sign->name, match.sign->toByteStr());
 		std::vector<FoundPacker>::iterator itr = std::find(this->packerAtOffset.begin(), this->packerAtOffset.end(), pckr);
-
-		if (itr != this->packerAtOffset.end()) { //already exist
-			FoundPacker &found = *itr;
-			packer = found.signaturePtr;
-		} else {
+		if (itr == this->packerAtOffset.end()) {
 			this->packerAtOffset.push_back(pckr);
 		}
 	}
-
 	emit foundSignatures(foundCount, 0);
-	return packer;
+	return foundCount;
 }
-
-PckrSign* PeHandler::findPackerInArea(offset_t rawOff, size_t areaSize, sig_ma::match_direction md)
-{
-	if (!signFinder || !m_PE) return NULL;
-	
-	BYTE *content = NULL;
-
-	bool isDeepSearch = false;
-	offset_t foundOffset = 0;
-	PckrSign* packer = NULL;
-	int foundCount = 0;
-
-	for (size_t step = 0; step < areaSize; step++) {
-
-		size_t size = areaSize - step;
-		content = m_PE->getContentAt(rawOff + step, Executable::RAW, size);
-		if (content == NULL) {
-			//printf("content is NULL\n");
-			break;
-		}
-		sig_ma::matched matchedSet = signFinder->getMatching(content, size, 0, md);
-		
-		foundCount += matchedSet.signs.size();
-		if (matchedSet.signs.size() == 0) break;
-
-		packer = *(matchedSet.signs.begin());
-		if (!packer) break;
-		
-		foundOffset = step + matchedSet.match_offset + rawOff;
-		//printf("Found %s, at %x searching next...\n", packer->get_name().c_str(), foundOffset);
-
-		step += matchedSet.match_offset;
-		FoundPacker pckr(foundOffset , packer);
-		std::vector<FoundPacker>::iterator itr = std::find(this->packerAtOffset.begin(), this->packerAtOffset.end(), pckr);
-		if (itr != this->packerAtOffset.end()) {
-			//already exist
-			FoundPacker &found = *itr;
-			packer = found.signaturePtr;
-			continue;
-		} else {
-			this->packerAtOffset.push_back(pckr);
-		}
-		if (isDeepSearch == false) break;
-	}
-
-	emit foundSignatures(foundCount, 1);
-	return packer;
-}
-
-size_t PeHandler::findSignatureInArea(offset_t rawOff, size_t areaSize, sig_ma::SigFinder &localSignFinder, std::vector<sig_ma::FoundPacker> &signAtOffset, bool isDeepSearch)
-{
-	if (!m_PE) return 0;
-	
-	for (size_t step = 0; step < areaSize; step++) {
-
-		size_t size = areaSize - step;
-		BYTE * content = m_PE->getContentAt(rawOff + step, Executable::RAW, size);
-		if (!content) break;
-
-		sig_ma::matched matchedSet = localSignFinder.getMatching(content, size, 0, sig_ma::FIXED);
-		if (matchedSet.signs.size() == 0) continue;
-
-		PckrSign *packer = *(matchedSet.signs.begin());
-		if (!packer) continue;
-		
-		offset_t foundOffset = step + matchedSet.match_offset + rawOff;
-		//printf("Found %s, at %x searching next...\n", packer->get_name().c_str(), foundOffset);
-
-		step += matchedSet.match_offset;
-		
-		FoundPacker pckr(foundOffset , packer);
-		std::vector<FoundPacker>::iterator itr = std::find(signAtOffset.begin(), signAtOffset.end(), pckr);
-		if (itr != signAtOffset.end()) {
-			//already exist
-			FoundPacker &found = *itr;
-			packer = found.signaturePtr;
-			continue;
-		} else {
-			signAtOffset.push_back(pckr);
-		}
-		if (isDeepSearch == false) break;
-	}
-	return signAtOffset.size();
-}
-
 
 void PeHandler::setHilighted(offset_t hOffset, uint32_t hSize)
 {

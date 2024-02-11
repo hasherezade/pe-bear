@@ -1,7 +1,5 @@
 #include "PackersTableModel.h"
 
-using namespace sig_ma;
-
 enum COLS {
 	COL_OFFSET = 0,
 	COL_NAME,
@@ -66,13 +64,12 @@ QVariant PackersTableModel::data(const QModelIndex &index, int role) const
 	FoundPacker &found = this->myPeHndl->packerAtOffset[row];
 
 	uint32_t offset = found.offset;
-	PckrSign *sign = found.signaturePtr;
 
 	SectionHdrWrapper *sec = m_PE->getSecHdrAtOffset(offset, Executable::RAW);
 	switch (column) {
 		case COL_OFFSET: return QString::number(offset, 16);
-		case COL_SIG: return QString::fromStdString(sign->getContent());
-		case COL_NAME: return QString::fromStdString(sign->getName());
+		case COL_SIG: return QString::fromStdString(found.packerName);
+		case COL_NAME: return QString::fromStdString(found.packerBytes);
 		case COL_SECTION: {
 			if (sec) return sec->mappedName;
 		}
@@ -98,7 +95,5 @@ bufsize_t PackersTableModel::getFieldSize(QModelIndex index) const
 	int size = this->myPeHndl->packerAtOffset.size();
 	if (size <= row) return 0;
 	FoundPacker &found = this->myPeHndl->packerAtOffset[row];
-	PckrSign *sign = found.signaturePtr;
-	if (!sign) return 0;
-	return sign->length();
+	return found.size;
 }

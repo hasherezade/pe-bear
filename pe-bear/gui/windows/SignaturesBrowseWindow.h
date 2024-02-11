@@ -35,7 +35,7 @@ public:
 		MAX_COL
 	};
 	
-	SignaturesBrowseModel(sig_ma::SigFinder *signs, QObject *parent = 0);
+	SignaturesBrowseModel(std::vector<sig_finder::Signature*>& _signatures, QObject *parent = 0);
 	
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -58,7 +58,7 @@ public:
 	}
 	
 protected:
-	sig_ma::SigFinder *signs;
+	std::vector<sig_finder::Signature*>& signatures;
 };
 
 //----------------------------------------------------
@@ -100,7 +100,7 @@ public slots:
 	void onSigListUpdated();
 
 public:
-	SignaturesBrowseWindow(sig_ma::SigFinder *vSign, QWidget *parent);
+	SignaturesBrowseWindow(std::vector<sig_finder::Signature*>& signatures, QWidget *parent);
 	
 private slots:
 	void onFilterChanged(QString);
@@ -109,7 +109,7 @@ private:
 	void createMenu();
 
 	QTreeView signsTree;
-	sig_ma::SigFinder* vSign;
+	std::vector<sig_finder::Signature*>& signatures;
 	SignaturesBrowseModel *sigModel;
 	SigSortFilterProxyModel *proxyModel;
 	

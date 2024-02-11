@@ -1,7 +1,19 @@
 #pragma once
 #include "CollectorThread.h"
-#include <sig_finder.h>
 #include "../Releasable.h"
+
+#include <sig_finder.h>
+using namespace sig_finder;
+
+struct MatchedSign
+{
+	MatchedSign() : offset(0), len(0) {}
+	MatchedSign(size_t _offset, size_t _len)
+	: offset(_offset), len(_len) {}
+	
+	size_t offset;
+	size_t len;
+};
 
 class MatchesCollection : public QObject, public Releasable
 {
@@ -10,14 +22,14 @@ class MatchesCollection : public QObject, public Releasable
 public:
 	MatchesCollection() : Releasable() {}
 	
-	QList<sig_ma::FoundPacker> packerAtOffset;
+	QList<MatchedSign> packerAtOffset;
 };
 
 class SignFinderThread : public CollectorThread
 {
 	Q_OBJECT
 public:
-	SignFinderThread(PEFile* pe, sig_ma::SigFinder &signFinder, MatchesCollection &matched, offset_t offset)
+	SignFinderThread(PEFile* pe, sig_finder::Node &signFinder, MatchesCollection &matched, offset_t offset)
 		: CollectorThread(pe), 
 		m_signFinder(signFinder), m_matched(matched), startOffset(offset)
 	{
@@ -34,17 +46,18 @@ public:
 	}
 
 signals:
+	void searchStarted(bool isStarted);
 	void gotMatches(MatchesCollection* matched);
 	void progressUpdated(int progress);
 	
 private:
 	void run();
 	void findInBuffer();
-	void addFoundPackers(offset_t startingRaw, sig_ma::matched &matchedSet);
-	bool findPackerSign(offset_t startingRaw);
+	size_t addFoundPackers(offset_t startingRaw, std::vector<sig_finder::Match> &matchedSet);
+	size_t findPackerSign(offset_t startingRaw);
 
 	offset_t startOffset;
-	sig_ma::SigFinder &m_signFinder;
+	sig_finder::Node &m_signFinder;
 	MatchesCollection &m_matched;
 };
 
@@ -70,7 +83,7 @@ public:
 	{
 		if (!m_PE) return false;
 		
-		SignFinderThread *thread = new SignFinderThread(m_PE, m_signFinder, m_matched, startOffset);
+		SignFinderThread *thread = new SignFinderThread(m_PE, m_patternFinder, m_matched, startOffset);
 		this->myThread = thread;
 
 		QObject::connect(thread, SIGNAL(gotMatches(MatchesCollection* )), 
@@ -78,20 +91,30 @@ public:
 
 		QObject::connect(thread, SIGNAL(progressUpdated(int)), 
 			this, SLOT(onProgressUpdated(int)), Qt::UniqueConnection);
-
+		
+		QObject::connect(thread, SIGNAL(searchStarted(bool)), 
+			this, SLOT(onSearchStarted(bool)), Qt::UniqueConnection);
+			
 		return true;
 	}
 	
 	bool loadSignature(const QString &label, const QString &text)
 	{
-		m_signFinder.clear();
-		return m_signFinder.loadSignature("Searched", text.toStdString());
+		m_patternFinder.clear();
+		Signature *sign = Signature::loadFromByteStr("Searched", text.toStdString());
+		if (!sign) {
+			return false;
+		}
+		bool isOk = m_patternFinder.addPattern(*sign);
+		delete sign;
+		return isOk;
 	}
 	
 signals:
 	void gotMatches(MatchesCollection* matched);
 	void progressUpdated(int progress);
-	
+	void searchStarted(bool isStarted);
+
 protected slots:
 
 	void onGotMatches(MatchesCollection* matched)
@@ -103,12 +126,17 @@ protected slots:
 	{
 		emit progressUpdated(progress);
 	}
-
+	
+	void onSearchStarted(bool isStarted)
+	{
+		emit searchStarted(isStarted);
+	}
+	
 protected:
 
 	PEFile* m_PE;
 	offset_t startOffset;
-	sig_ma::SigFinder m_signFinder;
+	sig_finder::Node m_patternFinder;
 	MatchesCollection m_matched;
 };
 

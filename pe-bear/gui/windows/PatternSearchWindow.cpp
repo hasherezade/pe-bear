@@ -34,26 +34,15 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	topLayout.addStretch();
 	setLayout(&topLayout);
 
-	stopButton.setText(tr("Stop"));
 	searchButton.setText(tr("Search"));
 	buttonLayout.addWidget(&searchButton);
-	buttonLayout.addWidget(&stopButton);
 	connect(&searchButton, SIGNAL(clicked()), this, SLOT(onSearchClicked()));
-	connect(&stopButton, SIGNAL(clicked()), this, SLOT(onStopClicked()));
 	patternEdit.setFocus();
 }
 
 QString PatternSearchWindow::fetchSignature()
 {
 	return patternEdit.text();
-}
-
-void PatternSearchWindow::onStopClicked()
-{
-	if (!this->threadMngr) {
-		return;
-	}
-	this->threadMngr->stopThread();
 }
 
 void PatternSearchWindow::onSearchClicked()
@@ -85,9 +74,11 @@ void PatternSearchWindow::onSearchClicked()
 		this, SLOT(matchesFound(MatchesCollection *)), Qt::UniqueConnection);
 	connect(threadMngr, SIGNAL(progressUpdated(int )), 
 		this, SLOT(onProgressUpdated(int )), Qt::UniqueConnection);
+	connect(threadMngr, SIGNAL(searchStarted(bool )), 
+		this, SLOT(onSearchStarted(bool )), Qt::UniqueConnection);
+		
 	progressBar.setVisible(true);
 	progressBar.setValue(0);
-	searchButton.setEnabled(false);
 	threadMngr->recreateThread();
 }
 
@@ -96,9 +87,13 @@ void PatternSearchWindow::onProgressUpdated(int progress)
 	progressBar.setValue(progress);
 }
 
+void PatternSearchWindow::onSearchStarted(bool isStarted)
+{
+	searchButton.setEnabled(!isStarted);
+}
+
 void PatternSearchWindow::matchesFound(MatchesCollection *matches)
 {
-	searchButton.setEnabled(true);
 	if (!threadMngr) return; //should never happen
 	
 	if (!matches || !matches->packerAtOffset.size()) {
@@ -106,22 +101,24 @@ void PatternSearchWindow::matchesFound(MatchesCollection *matches)
 		threadMngr->stopThread();
 		return;
 	}
-	const QList<sig_ma::FoundPacker> &signAtOffset = matches->packerAtOffset;
+	const QList<MatchedSign> &signAtOffset = matches->packerAtOffset;
 	if (!signAtOffset.size()) {
 		QMessageBox::information(this, tr("Info"), tr("Signature not found!"), QMessageBox::Ok);
 		threadMngr->stopThread();
 		return;
 	}
-	const sig_ma::FoundPacker &pckr = *(signAtOffset.begin());
-	m_peHndl->setDisplayed(false, pckr.offset, pckr.signaturePtr->length());
-	m_peHndl->setHilighted(pckr.offset, pckr.signaturePtr->length());
-	startOffsetBox.setValue(pckr.offset);
-	if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(pckr.offset, 16) + "\n"+ 
+	MatchedSign match = *(signAtOffset.begin());
+	const size_t offset = match.offset;
+	const size_t signLen = match.len;
+	m_peHndl->setDisplayed(false, offset, signLen);
+	m_peHndl->setHilighted(offset, signLen);
+	startOffsetBox.setValue(offset);
+	if (QMessageBox::question(this, tr("Info"), tr("Signature found at:") + " 0x" + QString::number(offset, 16) + "\n"+ 
 		tr("Search next?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
 	{
 		threadMngr->stopThread();
 		return;
 	}
-	threadMngr->setStartOffset(pckr.offset + 1);
+	threadMngr->setStartOffset(offset + 1);
 	threadMngr->recreateThread();
 }

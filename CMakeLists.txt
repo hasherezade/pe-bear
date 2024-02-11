@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project (PE-bear_full)
 
 # modules:
-set ( M_SIGFIND "sig_finder" )
+set ( M_SIGFIND "sig_finder/sig_finder" )
 set ( M_BEARPARSER "bearparser/parser" )
 set ( M_DISASM "disasm" )
 set ( M_CAPSTONE "capstone" )
@@ -23,7 +23,9 @@ endif()
 set (PARSER_DIR "${CMAKE_SOURCE_DIR}/${M_BEARPARSER}" CACHE PATH "BearParser main path")
 set (PARSER_INC "${PARSER_DIR}/include" CACHE PATH "BearParser include path")
 
-set( SIGFIND_DIR "${CMAKE_SOURCE_DIR}/${M_SIGFIND}" CACHE PATH "SigMa main path")
+set( SIGFIND_DIR "${CMAKE_SOURCE_DIR}/${M_SIGFIND}" CACHE PATH "SigFinder main path")
+set (SIGFIND_INC "${SIGFIND_DIR}/include" CACHE PATH "SigFinder include path")
+
 set( DISASM_DIR "${CMAKE_SOURCE_DIR}/${M_DISASM}" CACHE PATH "Disasm main path")
 
 set (CAPSTONE_DIR "${CMAKE_SOURCE_DIR}/${M_CAPSTONE}" CACHE PATH "Capstone main path")
