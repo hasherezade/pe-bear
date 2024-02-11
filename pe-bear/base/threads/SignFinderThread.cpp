@@ -2,6 +2,7 @@
 
 void SignFinderThread::run()
 {
+	emit searchStarted(true);
 	QMutexLocker lock(&myMutex);
 	this->m_matched.packerAtOffset.clear();
 	if (!isByteArrInit()) {
@@ -9,6 +10,7 @@ void SignFinderThread::run()
 	}
 	findInBuffer();
 	emit gotMatches(&m_matched);
+	emit searchStarted(false);
 }
 
 void SignFinderThread::findInBuffer()

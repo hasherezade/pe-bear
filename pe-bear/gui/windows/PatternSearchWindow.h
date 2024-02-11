@@ -44,10 +44,10 @@ public:
 
 protected slots:
 	void onSearchClicked();
-	void onStopClicked();
 
 	void matchesFound(MatchesCollection *thread);
 	void onProgressUpdated(int progress);
+	void onSearchStarted(bool isStarted);
 
 protected:
 	QString fetchSignature();
@@ -66,7 +66,6 @@ protected:
 	QProgressBar progressBar;
 	
 	QPushButton searchButton;
-	QPushButton stopButton;
 	
 	PeHandler* m_peHndl;
 	SignFinderThreadManager *threadMngr;

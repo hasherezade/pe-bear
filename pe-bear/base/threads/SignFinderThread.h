@@ -46,6 +46,7 @@ public:
 	}
 
 signals:
+	void searchStarted(bool isStarted);
 	void gotMatches(MatchesCollection* matched);
 	void progressUpdated(int progress);
 	
@@ -90,7 +91,10 @@ public:
 
 		QObject::connect(thread, SIGNAL(progressUpdated(int)), 
 			this, SLOT(onProgressUpdated(int)), Qt::UniqueConnection);
-
+		
+		QObject::connect(thread, SIGNAL(searchStarted(bool)), 
+			this, SLOT(onSearchStarted(bool)), Qt::UniqueConnection);
+			
 		return true;
 	}
 	
@@ -109,7 +113,8 @@ public:
 signals:
 	void gotMatches(MatchesCollection* matched);
 	void progressUpdated(int progress);
-	
+	void searchStarted(bool isStarted);
+
 protected slots:
 
 	void onGotMatches(MatchesCollection* matched)
@@ -121,7 +126,12 @@ protected slots:
 	{
 		emit progressUpdated(progress);
 	}
-
+	
+	void onSearchStarted(bool isStarted)
+	{
+		emit searchStarted(isStarted);
+	}
+	
 protected:
 
 	PEFile* m_PE;
