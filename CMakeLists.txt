@@ -23,8 +23,8 @@ endif()
 set (PARSER_DIR "${CMAKE_SOURCE_DIR}/${M_BEARPARSER}" CACHE PATH "BearParser main path")
 set (PARSER_INC "${PARSER_DIR}/include" CACHE PATH "BearParser include path")
 
-set( SIGFIND_DIR "${CMAKE_SOURCE_DIR}/${M_SIGFIND}" CACHE PATH "SigMa main path")
-set (SIGFIND_INC "${SIGFIND_DIR}/include" CACHE PATH "SigMa include path")
+set( SIGFIND_DIR "${CMAKE_SOURCE_DIR}/${M_SIGFIND}" CACHE PATH "SigFinder main path")
+set (SIGFIND_INC "${SIGFIND_DIR}/include" CACHE PATH "SigFinder include path")
 
 set( DISASM_DIR "${CMAKE_SOURCE_DIR}/${M_DISASM}" CACHE PATH "Disasm main path")
 
