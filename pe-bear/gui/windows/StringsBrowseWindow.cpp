@@ -95,17 +95,20 @@ QVariant StringsTableModel::data(const QModelIndex &index, int role) const
 void StringsBrowseWindow::filterPatamsChanged(QString &str, bool isRegex, bool isCaseSens)
 {
 	if (!this->stringsProxyModel) return;
-	
-	QRegExp::PatternSyntax filterType = QRegExp::FixedString;
+
 	if (isRegex) {
-		filterType = QRegExp::RegExp;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+		QRegularExpression::PatternOptions options = isCaseSens ?
+			QRegularExpression::NoPatternOption :
+			QRegularExpression::CaseInsensitiveOption;
+
+		stringsProxyModel->setFilterRegularExpression(QRegularExpression(str, options));
+#else
+		stringsProxyModel->setFilterRegExp(QRegExp(str, isCaseSens ? Qt::CaseSensitive : Qt::CaseInsensitive));
+#endif
+	} else {
+		stringsProxyModel->setFilterFixedString(str);
 	}
-	Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-	if (isCaseSens) {
-		cs = Qt::CaseSensitive;
-	}
-	QRegExp regExp(str, cs, filterType);
-	stringsProxyModel->setFilterRegExp(regExp);
 }
 
 void StringsBrowseWindow::onFilterCriteriaChanged(int isRegex)

@@ -248,6 +248,7 @@ set (pebear_srcs
 )
 
 set (pebear_hdrs
+	PEbear.h
 	REbear.h
 	${pebear_threads_hdrs}
 	${pebear_base_hdrs}

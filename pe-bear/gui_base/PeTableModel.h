@@ -1,12 +1,9 @@
 #pragma once
 #include <QtGlobal>
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
 
 #include <bearparser/bearparser.h>
+
+#include "../PEBear.h"
 #include "PeGuiItem.h"
 #include "TreeCpView.h"
 #include "../gui/PeTreeModel.h"

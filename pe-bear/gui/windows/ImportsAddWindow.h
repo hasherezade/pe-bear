@@ -1,12 +1,7 @@
 #pragma once
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
-
+#include "../../PEBear.h"
 #include "../../base/PeHandlersManager.h"
 #include "../../base/ImportsAutoadderSettings.h"
 
@@ -153,7 +148,7 @@ protected:
 		propertyLayout5,
 		propertyLayout6;
 
-	QRegExpValidator *funcNameValidator;
+	QRegularExpressionValidator *funcNameValidator;
 
 	QHBoxLayout buttonLayout1;
 	QHBoxLayout buttonLayout2;

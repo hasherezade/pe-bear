@@ -42,13 +42,17 @@ public:
 	DisasmItemDelegate(QObject* parent)
 		: QStyledItemDelegate(parent)
 	{
-		validator.setRegExp(QRegExp("[0-9A-Fa-f]{1,}"));
+	#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+		validator.setRegularExpression(QRegularExpression("[0-9A-Fa-f]{1,}"));
+	#else
+		validator.setRegExp(QRegularExpression("[0-9A-Fa-f]{1,}"));
+	#endif
 	}
 
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
-	QRegExpValidator validator;
+	QRegularExpressionValidator validator;
 };
 
 //--------------------------------------------------------------------

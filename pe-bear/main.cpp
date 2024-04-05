@@ -3,12 +3,8 @@
 #include <QtCore>
 #include <QApplication>
 #include <QTranslator>
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
 
+#include "PEBear.h"
 #include "gui/windows/MainWindow.h"
 #include "base/MainSettings.h"
 

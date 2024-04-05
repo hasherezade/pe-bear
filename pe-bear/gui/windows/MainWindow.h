@@ -113,7 +113,7 @@ protected:
 	virtual void wheelEvent(QWheelEvent* event)
 	{
 		if (QApplication::keyboardModifiers() & Qt::ControlModifier ) {
-			if(event->delta() > 0) {
+			if(event->angleDelta().y() > 0) {
 				zoomFonts(true);
 			} else {
 				zoomFonts(false);

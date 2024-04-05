@@ -1,11 +1,7 @@
 #pragma once
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
+#include "../PEBear.h"
 
 class HexSpinBox : public QSpinBox
 {
@@ -19,6 +15,6 @@ protected:
 	QString textFromValue(int value) const;
 
 private:
-	QRegExpValidator *validator;
+	QRegularExpressionValidator *validator;
 };
 

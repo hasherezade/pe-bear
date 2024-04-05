@@ -66,7 +66,7 @@ QByteArray ClipboardUtil::parseBytesString(QString text, QString separator)
 	QByteArray emptyArr;
 	if (text.length() == 0) return emptyArr;
 
-	QStringList chunks = text.split(separator, QString::SkipEmptyParts);
+	QStringList chunks = text.split(separator, Qt::SkipEmptyParts);
 	int size = chunks.size();
 	
 	QByteArray bytes;
