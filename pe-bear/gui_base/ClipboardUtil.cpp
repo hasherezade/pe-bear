@@ -1,10 +1,10 @@
 #include "ClipboardUtil.h"
-
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
 #else
 	#include <QtGui>
 #endif
+
 
 int ClipboardUtil::byteArrayToBuffer(QByteArray bytes, uchar *buf, int bufSize)
 {
@@ -65,8 +65,11 @@ QByteArray ClipboardUtil::parseBytesString(QString text, QString separator)
 {
 	QByteArray emptyArr;
 	if (text.length() == 0) return emptyArr;
-
+#if QT_VERSION >= 0x050000
 	QStringList chunks = text.split(separator, Qt::SkipEmptyParts);
+#else
+	QStringList chunks = text.split(separator, QString::SkipEmptyParts);
+#endif
 	int size = chunks.size();
 	
 	QByteArray bytes;

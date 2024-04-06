@@ -1,10 +1,12 @@
 #pragma once
 #include <QtGlobal>
+#include <QtCore>
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 	#include <QtWidgets>
 #else
 	#include <QtGui>
-	typedef QRegularExpression QRegExp;
-	typedef QRegularExpressionValidator QRegExpValidator;
+	typedef QRegExp QRegularExpression;
+	typedef QRegExpValidator QRegularExpressionValidator;
 #endif
 

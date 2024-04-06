@@ -11,7 +11,11 @@ BearVers::BearVers(QString replyString)
 	: vMajor(0), vMinor(0), vPatch(0), vSub(0), vDesc(""), valid(false)
 {
 	replyString = replyString.trimmed();
+#if QT_VERSION >= 0x050000
 	QStringList strings = replyString.split(".", Qt::SkipEmptyParts);
+#else
+	QStringList strings = replyString.split(".", QString::SkipEmptyParts);
+#endif
 	if (strings.length() < 3) return;
 
 	this->vMajor = strings[0].toInt();

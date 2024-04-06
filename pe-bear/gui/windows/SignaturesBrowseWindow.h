@@ -74,8 +74,11 @@ public:
 		for(int i = 0; i < source->columnCount(); i++)
 		{
 			QModelIndex index = source->index(sourceRow, i, sourceParent);
-			if (source->data(index).toString().toLower().trimmed().contains(filterRegularExpression()))
-				return true;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+			if (source->data(index).toString().toLower().trimmed().contains(filterRegularExpression())) return true;
+#else
+			if (source->data(index).toString().toLower().trimmed().contains(filterRegExp())) return true;
+#endif
 		}
 		return false;  
 	}
