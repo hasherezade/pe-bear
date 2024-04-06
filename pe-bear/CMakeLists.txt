@@ -248,7 +248,7 @@ set (pebear_srcs
 )
 
 set (pebear_hdrs
-	PEBear.h
+	QtCompat.h
 	REbear.h
 	${pebear_threads_hdrs}
 	${pebear_base_hdrs}

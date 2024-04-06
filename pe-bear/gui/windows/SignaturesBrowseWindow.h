@@ -3,7 +3,7 @@
 
 #include <bearparser/bearparser.h>
 
-#include "../../PEBear.h"
+#include "../../QtCompat.h"
 #include "../../base/PeHandlersManager.h"
 #include "../../gui_base/FollowablePeTreeView.h"
 #include "../../gui_base/OffsetDependentAction.h"

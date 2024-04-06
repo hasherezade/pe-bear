@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "PeWrapperModel.h"
 #include "../gui_base/WrapperTableModel.h"
 

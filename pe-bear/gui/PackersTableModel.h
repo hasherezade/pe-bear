@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "../gui_base/FollowablePeTreeView.h"
 
 class PackersTableModel : public PeTableModel

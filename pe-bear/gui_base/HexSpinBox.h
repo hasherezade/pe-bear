@@ -1,7 +1,7 @@
 #pragma once
 #include <QtGlobal>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 
 class HexSpinBox : public QSpinBox
 {

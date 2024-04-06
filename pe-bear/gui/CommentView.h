@@ -2,7 +2,7 @@
 #include <QtCore>
 #include <QtGlobal>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "../gui_base/PeGuiItem.h"
 #include "../base/CommentHandler.h"
 

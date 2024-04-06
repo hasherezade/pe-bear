@@ -2,7 +2,7 @@
 
 #include <QtGlobal>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "../gui/pe_models.h"
 #include "../gui_base/PeGuiItem.h"
 #include "../gui/windows/SectionAddWindow.h"

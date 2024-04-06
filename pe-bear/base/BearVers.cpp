@@ -1,5 +1,5 @@
 #include "BearVers.h"
-#include "../PEBear.h"
+#include "../QtCompat.h"
 using namespace pe_bear;
 
 BearVers::BearVers(int ma, int mi, int p, int s, const QString &desc)

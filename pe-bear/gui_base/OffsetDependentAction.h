@@ -3,7 +3,7 @@
 
 #include <bearparser/bearparser.h>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 
 class OffsetDependentAction : public QAction
 {

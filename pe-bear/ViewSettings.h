@@ -2,7 +2,7 @@
 
 #include <QtGlobal>
 
-#include "PEBear.h"
+#include "QtCompat.h"
 
 class ViewSettings
 {

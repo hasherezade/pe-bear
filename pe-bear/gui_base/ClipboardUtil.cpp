@@ -1,5 +1,5 @@
 #include "ClipboardUtil.h"
-#include "../PEBear.h"
+#include "../QtCompat.h"
 
 int ClipboardUtil::byteArrayToBuffer(QByteArray bytes, uchar *buf, int bufSize)
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../PEBear.h"
+#include "../../QtCompat.h"
 
 class MouseTrackingTableView : public QTableView
 {

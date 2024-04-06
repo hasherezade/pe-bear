@@ -1,7 +1,7 @@
 #pragma once
 #include <QtGlobal>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "../gui/pe_models.h"
 #include "WrapperTreeView.h"
 #include "DataDirWrapperSplitter.h"

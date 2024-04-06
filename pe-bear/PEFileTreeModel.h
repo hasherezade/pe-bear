@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 
-#include "PEBear.h"
+#include "QtCompat.h"
 #include "gui_base/PeTreeView.h"
 #include "ExeDependentAction.h"
 #include "gui/PeTreeModel.h"

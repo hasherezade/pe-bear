@@ -2,7 +2,7 @@
 #include <QtGlobal>
 #include <vector>
 
-#include "PEBear.h"
+#include "QtCompat.h"
 #include "gui_base/PeGuiItem.h"
 
 //--------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 
 #include <bearparser/bearparser.h>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "../ViewSettings.h"
 
 #define HEX_COL_NUM 16

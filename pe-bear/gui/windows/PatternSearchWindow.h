@@ -3,7 +3,7 @@
 
 #include <bearparser/bearparser.h>
 
-#include "../../PEBear.h"
+#include "../../QtCompat.h"
 #include "../../base/PeHandler.h"
 #include "../../base/threads/SignFinderThread.h"
 #include "../../gui_base/HexSpinBox.h"

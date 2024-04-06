@@ -1,7 +1,7 @@
 #pragma once
 #include <QtGlobal>
 
-#include "../PEBear.h"
+#include "../QtCompat.h"
 #include "TreeCpView.h"
 #include "PeTableModel.h"
 

@@ -4,7 +4,7 @@
 #include <QtGlobal>
 #include <QStyledItemDelegate>
 
-#include "PEBear.h"
+#include "QtCompat.h"
 #include "REbear.h"
 #include "base/PeHandlersManager.h"
 #include "PEFileTreeModel.h"

@@ -4,7 +4,7 @@
 
 #include <bearparser/bearparser.h>
 
-#include "../../PEBear.h"
+#include "../../QtCompat.h"
 #include "../../base/PeHandler.h"
 #include "../../base/MainSettings.h"
 #include "../followable_table/FollowableOffsetedView.h"

@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QTranslator>
 
-#include "PEBear.h"
+#include "QtCompat.h"
 #include "gui/windows/MainWindow.h"
 #include "base/MainSettings.h"
 
