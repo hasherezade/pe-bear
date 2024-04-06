@@ -2,15 +2,10 @@
 
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
-
 #include <map>
 #include <set>
 
+#include "PEBear.h"
 #include "gui_base/PeTreeView.h"
 #include "ExeDependentAction.h"
 #include "gui/PeTreeModel.h"

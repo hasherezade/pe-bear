@@ -39,7 +39,11 @@ QModelIndex getNextIndex(QAbstractItemModel &model, const QModelIndex &index)
 HexItemDelegate::HexItemDelegate(QObject* parent) :
 	QStyledItemDelegate(parent)
 {
-	validator.setRegExp(QRegExp("[0-9A-Fa-f]{2,}"));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+	validator.setRegularExpression(QRegularExpression("[0-9A-Fa-f]{2,}"));
+#else
+	validator.setRegExp(QRegularExpression("[0-9A-Fa-f]{2,}"));
+#endif
 }
 
 void HexItemDelegate::selectNextParentItem(const QModelIndex &index) const

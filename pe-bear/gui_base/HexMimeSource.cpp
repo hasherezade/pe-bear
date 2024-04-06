@@ -54,7 +54,7 @@ const char* HexMimeSource::format(int n) const
 HexConverter::HexConverter(QObject *parent)
     : QObject(parent)
 {
-	validator = new QRegExpValidator(QRegExp("[0-9A-Fa-f]{1,8}"), this);
+	validator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{1,8}"), this);
 }
 
 QString HexConverter::textFromValue(int value) const

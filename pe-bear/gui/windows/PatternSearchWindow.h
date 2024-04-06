@@ -1,14 +1,9 @@
 #pragma once
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
-
 #include <bearparser/bearparser.h>
 
+#include "../../PEBear.h"
 #include "../../base/PeHandler.h"
 #include "../../base/threads/SignFinderThread.h"
 #include "../../gui_base/HexSpinBox.h"

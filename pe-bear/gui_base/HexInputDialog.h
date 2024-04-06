@@ -1,11 +1,7 @@
 #pragma once
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
+#include "../PEBear.h"
 
 class HexInputDialog : public QDialog
 {
@@ -26,7 +22,12 @@ public:
 	qulonglong getNumValue(bool *isValid = NULL);
 	void setDefaultValue(qulonglong number);
 
-	void setRegex(const QRegExp &regex) { validator->setRegExp(regex); }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+	void setRegex(const QRegularExpression &regex) { validator->setRegularExpression(regex); }
+#else
+	void setRegex(const QRegularExpression &regex) { validator->setRegExp(regex); }
+#endif
+
 	void setMaxLength(int len) { le->setMaxLength(len); }
 
 public slots:
@@ -38,5 +39,5 @@ protected:
 	QVBoxLayout *vbox, *layout_middleBox;
 	QLabel *captionLabel;
 	QLineEdit *le;
-	QRegExpValidator *validator;
+	QRegularExpressionValidator *validator;
 };

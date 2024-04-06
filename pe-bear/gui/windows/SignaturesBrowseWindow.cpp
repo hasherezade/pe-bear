@@ -103,9 +103,8 @@ SignaturesBrowseWindow::SignaturesBrowseWindow(std::vector<Signature*>& _signatu
 void SignaturesBrowseWindow::onFilterChanged(QString str)
 {
 	if (!proxyModel) return;
-	
-	QRegExp regExp(str.toLower(), Qt::CaseSensitive, QRegExp::FixedString);
-	proxyModel->setFilterRegExp(regExp);
+
+	proxyModel->setFilterFixedString(str.toLower());
 }
 
 void SignaturesBrowseWindow::createMenu()

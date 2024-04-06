@@ -14,7 +14,7 @@ PatternSearchWindow::PatternSearchWindow(QWidget *parent, PeHandler* peHndl)
 	startOffsetBox.setPrefix("0x");
 	startOffsetBox.setValue(0);
 
-	QRegExpValidator *validator = new QRegExpValidator(QRegExp("([0-9A-Fa-f\\?]{0,2} {0,1})*"), this);
+	QRegularExpressionValidator *validator = new QRegularExpressionValidator(QRegularExpression("([0-9A-Fa-f\\?]{0,2} {0,1})*"), this);
 	patternEdit.setValidator(validator);
 	patternEdit.setToolTip(tr("Hexadecimal with wild characters, i.e.")+ "\"55 8B ?? 8B 45 0C\"");
 	patternLabel.setText(tr("Signature to search:"));

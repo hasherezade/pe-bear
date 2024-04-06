@@ -106,8 +106,8 @@ QVariant HexDumpModel::getRawContentAt(const QModelIndex &index) const
 	if (!contentPtr) {
 		return QVariant();
 	}
-	const QChar c = contentPtr[0];
-	return c;
+
+	return QChar(contentPtr[0]);
 }
 
 QVariant HexDumpModel::getElement(offset_t offset) const
@@ -128,7 +128,7 @@ QVariant HexDumpModel::getElement(offset_t offset) const
 #endif
 	}
 	
-	const QChar c = val;
+	const QChar c(val);
 	if (c.isPrint() && !c.isSpace())
 		return c;
 	return QChar('.');

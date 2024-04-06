@@ -2,17 +2,11 @@
 
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
-
+#include "../PEBear.h"
 #include "../gui/pe_models.h"
 #include "../gui_base/PeGuiItem.h"
 #include "../gui/windows/SectionAddWindow.h"
 #include "../gui/DosHdrTableModel.h"
-
 #include "../HexView.h"
 #include "../DisasmView.h"
 #include "../gui_base/PeTreeView.h"

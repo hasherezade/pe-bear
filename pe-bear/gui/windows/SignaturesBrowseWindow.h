@@ -1,14 +1,9 @@
 #pragma once
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#else
-	#include <QtGui>
-#endif
-
 #include <bearparser/bearparser.h>
 
+#include "../../PEBear.h"
 #include "../../base/PeHandlersManager.h"
 #include "../../gui_base/FollowablePeTreeView.h"
 #include "../../gui_base/OffsetDependentAction.h"
@@ -79,7 +74,7 @@ public:
 		for(int i = 0; i < source->columnCount(); i++)
 		{
 			QModelIndex index = source->index(sourceRow, i, sourceParent);
-			if (source->data(index).toString().toLower().trimmed().contains(filterRegExp()))
+			if (source->data(index).toString().toLower().trimmed().contains(filterRegularExpression()))
 				return true;
 		}
 		return false;  

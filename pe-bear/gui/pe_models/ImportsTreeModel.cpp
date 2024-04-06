@@ -201,7 +201,7 @@ QVariant ImportedFuncModel::data(const QModelIndex &index, int role) const
 		{
 			char *name = entry->getFunctionName();
 			if (!name) return NOT_FILLED;
-			return name;
+			return QString(name);
 		}
 		case ORDINAL:
 			if (!entry->isByOrdinal()) return NOT_FILLED;

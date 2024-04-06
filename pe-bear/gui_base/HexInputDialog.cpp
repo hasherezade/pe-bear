@@ -22,7 +22,7 @@ HexInputDialog::HexInputDialog(QString title, QString caption, QWidget *parent)
 	le = new QLineEdit(this);
 	layout_middleBox->addWidget(le);
 
-	validator = new QRegExpValidator(QRegExp("[0-9A-Fa-f]{1,}"));
+	validator = new QRegularExpressionValidator(QRegularExpression("[0-9A-Fa-f]{1,}"));
 	le->setValidator(validator);
 	vbox->addLayout(layout_middleBox);
 
