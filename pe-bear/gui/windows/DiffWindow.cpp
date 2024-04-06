@@ -59,9 +59,9 @@ DiffWindow::DiffWindow(PeHandlersManager &peMngr, QWidget *parent)
 
 	this->setStatusBar(&this->statusBar);
 
-	connect( &this->fileCombo[LEFT], SIGNAL(activated(const QString &)),
+	connect( &this->fileCombo[LEFT], SIGNAL(currentTextChanged(const QString &)),
 		this, SLOT(file1Selected(const QString &)) );
-	connect( &this->fileCombo[RIGHT], SIGNAL(activated(const QString &)),
+	connect( &this->fileCombo[RIGHT], SIGNAL(currentTextChanged(const QString &)),
 		this, SLOT(file2Selected(const QString &)) );
 
 	connect( this, SIGNAL(contentChanged(BYTE*, int, offset_t, ContentIndx)),
