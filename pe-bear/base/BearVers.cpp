@@ -1,4 +1,5 @@
 #include "BearVers.h"
+#include "../PEBear.h"
 using namespace pe_bear;
 
 BearVers::BearVers(int ma, int mi, int p, int s, const QString &desc)
@@ -11,11 +12,7 @@ BearVers::BearVers(QString replyString)
 	: vMajor(0), vMinor(0), vPatch(0), vSub(0), vDesc(""), valid(false)
 {
 	replyString = replyString.trimmed();
-#if QT_VERSION >= 0x050000
-	QStringList strings = replyString.split(".", Qt::SkipEmptyParts);
-#else
-	QStringList strings = replyString.split(".", QString::SkipEmptyParts);
-#endif
+	QStringList strings = replyString.split(".", QT_SkipEmptyParts);
 	if (strings.length() < 3) return;
 
 	this->vMajor = strings[0].toInt();
