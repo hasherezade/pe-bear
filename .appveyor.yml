@@ -85,6 +85,7 @@ for:
 
     after_build:
      - mkdir %artifactName%
+     - dir "%QT%\plugins\styles"
      - cp -r pe-bear/%buildConfig%/* %artifactName%
      - cp "%QT%\bin\Qt6Core.dll" %artifactName%
      - cp "%QT%\bin\Qt6Gui.dll" %artifactName%
