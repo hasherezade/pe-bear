@@ -63,11 +63,11 @@ for:
     install:
      - git submodule update --init --recursive
      - if [%buildPlatform%]==[x64] (
-       set QT5=C:\Qt\5.15.2\msvc2019_64)
+       set QT=C:\Qt\6.7.0\msvc2019_64)
      - if [%buildPlatform%]==[x86] (
-       set QT5=C:\Qt\5.15.2\msvc2019)
-     - set PATH=%PATH%;%QT5%\bin;%QT5%\lib\cmake
-     - set Qt5Core_DIR=%QT5%
+       set QT=C:\Qt\6.7.0\msvc2019)
+     - set PATH=%PATH%;%QT%\bin;%QT%\lib\cmake
+     - set Qt6Core_DIR=%QT%
      
     before_build:
      - mkdir build
@@ -83,15 +83,16 @@ for:
     after_build:
      - mkdir %artifactName%
      - cp -r pe-bear/%buildConfig%/* %artifactName%
-     - cp "%QT5%\bin\Qt5Core.dll" %artifactName%
-     - cp "%QT5%\bin\Qt5Gui.dll" %artifactName%
-     - cp "%QT5%\bin\Qt5Widgets.dll" %artifactName%
+     - cp "%QT%\bin\QTCore.dll" %artifactName%
+     - cp "%QT%\bin\QTGui.dll" %artifactName%
+     - cp "%QT%\bin\QTWidgets.dll" %artifactName%
      - mkdir %artifactName%\platforms
      - mkdir %artifactName%\styles
      - mkdir %artifactName%\imageformats
-     - cp "%QT5%\plugins\platforms\qwindows.dll" %artifactName%\platforms
-     - cp "%QT5%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles
-     - cp "%QT5%\plugins\imageformats\qico.dll" %artifactName%\imageformats
+     - cp "%QT%\plugins\platforms\qwindows.dll" %artifactName%\platforms
+     - cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles
+     - cp "%QT%\plugins\imageformats\qico.dll" %artifactName%\imageformats
 
     artifacts:
      - path: build\%artifactName%
+     
