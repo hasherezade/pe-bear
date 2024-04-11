@@ -82,10 +82,9 @@ for:
 
     after_build:
      - mkdir %artifactName%
+     - dir -r "%QT%"
      - cp -r pe-bear/%buildConfig%/* %artifactName%
-     - cp "%QT%\bin\QTCore.dll" %artifactName%
-     - cp "%QT%\bin\QTGui.dll" %artifactName%
-     - cp "%QT%\bin\QTWidgets.dll" %artifactName%
+     - cp "%QT%\bin\*.dll" %artifactName%
      - mkdir %artifactName%\platforms
      - mkdir %artifactName%\styles
      - mkdir %artifactName%\imageformats
