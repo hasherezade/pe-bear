@@ -91,7 +91,6 @@ for:
      - mkdir %artifactName%\styles
      - mkdir %artifactName%\imageformats
      - cp "%QT%\plugins\platforms\qwindows.dll" %artifactName%\platforms
-     - cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles
      - cp "%QT%\plugins\imageformats\qico.dll" %artifactName%\imageformats
 
     artifacts:
