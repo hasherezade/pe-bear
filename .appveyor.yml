@@ -63,13 +63,13 @@ for:
     install:
      - git submodule update --init --recursive
      - if [%buildPlatform%]==[x64] (
-       set QT=C:\Qt\6.7.0\msvc2019_64 )
+       set QT=C:\Qt\6.7.0\msvc2019_64)
      - if [%buildPlatform%]==[x64] (
-       set Qt6Core_DIR=%QT% )
+       set Qt6Core_DIR=%QT%)
      - if [%buildPlatform%]==[x86] (
-       set QT=C:\Qt\5.15.2\msvc2019 )
+       set QT=C:\Qt\5.15.2\msvc2019)
      - if [%buildPlatform%]==[x86] (
-       set Qt5Core_DIR=%QT% )
+       set Qt5Core_DIR=%QT%)
      - set PATH=%PATH%;%QT%\bin;%QT%\lib\cmake
      
     before_build:
