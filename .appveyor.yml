@@ -62,18 +62,12 @@ for:
     
     install:
      - git submodule update --init --recursive
-     - if [%buildPlatform%]==[x64] (
-       set QT_VER=6)
-     - if [%buildPlatform%]==[x86] (
-       set QT_VER=5) 
-     - if [%buildPlatform%]==[x64] (
-       set QT_VER=C:\Qt\6.7.0\msvc2019_64)
-     - if [%buildPlatform%]==[x64] (
-       set Qt6Core_DIR=%QT%)
-     - if [%buildPlatform%]==[x86] (
-       set QT=C:\Qt\5.15.2\msvc2019)
-     - if [%buildPlatform%]==[x86] (
-       set Qt5Core_DIR=%QT%)
+     - if [%buildPlatform%]==[x64] (set QT_VER=6)
+     - if [%buildPlatform%]==[x64] (set QT_VER=C:\Qt\6.7.0\msvc2019_64)
+     - if [%buildPlatform%]==[x64] (set Qt6Core_DIR=%QT%)
+     - if [%buildPlatform%]==[x86] (set QT_VER=5) 
+     - if [%buildPlatform%]==[x86] (set QT=C:\Qt\5.15.2\msvc2019)
+     - if [%buildPlatform%]==[x86] (set Qt5Core_DIR=%QT%)
      - set PATH=%PATH%;%QT%\bin;%QT%\lib\cmake
      
     before_build:
@@ -81,10 +75,8 @@ for:
      - cd build
      
     build_script:
-      - if [%buildPlatform%]==[x64] (
-        cmake .. -A x64 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
-      - if [%buildPlatform%]==[x86] (
-        cmake .. -A Win32 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
+      - if [%buildPlatform%]==[x64] (cmake .. -A x64 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
+      - if [%buildPlatform%]==[x86] (cmake .. -A Win32 -DCOMMIT_HASH:STRING="\""%APPVEYOR_REPO_COMMIT%"\"" )
       - cmake --build . --config %buildConfig%
 
     after_build:
@@ -99,10 +91,8 @@ for:
      - mkdir %artifactName%\imageformats
      - cp "%QT%\plugins\platforms\qwindows.dll" %artifactName%\platforms
      - cp "%QT%\plugins\imageformats\qico.dll" %artifactName%\imageformats
-     - if [%QT_VER%]==[5] (
-       cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles )
-     - if [%QT_VER%]==[6] (
-       cp "%QT%\plugins\styles\qmodernwindowsstyled.dll" %artifactName%\styles )
+     - if [%QT_VER%]==[5] (cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles)
+     - if [%QT_VER%]==[6] (cp "%QT%\plugins\styles\qmodernwindowsstyled.dll" %artifactName%\styles)
 
     artifacts:
      - path: build\%artifactName%
