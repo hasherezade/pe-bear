@@ -63,7 +63,11 @@ for:
     install:
      - git submodule update --init --recursive
      - if [%buildPlatform%]==[x64] (
-       set QT=C:\Qt\6.7.0\msvc2019_64)
+       set QT_VER=6)
+     - if [%buildPlatform%]==[x86] (
+       set QT_VER=5) 
+     - if [%buildPlatform%]==[x64] (
+       set QT_VER=C:\Qt\6.7.0\msvc2019_64)
      - if [%buildPlatform%]==[x64] (
        set Qt6Core_DIR=%QT%)
      - if [%buildPlatform%]==[x86] (
@@ -87,16 +91,18 @@ for:
      - mkdir %artifactName%
      - dir "%QT%\plugins\styles"
      - cp -r pe-bear/%buildConfig%/* %artifactName%
-     - cp "%QT%\bin\Qt6Core.dll" %artifactName%
-     - cp "%QT%\bin\Qt6Gui.dll" %artifactName%
-     - cp "%QT%\bin\Qt6Widgets.dll" %artifactName%
+     - cp "%QT%\bin\Qt%QT_VER%Core.dll" %artifactName%
+     - cp "%QT%\bin\Qt%QT_VER%Gui.dll" %artifactName%
+     - cp "%QT%\bin\Qt%QT_VER%Widgets.dll" %artifactName%
      - mkdir %artifactName%\platforms
      - mkdir %artifactName%\styles
      - mkdir %artifactName%\imageformats
      - cp "%QT%\plugins\platforms\qwindows.dll" %artifactName%\platforms
      - cp "%QT%\plugins\imageformats\qico.dll" %artifactName%\imageformats
-     - if [%buildPlatform%]==[x86] (
+     - if [%QT_VER%]==[5] (
        cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles )
+     - if [%QT_VER%]==[6] (
+       cp "%QT%\plugins\styles\qmodernwindowsstyled.dll" %artifactName%\styles )
 
     artifacts:
      - path: build\%artifactName%
