@@ -91,7 +91,7 @@ for:
      - cp "%QT%\plugins\platforms\qwindows.dll" %artifactName%\platforms
      - cp "%QT%\plugins\imageformats\qico.dll" %artifactName%\imageformats
      - if [%QT_VER%]==[5] (cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles)
-     - if [%QT_VER%]==[6] (cp "%QT%\plugins\styles\qmodernwindowsstyled.dll" %artifactName%\styles)
+     - if [%QT_VER%]==[6] (cp "%QT%\plugins\styles\qmodernwindowsstyle.dll" %artifactName%\styles)
 
     artifacts:
      - path: build\%artifactName%
