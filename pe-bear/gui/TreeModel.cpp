@@ -56,12 +56,13 @@ void TreeItem::detachChild(TreeItem *child)
 
 void TreeItem::removeAllChildren()
 {
-	QList<TreeItem*>::iterator chIter;
-	for (chIter = m_childItems.begin(); chIter != m_childItems.end(); ++chIter) {
+	for (auto chIter = m_childItems.begin(); chIter != m_childItems.end(); ++chIter) {
 		TreeItem* child = *chIter;
-		this->detachChild(child);
-		delete child;
+		if (child) {
+			delete child;
+		}
 	}
+	m_childItems.clear();
 }
 
 TreeItem *TreeItem::child(int row)
