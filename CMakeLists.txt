@@ -7,7 +7,8 @@ set ( M_BEARPARSER "bearparser/parser" )
 set ( M_DISASM "disasm" )
 set ( M_CAPSTONE "capstone" )
 
-option(USE_QT4 "Use Qt4 (Qt5 if OFF)" OFF )
+option(USE_QT4 "Use Qt4" OFF )
+option(USE_QT5 "Use Qt5" OFF )
 option(SHOW_CONSOLE "Show debug console" OFF )
 
 # libraries should be searched in a local directory of the binary

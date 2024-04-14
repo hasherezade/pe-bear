@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build_qt5.sh
+./build_qt6.sh
