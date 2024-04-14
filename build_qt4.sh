@@ -4,10 +4,10 @@ echo "Trying to build PE-bear..."
 
 #QT check
 
-QT_VER=`qmake -v`
+QT_VER=$(qmake -v)
 QTV="version"
 if echo "$QT_VER" | grep -q "$QTV"; then
-    QT4_FOUND=`whereis qt4`
+    QT4_FOUND=$(whereis qt4)
     if echo "$QT4_FOUND" | grep -q "lib"; then
         echo "[+] Qt4 found!"
     else
@@ -19,7 +19,7 @@ else
     exit -1
 fi
 
-CMAKE_VER=`cmake --version`
+CMAKE_VER=$(cmake --version)
 CMAKEV="cmake version"
 if echo "$CMAKE_VER" | grep -q "$CMAKEV"; then
     echo "[+] CMake found!"

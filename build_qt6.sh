@@ -4,15 +4,15 @@ echo "Trying to build PE-bear..."
 
 #QT check
 
-QT_VER=`qmake -v`
-str=$QT_VER
+QT_VER=$(qmake -v)
+str="$QT_VER"
 substr="Qt version 6"
 
 echo $QT_VER
 if [[ $str == *"$substr"* ]]; then
     echo "[+] Qt6 found!"
 else
-    str2=`whereis qt6`
+    str2=$(whereis qt6)
     substr2="/qt6"
     if [[ $str2 == *"$substr2"* ]]; then
         echo "[+] Qt6 found!"
@@ -22,8 +22,7 @@ else
     fi
 fi
 
-
-CMAKE_VER=`cmake --version`
+CMAKE_VER=$(cmake --version)
 CMAKEV="cmake version"
 if echo "$CMAKE_VER" | grep -q "$CMAKEV"; then
     echo "[+] CMake found!"
