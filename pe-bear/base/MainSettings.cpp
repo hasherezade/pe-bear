@@ -107,8 +107,10 @@ QFont readFontProperties(QSettings &settings, QString propertyName, QFont defaul
 	if (settings.status() != QSettings::NoError ) {
 		return defaultFont;
 	}
-	QFont font(fontStr);
-	font.fromString(fontStr);
+	QFont font;
+	if (!font.fromString(fontStr)) {
+		font = defaultFont;
+	}
 	font.setPointSize(settings.value(propertyName + ".size", defaultFontSize).toInt());
 	if (settings.status() != QSettings::NoError ) {
 		return defaultFont;
