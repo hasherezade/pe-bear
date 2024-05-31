@@ -168,7 +168,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/ContentPreview.cpp" line="134"/>
-        <source> is invali../pe-bear</source>
+        <source> is invalid:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -741,7 +741,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/DisasmView.cpp" line="230"/>
-        <source> is invali../pe-bear</source>
+        <source> is invalid:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1134,7 +1134,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/ImportsAddWindow.cpp" line="67"/>
-        <source>List of imports to be adde../pe-bear</source>
+        <source>List of imports to be added:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1858,7 +1858,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1013"/>
-        <source>Cannot loa../pe-bear</source>
+        <source>Cannot load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
