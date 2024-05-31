@@ -1339,17 +1339,17 @@
     <name>MainWindow</name>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="133"/>
-        <source>File reloade../pe-bear </source>
+        <source>File reloaded: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="149"/>
-        <source>File delete../pe-bear </source>
+        <source>File deleted: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="151"/>
-        <source>File change../pe-bear </source>
+        <source>File changed: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1582,7 +1582,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="500"/>
-        <source>Loade../pe-bear </source>
+        <source>Loaded: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1597,7 +1597,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="549"/>
-        <source>Failed to loa../pe-bear </source>
+        <source>Failed to load: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1815,7 +1815,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="944"/>
-        <source>Foun../pe-bear </source>
+        <source>Found: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1964,7 +1964,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1162"/>
-        <source>Dumpe../pe-bear </source>
+        <source>Dumped: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2148,7 +2148,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/PEDockedWidget.cpp" line="270"/>
-        <source>Wrong address supplie../pe-bear </source>
+        <source>Wrong address supplied: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2686,7 +2686,7 @@
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/SecHdrsTreeModel.cpp" line="192"/>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/SecHdrsTreeModel.cpp" line="198"/>
-        <source>mappe../pe-bear</source>
+        <source>mapped: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2702,7 +2702,7 @@
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/SecHdrsTreeModel.cpp" line="269"/>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/pe_models/SecHdrsTreeModel.cpp" line="276"/>
-        <source>mappe../pe-bear </source>
+        <source>mapped: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
