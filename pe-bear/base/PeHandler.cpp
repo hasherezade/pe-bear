@@ -594,7 +594,7 @@ bool PeHandler::canAddImportsLib(size_t libsCount)
 
 	if (!m_PE->getContentAt(impDirOffset, tableSize + fieldSize)) return false;
 
-	offset_t fieldOffset = (tableSize < fieldSize) ? impDirOffset : impDirOffset + tableSize - fieldSize; // substract the terminator record from the table
+	offset_t fieldOffset = (tableSize < fieldSize) ? impDirOffset : impDirOffset + tableSize - fieldSize; // subtract the terminator record from the table
 	BYTE *ptr = m_PE->getContentAt(fieldOffset, fieldSize * kRequiredFreeRecords); // space for the new records + the terminator
 	if (!ptr) return false;
 
@@ -616,7 +616,7 @@ bool PeHandler::addImportLib(bool continueLastOperation)
 
 	const bufsize_t fieldSize = sizeof(IMAGE_IMPORT_DESCRIPTOR);
 
-	offset_t fieldOffset = (tableSize < fieldSize) ? impDirOffset : (impDirOffset + tableSize - fieldSize); // substract the terminator record from the table
+	offset_t fieldOffset = (tableSize < fieldSize) ? impDirOffset : (impDirOffset + tableSize - fieldSize); // subtract the terminator record from the table
 	BYTE *ptr = m_PE->getContentAt(fieldOffset, fieldSize * 2); // space for the new record + terminator
 	if (!ptr) return false;
 

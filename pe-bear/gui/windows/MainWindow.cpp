@@ -833,7 +833,7 @@ void MainWindow::info()
 	msg += "<br/>";
 
 #if QT_VERSION < 0x050000
-	msg += "\n" + tr("WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.");
+	msg += "\n" + tr("WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommended for the best user experience.");
 #endif
 
 	QMessageBox msgBox(this);
@@ -1047,7 +1047,7 @@ PeHandler* MainWindow::loadPE(QString fName, const bool showAlert)
 		}
 	}
 	if (!hndl) {
-		QString msg = tr("Error occured during loading the file: ") + fName +"\n" + tr("Type: ") + ExeFactory::getTypeName(type);
+		QString msg = tr("Error occurred during loading the file: ") + fName +"\n" + tr("Type: ") + ExeFactory::getTypeName(type);
 		this->statusBar.showMessage(msg + " [" + fName + "]");
 		if (showAlert) QMessageBox::warning(this, tr( "Cannot load!"), msg);
 		return NULL;

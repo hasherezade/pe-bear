@@ -28,7 +28,7 @@ void OffsetedView::mousePressEvent(QMouseEvent *ev)
 void OffsetedView::onIndexChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     const offset_t offset = getOffsetFromUserData(current);
-    //protect from emiting the same target more than once (from various events)
+    //protect from emitting the same target more than once (from various events)
     emitSelectedTarget(offset, m_targetAddrType, true);
 }
 
