@@ -4178,7 +4178,7 @@ E9 ?? ?? ?? 00 87 0C 24 59 99 03 04 24 E9 ?? ??
 FA ?? ?? ?? ?? E9 ?? ?? ?? 00 C1 C3 15 81 CB ??
 ?? ?? ?? 81 F3 ?? ?? ?? ?? 81 C3 ?? ?? ?? ?? 87
 
-EXECryptor 2.x -> SoftComplete Developement
+EXECryptor 2.x -> SoftComplete Development
 32
 A4 ?? ?? 00 00 00 00 00 FF FF FF FF 3C ?? ?? 00
 94 ?? ?? 00 D8 ?? ?? 00 00 00 00 00 FF FF FF FF
@@ -11016,12 +11016,12 @@ Special EXE Password Protector v1.0
 60 E8 00 00 00 00 5D 81 ED 06 00 00 00 89 AD 8C
 01 00 00 8B C5 2B 85 FE 75 00 00 89 85 3E 77
 
-Special EXE Pasword Protector V1.01 (Eng) -> Pavol Cerven
+Special EXE Password Protector V1.01 (Eng) -> Pavol Cerven
 30
 60 E8 00 00 00 00 5D 81 ED 06 00 00 00 89 AD 8C
 01 00 00 8B C5 2B 85 FE 75 00 00 89 85 3E
 
-Special EXE Pasword Protector v1.01 (Eng) -> Pavol Cerven
+Special EXE Password Protector v1.01 (Eng) -> Pavol Cerven
 85
 60 E8 00 00 00 00 5D 81 ED 06 00 00 00 89 AD 8C
 01 00 00 8B C5 2B 85 FE 75 00 00 89 85 3E 77 00

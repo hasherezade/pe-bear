@@ -43,7 +43,7 @@ protected:
 private:
 	void emitSelectedTarget(const offset_t offset, Executable::addr_type aType, bool verify)
 	{
-		//protect from emiting the same target more than once (from various events)
+		//protect from emitting the same target more than once (from various events)
 		if (verify && m_prevOffset == offset && m_prevType == aType) {
 			return;
 		}

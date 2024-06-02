@@ -1750,7 +1750,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="836"/>
-        <source>WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommened for the best user experience.</source>
+        <source>WARNING: this is a legacy build with Qt4. The builds with Qt5 are recommended for the best user experience.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1888,7 +1888,7 @@
     </message>
     <message>
         <location filename="../pe-bear/pe-bear/pe-bear/gui/windows/MainWindow.cpp" line="1050"/>
-        <source>Error occured during loading the file: </source>
+        <source>Error occurred during loading the file: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>

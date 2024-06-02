@@ -206,7 +206,7 @@ bool ResourcesDirSplitter::displayIcon(ResourceContentWrapper *resContent, const
 	if (restype == pe::RESTYPE_ICON) {
 		dimH = dimW;
 		if (tmp.init((const BYTE*)contentPtr, contentSize)) {
-			//replace pointer to the content by a temporay buffer:
+			//replace pointer to the content by a temporary buffer:
 			content = (char*)tmp.getContent();
 
 			// overwrite the header in the temporary buffer:
