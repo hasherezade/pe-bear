@@ -36,7 +36,7 @@ echo $CMAKE_VER
 mkdir build_qt5
 echo "[+] build directory created"
 cd build_qt5
-cmake cmake -DUSE_QT5=ON -DCMAKE_INSTALL_PREFIX:PATH=$(pwd) ..
+cmake -DUSE_QT5=ON -DCMAKE_INSTALL_PREFIX:PATH=$(pwd) ..
 cmake --build . --target install
 make
 cd ..
