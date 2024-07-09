@@ -39,17 +39,17 @@ for:
 
     install:
      - git submodule update --init --recursive
-     - export PATH="$HOME/$HOME/Qt/6.6.2/gcc_64/bin:$PATH"
+     - export PATH="$HOME/Qt/5.15.2/gcc_64/bin:$PATH"
 
     before_build:
       - cmake --version
 
     build_script:
-      - ./build_qt6.sh
+      - ./build_qt5.sh
 
     after_build:
        - ls
-       - cd build_qt6
+       - cd build_qt5
        - tar -czvf ../PE-bear.tar.gz bin/PE-bear
        - cd ..
 
