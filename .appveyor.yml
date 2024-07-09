@@ -2,13 +2,16 @@ version: '{branch}.{build}'
 skip_tags: true
 
 image:
-- Visual Studio 2019
+- Ubuntu2204
 - macos
+- Visual Studio 2019
 
 matrix:
   exclude:
     - platform: x86
       image: macOS
+    - platform: x86
+      image: Ubuntu2204
 
 platform:
   - x64
@@ -27,7 +30,33 @@ environment:
   artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(PLATFORM)
   buildConfig: $(CONFIGURATION)
   buildPlatform: $(PLATFORM)
+  
+for:
+  -
+    matrix:
+      only:
+        - image: Ubuntu2204
 
+    install:
+     - git submodule update --init --recursive
+     - export PATH="$HOME/Qt/5.15.2/gcc_64/bin:$PATH"
+
+    before_build:
+      - cmake --version
+      - qmake -v
+
+    build_script:
+      - ./build_qt5.sh
+
+    after_build:
+       - ls
+       - cd build_qt5
+       - tar -czvf ../PE-bear.tar.gz bin/PE-bear
+       - cd ..
+
+    artifacts:
+       - path: PE-bear.tar.gz
+       
 for:
   -
     matrix:
