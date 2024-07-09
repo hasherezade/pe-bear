@@ -39,11 +39,10 @@ for:
 
     install:
      - git submodule update --init --recursive
-     - export PATH="$HOME/$HOME/Qt/6.6/gcc_64/bin:$PATH"
+     - export PATH="$HOME/$HOME/Qt/6.6.2/gcc_64/bin:$PATH"
 
     before_build:
       - cmake --version
-      - qmake -v
 
     build_script:
       - ./build_qt6.sh
