@@ -191,7 +191,7 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 	return va;
 }
 
-minidis::mnem_type CDisasm::fetchMnemType(const cs_insn &insn) const
+minidis::mnem_type CDisasm::fetchMnemType_Intel(const cs_insn &insn) const
 {
 	using namespace minidis;
 
@@ -254,12 +254,43 @@ minidis::mnem_type CDisasm::fetchMnemType(const cs_insn &insn) const
 	return MT_OTHER;
 }
 
+minidis::mnem_type CDisasm::fetchMnemType_Arm64(const cs_insn &insn) const
+{
+	using namespace minidis;
+
+	const unsigned int cMnem = insn.id;
+	if (cMnem == arm64_insn::ARM64_INS_UDF) {
+		return MT_INT3;
+	}
+	if (cMnem == x86_insn::X86_INS_INVALID) {
+		return MT_INVALID;
+	}
+	if (cMnem >= arm64_insn::ARM64_INS_B && cMnem <= arm64_insn::ARM64_INS_BTI) {
+		return MT_JUMP;
+	}
+	switch (cMnem) {
+		case arm64_insn::ARM64_INS_CBZ:
+		case arm64_insn::ARM64_INS_CBNZ:
+		case arm64_insn::ARM64_INS_TBL:
+		case arm64_insn::ARM64_INS_TBNZ:
+		case arm64_insn::ARM64_INS_TBX:
+		case arm64_insn::ARM64_INS_TBZ:
+			return MT_COND_JUMP;
+	}
+	switch(cMnem) {
+		case ARM64_INS_RET:
+		case ARM64_INS_RETAA:
+		case ARM64_INS_RETAB:
+			return MT_RET;
+	}
+	return MT_OTHER;
+}
 bool CDisasm::isPushRet(int index, /*out*/ int* ret_index) const
 {
 	if (index >= this->_chunksCount()) {
 		return false;
 	}
-
+	
 	const cs_insn m_insn = m_table.at(index);
 	const cs_detail *detail = &m_details.at(index);
 

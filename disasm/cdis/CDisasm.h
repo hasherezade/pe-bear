@@ -57,12 +57,27 @@ public:
 		if (index >= this->_chunksCount()) {
 			return "";
 		}
-		
 		const cs_insn m_insn = m_table.at(index);
 		return printBytes((uint8_t*) m_insn.bytes, m_insn.size);
 	}
 	
 	bool isImmediate(size_t index) const
+	{
+		if (this->m_arch == Executable::ARCH_INTEL) {
+			return isImmediate_Intel(index);
+		}
+		return false;
+	}
+
+	int32_t getImmediateVal(size_t index) const
+	{
+		if (this->m_arch == Executable::ARCH_INTEL) {
+			return getImmediateVal_Intel(index);
+		}
+		return 0;
+	}
+	
+	bool isImmediate_Intel(size_t index) const
 	{
 		if (index >= this->_chunksCount()) {
 			return false;
@@ -78,7 +93,7 @@ public:
 		return false;
 	}
 	
-	int32_t getImmediateVal(size_t index) const
+	int32_t getImmediateVal_Intel(size_t index) const
 	{
 		if (!isImmediate(index)) {
 			return 0;
@@ -111,11 +126,36 @@ public:
 	bool isFollowable(const int y) const;
 	
 	QString translateBranching(const int y) const;
+	
 protected:
 	size_t _chunksCount() const { return this->m_table.size(); }
-	bool isLongOp(const cs_insn &m_insn) const { return (m_insn.id == X86_INS_LCALL || m_insn.id == X86_INS_LJMP); }
-	minidis::mnem_type fetchMnemType(const cs_insn &insn) const;
 	
+	bool isLongOp(const cs_insn &m_insn) const 
+	{
+		if (this->m_arch == Executable::ARCH_INTEL) {
+			return isLongOp_Intel(m_insn);
+		}
+		return false;
+	}
+	
+	bool isLongOp_Intel(const cs_insn &m_insn) const 
+	{
+		return (m_insn.id == X86_INS_LCALL || m_insn.id == X86_INS_LJMP);
+	}
+	
+	minidis::mnem_type fetchMnemType(const cs_insn &insn) const {
+		if (this->m_arch == Executable::ARCH_INTEL) {
+			return fetchMnemType_Intel(insn);
+		}
+		if (this->m_arch == Executable::ARCH_ARM && this->m_bitMode == 64) {
+			return fetchMnemType_Arm64(insn);
+		}
+		return minidis::MT_OTHER;
+	}
+	
+	minidis::mnem_type fetchMnemType_Intel(const cs_insn &insn) const;
+	minidis::mnem_type fetchMnemType_Arm64(const cs_insn &insn) const;
+
 	size_t disasmNext();
 	bool init_capstone(Executable::exe_arch arch, Executable::exe_bits bitMode);
 	
