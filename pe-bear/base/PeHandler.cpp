@@ -1194,7 +1194,7 @@ bool PeHandler::exportDisasm(const QString &path, const offset_t startOff, const
 	}
 	
 	pe_bear::PeDisasm myDisasm(pe, previewSize);
-	myDisasm.init(startOff, pe->getBitMode());
+	myDisasm.init(startOff, pe->getArch(), pe->getBitMode());
 	myDisasm.fillTable();
 
 	QTextStream disasmStream(&fOut);

@@ -12,20 +12,25 @@ PeDisasm::PeDisasm(PEFile *pe, size_t _previewSize)
 	if (pe == NULL) throw CustomException("PE not initialized!");
 }
 
-bool PeDisasm::init(const offset_t offset, Executable::exe_bits bitMode)
+bool PeDisasm::init(const offset_t offset, Executable::exe_arch arch, Executable::exe_bits bitMode)
 {
 	this->isInit = false;
 	clearTable();
 	if (!m_PE) {
 		return false;
 	}
-	
 	this->firstOffset = offset;
 	if (bitMode == Executable::UNKNOWN) {
 		this->isBitModeAuto = true;
 		this->m_bitMode = m_PE->getBitMode();
 	} else {
 		this->m_bitMode = bitMode;
+	}
+	if (arch == Executable::ARCH_UNKNOWN) {
+		//this->isBitModeAuto = true;
+		this->m_arch = m_PE->getArch();
+	} else {
+		this->m_arch = arch;
 	}
 	if (m_PE->getContentSize() < offset) {
 		return false;
@@ -37,7 +42,7 @@ bool PeDisasm::init(const offset_t offset, Executable::exe_bits bitMode)
 	if (!buf) {
 		return false;
 	}
-	const bool isOk = __disasm_super::init(buf, maxSize, disasmSize, offset, m_bitMode);
+	const bool isOk = __disasm_super::init(buf, maxSize, disasmSize, offset, m_arch, m_bitMode);
 	this->isInit = isOk;
 	return isOk;
 }

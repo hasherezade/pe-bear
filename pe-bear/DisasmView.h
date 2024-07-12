@@ -174,7 +174,7 @@ public slots:
 	void setStartingOffset(offset_t start) { startOff = start; rebuildDisamTab(); }
 	void setShownContent(offset_t start, bufsize_t size) { setStartingOffset(start);  emit scrollReset(); }
 
-	void resetDisasmMode(uint8_t bitMode);
+	void resetDisasmMode(uint8_t bitMode, Executable::exe_arch arch);
 	void setShowImageBase(bool flag);
 	bool setComment(offset_t rva, const QString &comment)
 	{
@@ -247,7 +247,9 @@ private:
 	uint32_t startOff;
 
 	uint8_t bitMode;
+	Executable::exe_arch arch;
 	bool isBitModeAuto;
+	bool archAuto;
 	bool showImageBase;
 
 	QIcon tracerIcon, tracerUpIcon, tracerDownIcon, tracerSelf;

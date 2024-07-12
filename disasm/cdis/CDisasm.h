@@ -18,7 +18,7 @@ public:
 	CDisasm();
 	~CDisasm();
 
-	bool init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_bits bitMode);
+	bool init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_arch arch, Executable::exe_bits bitMode);
 	bool fillTable();
 	bool clearTable();
 	offset_t getRawAt(int index) const;
@@ -117,7 +117,7 @@ protected:
 	minidis::mnem_type fetchMnemType(const cs_insn &insn) const;
 	
 	size_t disasmNext();
-	bool init_capstone(Executable::exe_bits bitMode);
+	bool init_capstone(Executable::exe_arch arch, Executable::exe_bits bitMode);
 	
 	//capstone stuff:
 	std::vector<cs_insn> m_table;

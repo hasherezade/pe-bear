@@ -29,7 +29,7 @@ public:
 	Disasm();
 	~Disasm();
 
-	virtual bool init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_bits bitMode) = 0;
+	virtual bool init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_arch arch, Executable::exe_bits bitMode) = 0;
 	virtual bool fillTable() = 0;
 	virtual bool clearTable() = 0;
 	virtual size_t getChunkSize(int index) const = 0;
@@ -101,6 +101,7 @@ protected:
 	bool is_init;
 
 	Executable::exe_bits m_bitMode;
+	Executable::exe_arch m_arch;
 
 	uint8_t* m_buf;
 	size_t m_bufSize;

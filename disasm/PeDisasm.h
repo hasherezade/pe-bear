@@ -19,7 +19,7 @@ class PeDisasm : public __disasm_super
 	
 public:
 	PeDisasm(PEFile *pe, size_t previewSize = DISASM_PREVIEW_SIZE);
-	bool init(const offset_t offset, Executable::exe_bits bitMode = Executable::UNKNOWN);
+	bool init(const offset_t offset, Executable::exe_arch arch, Executable::exe_bits bitMode);
 	bool fillTable();
 
 	bool isRvaContnuous(int index) const;

@@ -28,12 +28,26 @@ cs_mode toCSmode(Executable::exe_bits bitMode)
 	return CS_MODE_32; //Default
 }
 
-bool CDisasm::init_capstone(Executable::exe_bits bitMode)
+bool CDisasm::init_capstone(Executable::exe_arch arch, Executable::exe_bits bitMode)
 {
 	cs_err err;
-	err = cs_open(CS_ARCH_X86, toCSmode(bitMode), &handle);
+	if (arch == Executable::ARCH_INTEL) {
+		err = cs_open(CS_ARCH_X86, toCSmode(bitMode), &handle);
+	} else if (arch == Executable::ARCH_ARM && bitMode == Executable::BITS_64) {
+		err = cs_open(CS_ARCH_ARM64, CS_MODE_LITTLE_ENDIAN, &handle);
+	} else if (arch == Executable::ARCH_ARM && bitMode == Executable::BITS_32) {
+		err = cs_open(CS_ARCH_ARM, CS_MODE_LITTLE_ENDIAN, &handle);
+	} else {
+		std::cout << "Unknown ARCH: " << std::hex << arch << "\n";
+		return false;
+	}
+
 	if (err) {
-		printf("Failed on cs_open() with error returned: %u\n", err);
+		if (err == CS_ERR_ARCH) {
+			std::cerr << "Failed on cs_open(): unsupported architecture supplied!\n";
+		} else {
+			std::cerr << "Failed on cs_open(), error: " << std::dec << err << std::endl;
+		}
 		return false;
 	}
 	cs_option(handle, CS_OPT_DETAIL, CS_OPT_ON);
@@ -46,7 +60,7 @@ bool CDisasm::init_capstone(Executable::exe_bits bitMode)
 	return true;
 }
 
-bool CDisasm::init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_bits bitMode)
+bool CDisasm::init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t offset, Executable::exe_arch arch, Executable::exe_bits bitMode)
 {
 	QMutexLocker locker(&m_disasmMutex);
 	is_init = false;
@@ -60,15 +74,16 @@ bool CDisasm::init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t off
 	this->m_offset = 0;
 	this->startOffset = this->convertToVA(offset);
 	m_bitMode = bitMode;
+	m_arch = arch;
 
-	is_init = init_capstone(m_bitMode);
+	is_init = init_capstone(m_arch, m_bitMode);
 	return this->is_init;
 }
 
 size_t CDisasm::disasmNext()
 {
 	if (!is_init && m_insn) {
-		printf("Cannot disasm next = NOT INIT!\n");
+		printf("Cannot disasm next = not initialized!\n");
 		return 0;
 	}
 	//--

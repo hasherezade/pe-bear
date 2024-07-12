@@ -363,34 +363,51 @@ void DisasmTreeView::initHeaderMenu()
 	/*Bitmode setting actions */
 	QActionGroup *group = new QActionGroup(this);
 	group->setExclusive(true);
-	QMenu* bitModeSubmenu = hdrSettings->addMenu(tr("&Bit mode"));
-	const int MODES_NUM = 4;
-	QAction *actions[MODES_NUM];
+	QMenu* archMenu = hdrSettings->addMenu(tr("Architectu&re"));
 
-	actions[0] = group->addAction(tr("Automatic"));
-	actions[0]->setData(0);
+	const int MODES_NUM = 6;
+	QAction *actionsI[MODES_NUM];
+
+	actionsI[0] = group->addAction(tr("Automatic"));
+	actionsI[0]->setData(0);
 
 	for (int i = 1; i < MODES_NUM; i++) {
-		int bitmode = 16<<(i-1);
-		actions[i] = group->addAction(QString::number(bitmode));
-		actions[i]->setData(bitmode);
+		if (i < 4) {
+			int bitmode = 16<<(i-1);
+			actionsI[i] = group->addAction(QString(tr("Intel")) + ": " + QString::number(bitmode) + tr("-bit"));
+		} else {
+			int val = i - 2;
+			int bitmode = 16<<(val-1);
+			actionsI[i] = group->addAction(QString(tr("ARM")) + ": " + QString::number(bitmode) + tr("-bit"));
+		}
+		actionsI[i]->setData(i);
 	}
 
 	for (int i = 0; i < MODES_NUM; i++) {
-		actions[i]->setCheckable(true);
-		bitModeSubmenu->addAction(actions[i]);
+		actionsI[i]->setCheckable(true);
+		archMenu->addAction(actionsI[i]);
 	}
-	actions[0]->setChecked(true);
+	actionsI[0]->setChecked(true);
 	connect(group, SIGNAL( triggered(QAction*) ), this, SLOT( setBitMode(QAction*) ));
 }
 
 void DisasmTreeView::setBitMode(QAction* action)
 {
 	QVariant data = action->data();
-	int bit = data.toInt();
-	if (!myModel) return;
-
-	myModel->resetDisasmMode(bit);
+	int flags = data.toInt();
+	if (!myModel) {
+		return;
+	}
+	int bitmode = 0;
+	Executable::exe_arch arch = Executable::ARCH_UNKNOWN;
+	if (flags < 4) {
+		bitmode = 16<<(flags-1);
+		arch = Executable::ARCH_INTEL;
+	} else {
+		bitmode = 16<<((flags - 2)-1);
+		arch = Executable::ARCH_ARM;
+	}
+	myModel->resetDisasmMode(bitmode, arch);
 	reset();
 }
 
@@ -656,7 +673,7 @@ void DisasmTreeView::initHeader()
 
 DisasmModel::DisasmModel(PeHandler *peHndl, QObject *parent)
 	: HexDumpModel(peHndl, parent), startOff(0),
-	isBitModeAuto(true), myDisasm(peHndl->getPe())
+	isBitModeAuto(true), archAuto(true), myDisasm(peHndl->getPe())
 {
 	addrType = Executable::RVA;
 	makeIcons(this->settings.getIconSize());
@@ -678,16 +695,19 @@ void DisasmModel::makeIcons(const QSize &vSize)
 
 void DisasmModel::rebuildDisamTab()
 {
-	if (this->isBitModeAuto) 
+	if (this->isBitModeAuto) {
 		this->bitMode = (m_PE) ? m_PE->getBitMode() : 32;
-
-	myDisasm.init(startOff, (Executable::exe_bits) this->bitMode);
+	}
+	if (this->archAuto) {
+		this->arch = (m_PE) ? m_PE->getArch() : Executable::ARCH_INTEL;
+	}
+	myDisasm.init(startOff, this->arch, (Executable::exe_bits) this->bitMode);
 	myDisasm.fillTable();
 	reset();
 	emit modelUpdated();
 }
 
-void DisasmModel::resetDisasmMode(uint8_t bitMode)
+void DisasmModel::resetDisasmMode(uint8_t bitMode, Executable::exe_arch arch)
 {
 	if (!m_PE) return;
 	if (bitMode != 16 && bitMode != 32 && bitMode != 64) {
@@ -696,6 +716,13 @@ void DisasmModel::resetDisasmMode(uint8_t bitMode)
 	} else {
 		this->isBitModeAuto = false;
 		this->bitMode = bitMode;
+	}
+	if (arch == Executable::ARCH_UNKNOWN) {
+		this->archAuto = true;
+		this->arch = m_PE->getArch();
+	} else {
+		this->archAuto = false;
+		this->arch = arch;
 	}
 	rebuildDisamTab();
 }
