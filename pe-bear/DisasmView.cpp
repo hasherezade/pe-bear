@@ -400,7 +400,10 @@ void DisasmTreeView::setBitMode(QAction* action)
 	}
 	int bitmode = 0;
 	Executable::exe_arch arch = Executable::ARCH_UNKNOWN;
-	if (flags < 4) {
+	if (flags == 0) {
+		arch = Executable::ARCH_UNKNOWN;
+	}
+	else if (flags < 4) {
 		bitmode = 16<<(flags-1);
 		arch = Executable::ARCH_INTEL;
 	} else {
