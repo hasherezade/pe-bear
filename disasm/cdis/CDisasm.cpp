@@ -269,6 +269,8 @@ minidis::mnem_type CDisasm::fetchMnemType_Arm64(const cs_insn &insn) const
 		return MT_JUMP;
 	}
 	switch (cMnem) {
+		case arm64_insn::ARM64_INS_NOP: return MT_NOP;
+
 		case arm64_insn::ARM64_INS_CBZ:
 		case arm64_insn::ARM64_INS_CBNZ:
 		case arm64_insn::ARM64_INS_TBL:
