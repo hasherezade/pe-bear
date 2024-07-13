@@ -808,7 +808,9 @@ void MainWindow::info()
 		msg += tr("commit hash: ") + QString(COMMIT_HASH) + "<br/>";
 	}
 #endif
-	msg += tr("author: Hasherezade") + " (<a href='" + QString(MY_SITE_LINK) + "'>" + tr("homepage") +"</a>)<br/>";
+	msg += tr("authors: Hasherezade") + " (<a href='" + QString(MY_SITE_LINK) + "'>" + tr("homepage") +"</a>) "
+	+ tr("and") 
+	+ " <a href='" + QString("https://github.com/hasherezade/pe-bear/graphs/contributors") + "'>" + tr("contributors") +"</a><br/>";
 	msg += tr("Source code & more info:") + " <a href='" + QString(SOURCE_LINK) + "'>" + tr("here") +"</a><br/>";
 	msg += "<br/>";
 	msg += "<i>" + tr("using:") + "</i><br/>";
