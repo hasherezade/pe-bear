@@ -123,9 +123,9 @@ public:
 
 protected:
 	size_t _chunksCount() const { return this->m_table.size(); }
-	
-	offset_t getArgVA_Intel(int index, int argNum, bool &isOk) const;
-	offset_t getArgVA_Arm64(int index, int argNum, bool &isOk) const;
+
+	offset_t getArgVA_Intel(int index, int argNum, bool &isOk, const cs_insn &insn, const cs_detail &detail) const;
+	offset_t getArgVA_Arm64(int index, int argNum, bool &isOk, const cs_insn &insn, const cs_detail &detail) const;
 	
 	bool isLongOp(const cs_insn &m_insn) const 
 	{
