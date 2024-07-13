@@ -847,12 +847,7 @@ Qt::ItemFlags DisasmModel::flags(const QModelIndex &index) const
 
 QString DisasmModel::getAsm(int index) const
 {
-	QString str = myDisasm.mnemStr(index);
-	
-	if (myDisasm.isBranching(index)) {
-		str = myDisasm.translateBranching(index);
-	}
-	return str;
+	return myDisasm.mnemStr(index);
 }
 
 QVariant DisasmModel::getHint(const QModelIndex &index) const

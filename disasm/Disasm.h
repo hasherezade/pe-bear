@@ -58,7 +58,7 @@ public:
 	virtual QString getHexStr(size_t index) const = 0;
 	virtual bool isImmediate(size_t index) const = 0;
 	
-	virtual int32_t getImmediateVal(size_t index) const = 0;
+	virtual int64_t getImmediateVal(size_t index) const = 0;
 	virtual minidis::mnem_type getMnemType(size_t index) const = 0;
 
 	virtual offset_t getRawAt(int index) const = 0;
@@ -85,7 +85,7 @@ public:
 	/* returns target VA or INVALID_ADDR */
 	virtual offset_t getArgVA(int index, int argNum, bool &isOk) const = 0;
 	
-	virtual QString translateBranching(const int index) const = 0;
+	//virtual QString translateBranching(const int index) const = 0;
 	
 	virtual bool isFollowable(const int y) const = 0;
 	
@@ -109,6 +109,7 @@ protected:
 	size_t m_disasmSize; // the part of buffer that will be used as a preview
 	offset_t m_offset;
 	offset_t startOffset;
+	offset_t m_RVA;
 
 	offset_t m_iptr; //instruction pointer
 	QMutex m_disasmMutex;

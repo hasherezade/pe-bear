@@ -1200,9 +1200,9 @@ bool PeHandler::exportDisasm(const QString &path, const offset_t startOff, const
 	QTextStream disasmStream(&fOut);
 	for (int index = 0; index < myDisasm.chunksCount(); ++index ) {
 		QString str = myDisasm.mnemStr(index);
-		if (myDisasm.isBranching(index)) {
+		/*if (myDisasm.isBranching(index)) {
 			str = myDisasm.translateBranching(index);
-		}
+		}*/
 
 		//resolve target functions:
 		bool isOk = false;

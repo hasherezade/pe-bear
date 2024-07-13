@@ -130,7 +130,7 @@ int32_t PeDisasm::getTargetDelta(int index) const
 
 offset_t PeDisasm::getArgRVA(int index, int argNum, bool &isOk) const
 {
-	offset_t targetVA = PeDisasm::getArgVA(index,  argNum, isOk);
+	offset_t targetVA = PeDisasm::getArgVA(index, argNum, isOk);
 	if (!isOk) {
 		return INVALID_ADDR;
 	}
