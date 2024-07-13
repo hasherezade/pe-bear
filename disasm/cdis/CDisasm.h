@@ -112,8 +112,9 @@ public:
 		if (index >= this->_chunksCount()) {
 			return MT_NONE;
 		}
-		const cs_insn &m_insn =  m_table.at(index);
-		return fetchMnemType(m_insn);
+		const cs_insn &insn =  m_table.at(index);
+		const cs_detail &detail =  m_details.at(index);
+		return fetchMnemType(insn, detail);
 	}
 	
 	virtual bool isAddrOperand(int index) const;
@@ -139,18 +140,18 @@ protected:
 		return (m_insn.id == X86_INS_LCALL || m_insn.id == X86_INS_LJMP);
 	}
 	
-	minidis::mnem_type fetchMnemType(const cs_insn &insn) const {
+	minidis::mnem_type fetchMnemType(const cs_insn &insn, const cs_detail &detail) const {
 		if (this->m_arch == Executable::ARCH_INTEL) {
 			return fetchMnemType_Intel(insn);
 		}
 		if (this->m_arch == Executable::ARCH_ARM && this->m_bitMode == 64) {
-			return fetchMnemType_Arm64(insn);
+			return fetchMnemType_Arm64(insn, detail);
 		}
 		return minidis::MT_OTHER;
 	}
 	
 	minidis::mnem_type fetchMnemType_Intel(const cs_insn &insn) const;
-	minidis::mnem_type fetchMnemType_Arm64(const cs_insn &insn) const;
+	minidis::mnem_type fetchMnemType_Arm64(const cs_insn &insn, const cs_detail &detail) const;
 
 	size_t disasmNext();
 	bool init_capstone(Executable::exe_arch arch, Executable::exe_bits bitMode);
