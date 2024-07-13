@@ -73,6 +73,7 @@ bool CDisasm::init(uint8_t* buf, size_t bufSize, size_t disasmSize, offset_t off
 
 	this->m_offset = 0;
 	this->startOffset = this->convertToVA(offset);
+	this->m_RVA = (this->startOffset != INVALID_ADDR) ? this->startOffset : 0;
 	m_bitMode = bitMode;
 	m_arch = arch;
 
@@ -87,7 +88,7 @@ size_t CDisasm::disasmNext()
 		return 0;
 	}
 	//--
-	bool isOk = cs_disasm_iter(handle, (const unsigned char**)&m_buf, &m_bufSize, &m_offset, m_insn);
+	bool isOk = cs_disasm_iter(handle, (const unsigned char**)&m_buf, &m_bufSize, &m_RVA, m_insn);
 	if (!isOk || !m_insn) {
 		is_init = false;
 		return 0;
@@ -138,7 +139,50 @@ offset_t CDisasm::getRawAt(int index) const
 		return INVALID_ADDR;
 	}
 	const cs_insn m_insn = m_table.at(index);
-	return m_insn.address;
+	if (startOffset == INVALID_ADDR) {
+		return m_insn.address;
+	}
+	return m_insn.address - startOffset;
+}
+
+offset_t CDisasm::getArgVA_Intel(int index, int argNum, bool &isOk, const cs_insn &insn, const cs_detail &detail) const
+{
+	size_t cnt = static_cast<size_t>(detail.x86.op_count);
+	if (argNum >= cnt) return INVALID_ADDR;
+	
+	offset_t va = INVALID_ADDR;
+	const x86_op_type op_type = detail.x86.operands[argNum].type;
+
+	if (op_type == X86_OP_MEM) {
+		int64_t lval = detail.x86.operands[argNum].mem.disp;
+		const x86_reg reg = static_cast<x86_reg>(detail.x86.operands[argNum].mem.base);
+		const bool isEIPrelative = (reg == X86_REG_IP || reg == X86_REG_EIP || reg == X86_REG_RIP);
+		if (isEIPrelative) {
+			const offset_t currVA = getVaAt(index);
+			const size_t instrLen = getChunkSize(index);
+			va = Disasm::getJmpDestAddr(currVA, instrLen, lval);
+		}
+		else if (reg <= X86_REG_INVALID) { //simple case, no reg value to add
+			va = Disasm::trimToBitMode(lval, this->m_bitMode);
+		}
+	}
+	if (op_type == X86_OP_IMM) {
+		va = detail.x86.operands[argNum].imm;
+	}
+	return va;
+}
+
+offset_t CDisasm::getArgVA_Arm64(int index, int argNum, bool &isOk, const cs_insn &insn, const cs_detail &detail) const
+{
+	size_t cnt = static_cast<size_t>(detail.arm64.op_count);
+	if (argNum >= cnt) return INVALID_ADDR;
+	
+	offset_t va = INVALID_ADDR;
+	//immediate:
+	if (detail.arm64.operands[argNum].type == ARM64_OP_IMM) {
+		va = detail.arm64.operands[argNum].imm;
+	}
+	return va;
 }
 
 offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
@@ -147,43 +191,19 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 	if (index >= m_table.size()) {
 		return INVALID_ADDR;
 	}
-	const cs_insn m_insn = m_table.at(index);
-	const cs_detail *m_detail = &m_details.at(index);
-	size_t cnt = static_cast<size_t>(m_detail->x86.op_count);
-	if (argNum >= cnt) return INVALID_ADDR;
-
-	offset_t currVA = getVaAt(index);
-	minidis::mnem_type mType = this->getMnemType(index);
-
-	const x86_reg reg = static_cast<x86_reg>(m_detail->x86.operands[argNum].mem.base);
-	//const size_t opSize = m_detail->x86.operands[argNum].size;
-	const x86_op_type type = m_detail->x86.operands[argNum].type;
-
-	size_t instrLen = getChunkSize(index);
+	const cs_insn &insn = m_table.at(index);
+	const cs_detail &detail = m_details.at(index);
+	
 	offset_t va = INVALID_ADDR;
-
-	if (type == X86_OP_MEM) {
-		int64_t lval = m_detail->x86.operands[argNum].mem.disp;
-
-		const bool isEIPrelative = (reg == X86_REG_IP || reg == X86_REG_EIP || reg == X86_REG_RIP);
-		if (isEIPrelative) {
-			va = Disasm::getJmpDestAddr(currVA, instrLen, lval);
-		}
-		else if (reg <= X86_REG_INVALID) { //simple case, no reg value to add
-			va = Disasm::trimToBitMode(lval, this->m_bitMode);
-		}
+	// Intel
+	if (this->m_arch == Executable::ARCH_INTEL) {
+		va = getArgVA_Intel(index, argNum, isOk, insn, detail);
 	}
-	if (type == X86_OP_IMM) {
-
-		int64_t lval = m_detail->x86.operands[argNum].imm;
-		if (this->isBranching(mType) && !isLongOp(m_insn)) {
-			lval = this->startOffset + lval;
-		}
-		va = lval;
-		if (reg > X86_REG_INVALID) { //if there are registers involved, it is not supported
-			va = INVALID_ADDR;
-		}
+	//ARM:
+	else if (this->m_arch == Executable::ARCH_ARM && this->m_bitMode == 64) {
+		va = getArgVA_Arm64(index, argNum, isOk, insn, detail);
 	}
+	// cleanup
 	if (va != INVALID_ADDR) {
 		isOk = true;
 		va = Disasm::trimToBitMode(va, this->m_bitMode);
@@ -254,7 +274,7 @@ minidis::mnem_type CDisasm::fetchMnemType_Intel(const cs_insn &insn) const
 	return MT_OTHER;
 }
 
-minidis::mnem_type CDisasm::fetchMnemType_Arm64(const cs_insn &insn) const
+minidis::mnem_type CDisasm::fetchMnemType_Arm64(const cs_insn &insn, const cs_detail &detail) const
 {
 	using namespace minidis;
 
@@ -262,48 +282,53 @@ minidis::mnem_type CDisasm::fetchMnemType_Arm64(const cs_insn &insn) const
 	if (cMnem == arm64_insn::ARM64_INS_UDF) {
 		return MT_INT3;
 	}
-	if (cMnem == x86_insn::X86_INS_INVALID) {
+	if (cMnem == arm64_insn::ARM64_INS_INVALID) {
 		return MT_INVALID;
 	}
-	if (cMnem >= arm64_insn::ARM64_INS_B && cMnem <= arm64_insn::ARM64_INS_BTI) {
-		return MT_JUMP;
+	if (cMnem == arm64_insn::ARM64_INS_NOP) {
+		return MT_NOP;
 	}
-	switch (cMnem) {
-		case arm64_insn::ARM64_INS_NOP: return MT_NOP;
+	for (size_t i = 0; i < detail.groups_count; i++) {
+		if (detail.groups[i] == ARM64_GRP_CALL) return MT_CALL;
+		if (detail.groups[i] == ARM64_GRP_RET) return MT_RET;
+		if (detail.groups[i] == ARM64_GRP_INT)  return MT_INTX;
+		
+		if (detail.groups[i] == ARM64_GRP_JUMP || detail.groups[i] == ARM64_GRP_BRANCH_RELATIVE) {
+			switch (cMnem) {
+				case arm64_insn::ARM64_INS_CBZ:
+				case arm64_insn::ARM64_INS_CBNZ:
+				case arm64_insn::ARM64_INS_TBNZ:
+				case arm64_insn::ARM64_INS_TBZ:
+					return MT_COND_JUMP;
+			}
+			return MT_JUMP;
+		}
 
-		case arm64_insn::ARM64_INS_CBZ:
-		case arm64_insn::ARM64_INS_CBNZ:
-		case arm64_insn::ARM64_INS_TBL:
-		case arm64_insn::ARM64_INS_TBNZ:
-		case arm64_insn::ARM64_INS_TBX:
-		case arm64_insn::ARM64_INS_TBZ:
-			return MT_COND_JUMP;
-	}
-	switch(cMnem) {
-		case ARM64_INS_RET:
-		case ARM64_INS_RETAA:
-		case ARM64_INS_RETAB:
-			return MT_RET;
 	}
 	return MT_OTHER;
 }
+
 bool CDisasm::isPushRet(int index, /*out*/ int* ret_index) const
 {
+	if (this->m_arch != Executable::ARCH_INTEL) {
+		return false;
+	}
+	
 	if (index >= this->_chunksCount()) {
 		return false;
 	}
 	
 	const cs_insn m_insn = m_table.at(index);
-	const cs_detail *detail = &m_details.at(index);
+	const cs_detail detail = m_details.at(index);
 
-	const minidis::mnem_type mnem = fetchMnemType(m_insn);
+	const minidis::mnem_type mnem = fetchMnemType(m_insn, detail);
 	if (mnem == minidis::MT_PUSH) {
 		int y2 = index + 1;
 		if (y2 >= m_table.size()) {
 			return false;
 		}
 		const cs_insn m_insn2 = m_table.at(y2);
-		const minidis::mnem_type mnem2 = fetchMnemType(m_insn2);
+		const minidis::mnem_type mnem2 = fetchMnemType(m_insn2, detail);
 		if (mnem2 == minidis::MT_RET) {
 			if (ret_index != NULL) {
 				(*ret_index) = y2;
@@ -323,23 +348,27 @@ bool CDisasm::isAddrOperand(int index) const
 	mnem_type mnem = this->getMnemType(index);
 	if (mnem == MT_PUSH || mnem == MT_MOV) return true;
 
-	const cs_detail *detail = &m_details.at(index);
-	const size_t cnt = static_cast<size_t>(detail->x86.op_count);
+	const cs_detail &detail = m_details.at(index);
+	
+	// Intel
+	if (this->m_arch == Executable::ARCH_INTEL) {
+		const size_t cnt = static_cast<size_t>(detail.x86.op_count);
 
-	for (int argNum = 0; argNum < cnt; argNum++) {
-		const x86_op_type type = detail->x86.operands[argNum].type;
-		const size_t opSize = detail->x86.operands[argNum].size;
+		for (int argNum = 0; argNum < cnt; argNum++) {
+			const x86_op_type opType = detail.x86.operands[argNum].type;
 
-		const x86_reg reg = static_cast<x86_reg>(detail->x86.operands[argNum].mem.base);
-		const bool isEIPrelative = (reg == X86_REG_IP || reg == X86_REG_EIP || reg == X86_REG_RIP);
+			if (opType == X86_OP_IMM 
+				&& detail.x86.operands[argNum].size > 8)
+			{
+				return true;
+			}
 
-		if (type == X86_OP_IMM
-			&& opSize > 8)
-		{
-			return true;
-		}
-		if (type == X86_OP_MEM && isEIPrelative) {
-			return true;
+			const x86_reg reg = static_cast<x86_reg>(detail.x86.operands[argNum].mem.base);
+			const bool isEIPrelative = (reg == X86_REG_IP || reg == X86_REG_EIP || reg == X86_REG_RIP);
+
+			if (opType == X86_OP_MEM && isEIPrelative) {
+				return true;
+			}
 		}
 	}
 	return false;
@@ -351,65 +380,44 @@ bool CDisasm::isFollowable(const int y) const
 
 	if (getRvaAt(y) == INVALID_ADDR) return false;
 
-	if (isBranching(y) == false && isPushRet(y) == false) {
+	if (!isBranching(y) && !isPushRet(y)) {
 		return false;
 	}
 	const cs_detail *detail = &m_details.at(y);
 	if (!detail) return false;
 
-	const size_t cnt = static_cast<size_t>(detail->x86.op_count);
-	if (!cnt) return false;
-
 	const size_t argNum = 0;
-	const x86_op_type type = detail->x86.operands[argNum].type;
-	const x86_reg reg = static_cast<x86_reg>(detail->x86.operands[argNum].mem.base);
-
-	if (type == X86_OP_IMM) {
-		return true;
-	}
-
-	if (type == X86_OP_MEM || type == X86_OP_IMM) {
-		if (reg <= X86_REG_INVALID) { //simple case, no reg value to add
+	// Intel
+	if (this->m_arch == Executable::ARCH_INTEL) {
+		size_t cnt = static_cast<size_t>(detail->x86.op_count);
+		if (!cnt) {
+			return false;
+		}
+		const x86_op_type op_type = detail->x86.operands[argNum].type;
+		if (op_type == X86_OP_IMM) {
 			return true;
 		}
-		const bool isEIPrelative = (reg == X86_REG_IP || reg == X86_REG_EIP || reg == X86_REG_RIP);
-		if (isEIPrelative) {
-			return true;
+		if (op_type == X86_OP_MEM || op_type == X86_OP_IMM) {
+			const x86_reg reg = static_cast<x86_reg>(detail->x86.operands[argNum].mem.base);
+			if (reg <= X86_REG_INVALID) { //simple case, no reg value to add
+				return true;
+			}
+			const bool isEIPrelative = (reg == X86_REG_IP || reg == X86_REG_EIP || reg == X86_REG_RIP);
+			if (isEIPrelative) {
+				return true;
+			}
 		}
 		return false;
 	}
+	// ARM
+	else if (this->m_arch == Executable::ARCH_ARM && this->m_bitMode == 64) {
+		size_t cnt = static_cast<size_t>(detail->arm64.op_count);
+		if (!cnt) {
+			return false;
+		}
+		if (detail->arm64.operands[argNum].type == ARM64_OP_IMM) {
+			return true;
+		}
+	}
 	return false;
-}
-
-QString CDisasm::translateBranching(const int y) const
-{
-	if (y >= this->_chunksCount()) {
-		return "";
-	}
-	const cs_insn m_insn = m_table.at(y);
-	const minidis::mnem_type mType = this->fetchMnemType(m_insn);
-
-	if (!this->isBranching(mType) || !m_insn.mnemonic) {
-		return "";
-	}
-	if (!this->isImmediate(y)) {
-		return this->mnemStr(y);
-	}
-	QString mnemDesc = QString(m_insn.mnemonic);
-	const size_t mnenSize = m_insn.size * 8;
-
-	if ((mType == minidis::MT_JUMP || mType == minidis::MT_COND_JUMP)
-		&& mnenSize < 32)
-	{
-		mnemDesc += " SHORT";
-	}
-	bool isOk = false;
-	offset_t targetVA = getTargetVA(y, isOk);
-
-	if (targetVA == INVALID_ADDR || !isOk) {
-		mnemDesc += " <INVALID>";
-		return mnemDesc;
-	}
-	mnemDesc += " 0x" + QString::number(targetVA, 16);
-	return mnemDesc;
 }
