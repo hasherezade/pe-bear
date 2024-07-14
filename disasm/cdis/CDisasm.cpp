@@ -191,20 +191,39 @@ int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) co
 		const cs_detail detail = m_details.at(index);
 		size_t cnt = static_cast<size_t>(detail.arm64.op_count);
 
-		if (cnt < 2 
+		if (cnt != 2 
 			|| detail.arm64.operands[0].type != ARM64_OP_REG
-			|| static_cast<arm64_reg>(detail.arm64.operands[0].mem.base) != reg
-			|| detail.arm64.operands[1].type != ARM64_OP_IMM)
+			|| static_cast<arm64_reg>(detail.arm64.operands[0].mem.base) != reg)
 		{
 			continue;
 		}
 		
 		const cs_insn insn = m_table.at(index);
-		if (insn.id == arm64_insn::ARM64_INS_ADRP) {
+		
+		if (insn.id == arm64_insn::ARM64_INS_ADRP
+			&& detail.arm64.operands[1].type == ARM64_OP_IMM 
+			)
+		{
 			va = detail.arm64.operands[1].imm; // the register is set to the immediate value
 			_isOk = true;
 			found = index;
-			//std::cout << "Found value for the register: " << std::hex << va << "\n";
+			//std::cout << "Found value for the register: " << reg << " = " << std::hex << va << "\n";
+			break;
+		}
+		
+		if (insn.id == arm64_insn::ARM64_INS_LDAR
+			&& detail.arm64.operands[1].type == ARM64_OP_MEM
+			)
+		{
+			// Example: LDAR X9, [X8]
+			bool isOk2 = false;
+			arm64_reg reg2 = static_cast<arm64_reg>(detail.arm64.operands[1].mem.base);
+			int64_t reg2_val = backtraceReg_Arm64(index, reg2, isOk2);
+			if (isOk2) {
+				//std::cout << "Backtrace for: " << reg << " Found value for the register2: " << reg2 << " = " << std::hex << reg2_val << "\n";
+				va = reg2_val;
+				_isOk = true;
+			}
 			break;
 		}
 	}
@@ -242,6 +261,19 @@ int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) co
 			)
 		{
 			va += detail.arm64.operands[1].mem.disp;
+			_isOk = true;
+			//std::cout << "Added: " << std::hex << va << "\n";
+		}
+		
+		if (insn.id == arm64_insn::ARM64_INS_ADD
+			&& cnt == 3
+			&& detail.arm64.operands[1].type == ARM64_OP_REG
+			&& detail.arm64.operands[1].mem.base == reg
+			&& detail.arm64.operands[2].type == ARM64_OP_IMM
+			)
+		{
+			//Example: ADD X9, X9, #0X288
+			va += detail.arm64.operands[2].imm;
 			_isOk = true;
 			//std::cout << "Added: " << std::hex << va << "\n";
 		}
