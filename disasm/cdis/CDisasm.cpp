@@ -190,10 +190,14 @@ int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) co
 		}
 		const cs_detail detail = m_details.at(index);
 		size_t cnt = static_cast<size_t>(detail.arm64.op_count);
-		if (cnt != 2) continue;
 
-		const arm64_reg regI = static_cast<arm64_reg>(detail.arm64.operands[0].mem.base);
-		if (regI != reg) continue;
+		if (cnt < 2 
+			|| detail.arm64.operands[0].type != ARM64_OP_REG
+			|| static_cast<arm64_reg>(detail.arm64.operands[0].mem.base) != reg
+			|| detail.arm64.operands[1].type != ARM64_OP_IMM)
+		{
+			continue;
+		}
 		
 		const cs_insn insn = m_table.at(index);
 		if (insn.id == arm64_insn::ARM64_INS_ADRP) {
