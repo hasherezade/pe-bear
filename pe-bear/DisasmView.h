@@ -165,10 +165,7 @@ private:
 class DisasmModel : public HexDumpModel
 {
 	Q_OBJECT
-/*
-signals:
-	void scrollReset(); // inherited from HexDumpModel
-	*/
+
 public slots:
 	virtual void onNeedReset() { rebuildDisamTab(); }
 	void setStartingOffset(offset_t start) { startOff = start; rebuildDisamTab(); }

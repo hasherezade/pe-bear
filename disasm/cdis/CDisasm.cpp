@@ -2,8 +2,6 @@
 #include <iostream>
 using namespace pe_bear;
 
-//const int CDisasm::MAX_ARG_NUM = 2;
-
 CDisasm::CDisasm()
 	: Disasm(),
 	m_insn(NULL)
@@ -161,14 +159,80 @@ offset_t CDisasm::getArgVA_Intel(int index, int argNum, bool &isOk, const cs_ins
 			const offset_t currVA = getVaAt(index);
 			const size_t instrLen = getChunkSize(index);
 			va = Disasm::getJmpDestAddr(currVA, instrLen, lval);
+			isOk = true;
 		}
 		else if (reg <= X86_REG_INVALID) { //simple case, no reg value to add
 			va = Disasm::trimToBitMode(lval, this->m_bitMode);
+			isOk = true;
 		}
 	}
 	if (op_type == X86_OP_IMM) {
 		va = detail.x86.operands[argNum].imm;
+		isOk = true;
 	}
+	return va;
+}
+
+int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) const
+{
+	using namespace minidis;
+	isOk = false;
+	
+	const int maxWindow = 10;
+	int64_t va = INVALID_ADDR;
+	bool _isOk = false;
+	int found = startIndx;
+	for (int index = (startIndx - 1); index >= 0 && index >= (startIndx - maxWindow); index--) {
+		const mnem_type mType = this->getMnemType(index);
+		if (mType == MT_CALL || mType == MT_JUMP || mType == MT_COND_JUMP || mType == MT_RET || mType == MT_INVALID) {
+			break;
+		}
+		const cs_detail detail = m_details.at(index);
+		size_t cnt = static_cast<size_t>(detail.arm64.op_count);
+		if (cnt != 2) continue;
+
+		const arm64_reg regI = static_cast<arm64_reg>(detail.arm64.operands[0].mem.base);
+		if (regI != reg) continue;
+		
+		const cs_insn insn = m_table.at(index);
+		if (insn.id == arm64_insn::ARM64_INS_ADRP) {
+			va = detail.arm64.operands[1].imm;
+			_isOk = true;
+			found = index;
+			//std::cout << "Found value for the register: " << std::hex << va << "\n";
+			break;
+		}
+	}
+	if (!_isOk) return INVALID_ADDR;
+	
+	for (int index = found + 1; index < startIndx; index++) {
+
+		const cs_detail detail = m_details.at(index);
+		size_t cnt = static_cast<size_t>(detail.arm64.op_count);
+		if (cnt != 2) continue;
+		/*std::cout << "Checking: " << this->mnemStr(index).toStdString();
+		for (size_t c = 0; c < cnt; c++) {
+			std::cout << " : " <<  detail.arm64.operands[c].type;
+		} 
+		std::cout << "\n";*/
+		if (detail.arm64.operands[0].type != ARM64_OP_REG
+			|| detail.arm64.operands[1].type != ARM64_OP_MEM
+			)
+		{
+			continue;
+		}
+		const arm64_reg reg0 = static_cast<arm64_reg>(detail.arm64.operands[0].mem.base);
+		if (reg0 != reg) continue;
+		
+		const cs_insn insn = m_table.at(index);
+		if (insn.id == arm64_insn::ARM64_INS_LDR) {
+			va += detail.arm64.operands[1].mem.disp;
+			//std::cout << "Added: " << std::hex << va << "\n";
+		}
+	}
+	
+	if (!_isOk) return INVALID_ADDR;
+	isOk = true;
 	return va;
 }
 
@@ -181,6 +245,11 @@ offset_t CDisasm::getArgVA_Arm64(int index, int argNum, bool &isOk, const cs_ins
 	//immediate:
 	if (detail.arm64.operands[argNum].type == ARM64_OP_IMM) {
 		va = detail.arm64.operands[argNum].imm;
+		isOk = true;
+	}
+	else if (argNum == 0 && detail.arm64.operands[argNum].type == ARM64_OP_REG) {
+		const arm64_reg reg = static_cast<arm64_reg>(detail.arm64.operands[argNum].mem.base);
+		va = backtraceReg_Arm64(index, reg, isOk);
 	}
 	return va;
 }
@@ -204,8 +273,7 @@ offset_t CDisasm::getArgVA(int index, int argNum, bool &isOk) const
 		va = getArgVA_Arm64(index, argNum, isOk, insn, detail);
 	}
 	// cleanup
-	if (va != INVALID_ADDR) {
-		isOk = true;
+	if (isOk) {
 		va = Disasm::trimToBitMode(va, this->m_bitMode);
 	}
 	return va;
@@ -288,6 +356,12 @@ minidis::mnem_type CDisasm::fetchMnemType_Arm64(const cs_insn &insn, const cs_de
 	if (cMnem == arm64_insn::ARM64_INS_NOP) {
 		return MT_NOP;
 	}
+	if (cMnem == arm64_insn::ARM64_INS_ADRP 
+		|| cMnem == arm64_insn::ARM64_INS_LDR
+		|| cMnem == arm64_insn::ARM64_INS_MOV)
+	{
+		return MT_MOV;
+	}
 	for (size_t i = 0; i < detail.groups_count; i++) {
 		if (detail.groups[i] == ARM64_GRP_CALL) return MT_CALL;
 		if (detail.groups[i] == ARM64_GRP_RET) return MT_RET;
@@ -313,15 +387,15 @@ bool CDisasm::isPushRet(int index, /*out*/ int* ret_index) const
 	if (this->m_arch != Executable::ARCH_INTEL) {
 		return false;
 	}
-	
 	if (index >= this->_chunksCount()) {
 		return false;
 	}
-	
+
 	const cs_insn m_insn = m_table.at(index);
 	const cs_detail detail = m_details.at(index);
 
 	const minidis::mnem_type mnem = fetchMnemType(m_insn, detail);
+	
 	if (mnem == minidis::MT_PUSH) {
 		int y2 = index + 1;
 		if (y2 >= m_table.size()) {
@@ -371,6 +445,17 @@ bool CDisasm::isAddrOperand(int index) const
 			}
 		}
 	}
+	// Arm64
+	else if (this->m_arch == Executable::ARCH_ARM && this->m_bitMode == 64) {
+		const size_t cnt = static_cast<size_t>(detail.arm64.op_count);
+
+		for (int argNum = 0; argNum < cnt; argNum++) {
+			if (detail.arm64.operands[argNum].type == ARM64_OP_IMM)
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -416,6 +501,9 @@ bool CDisasm::isFollowable(const int y) const
 			return false;
 		}
 		if (detail->arm64.operands[argNum].type == ARM64_OP_IMM) {
+			return true;
+		}
+		if (cnt == 1 && detail->arm64.operands[argNum].type == ARM64_OP_REG) {
 			return true;
 		}
 	}
