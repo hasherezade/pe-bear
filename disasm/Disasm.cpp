@@ -4,7 +4,7 @@
 using namespace pe_bear;
 using namespace minidis;
 
-const int Disasm::MAX_ARG_NUM = 2;
+const int Disasm::MAX_ARG_NUM = 3;
 
 void pe_bear::resetCond(cond_buf &buf)
 {

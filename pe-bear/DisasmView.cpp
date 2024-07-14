@@ -884,17 +884,13 @@ QVariant DisasmModel::getHint(const QModelIndex &index) const
 
 bool DisasmModel::isClickable(const QModelIndex &index) const
 {
-	bool isValid = false;
-	if (index.isValid() == false) return false;
-	
-	int y = index.row();
-	return myDisasm.isFollowable(y);
+	if (!index.isValid()) return false;
+	return myDisasm.isFollowable(index.row());
 }
 
 uint32_t DisasmModel::getCurrentChunkSize(const QModelIndex &index) const
 {
-	bool isValid = false;
-	if (index.isValid() == false) return 0;
+	if (!index.isValid()) return 0;
 	return myDisasm.getChunkSize(index.row());
 }
 

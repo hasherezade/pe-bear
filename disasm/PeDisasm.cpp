@@ -144,7 +144,7 @@ offset_t PeDisasm::getArgRVA(int index, int argNum, bool &isOk) const
 offset_t PeDisasm::getTargetVA(int index, bool &isOk) const
 {
 	offset_t targetAddr = INVALID_ADDR;
-	for (int i = 0; i <= MAX_ARG_NUM; i++ ) {
+	for (int i = 0; i <= getMaxArgNum(); i++ ) {
 		targetAddr = getArgVA(index, i, isOk);
 		if (targetAddr != INVALID_ADDR) break;
 	}
@@ -211,19 +211,21 @@ bool PeDisasm::isCallToRet(int index) const
 	using namespace minidis;
 	
 	if (!m_PE) return false;
+	
+	if (this->m_arch == Executable::ARCH_INTEL) {
+		const mnem_type mnem = this->getMnemType(index);
+		if (mnem != MT_CALL) return false;
+		//is pointer to RET?
+		static const BYTE OP_RET = 0xc3;
 
-	const mnem_type mnem = this->getMnemType(index);
-	if (mnem != MT_CALL) return false;
-	//is pointer to RET?
-	static const BYTE OP_RET = 0xc3;
+		bool isOk = false;
+		uint64_t raw = this->getTargetRaw(index, isOk);
+		if (raw == INVALID_ADDR || !isOk) return false;
 
-	bool isOk = false;
-	uint64_t raw = this->getTargetRaw(index, isOk);
-	if (raw == INVALID_ADDR || !isOk) return false;
-
-	BYTE *cntnt = m_PE->getContent();
-	if (cntnt[raw] == OP_RET) {
-		return true;
+		BYTE *cntnt = m_PE->getContent();
+		if (cntnt[raw] == OP_RET) {
+			return true;
+		}
 	}
 	return false;
 }

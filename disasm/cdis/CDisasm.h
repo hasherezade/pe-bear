@@ -13,7 +13,6 @@ namespace pe_bear {
 class CDisasm : public Disasm
 {
 public:
-	//const  static int MAX_ARG_NUM;
 
 	CDisasm();
 	~CDisasm();
@@ -120,6 +119,17 @@ public:
 	virtual bool isAddrOperand(int index) const;
 	
 	bool isFollowable(const int y) const;
+	
+	int getMaxArgNum() const
+	{
+		if (this->m_arch == Executable::ARCH_INTEL) {
+			return 2;
+		}
+		if (this->m_arch == Executable::ARCH_ARM) {
+			return 3;
+		}
+		return 2;
+	}
 
 protected:
 	size_t _chunksCount() const { return this->m_table.size(); }
