@@ -185,6 +185,7 @@ int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) co
 	for (int index = (startIndx - 1); index >= 0 && index >= (startIndx - maxWindow); index--) {
 		const mnem_type mType = this->getMnemType(index);
 		if (mType == MT_CALL || mType == MT_JUMP || mType == MT_COND_JUMP || mType == MT_RET || mType == MT_INVALID) {
+			// basic block end
 			break;
 		}
 		const cs_detail detail = m_details.at(index);
@@ -196,7 +197,7 @@ int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) co
 		
 		const cs_insn insn = m_table.at(index);
 		if (insn.id == arm64_insn::ARM64_INS_ADRP) {
-			va = detail.arm64.operands[1].imm;
+			va = detail.arm64.operands[1].imm; // the register is set to the immediate value
 			_isOk = true;
 			found = index;
 			//std::cout << "Found value for the register: " << std::hex << va << "\n";
@@ -206,27 +207,38 @@ int64_t CDisasm::backtraceReg_Arm64(int startIndx, arm64_reg reg, bool& isOk) co
 	if (!_isOk) return INVALID_ADDR;
 	
 	for (int index = found + 1; index < startIndx; index++) {
-
+		bool affectsReg = false;
+		
 		const cs_detail detail = m_details.at(index);
-		size_t cnt = static_cast<size_t>(detail.arm64.op_count);
-		if (cnt != 2) continue;
-		/*std::cout << "Checking: " << this->mnemStr(index).toStdString();
-		for (size_t c = 0; c < cnt; c++) {
-			std::cout << " : " <<  detail.arm64.operands[c].type;
-		} 
-		std::cout << "\n";*/
-		if (detail.arm64.operands[0].type != ARM64_OP_REG
-			|| detail.arm64.operands[1].type != ARM64_OP_MEM
+		const size_t cnt = static_cast<size_t>(detail.arm64.op_count);
+		
+		if (cnt > 0 
+			&& detail.arm64.operands[0].type == ARM64_OP_REG
+			&& static_cast<arm64_reg>(detail.arm64.operands[0].mem.base) == reg
 			)
 		{
-			continue;
+			affectsReg = true;
+			_isOk = false;
 		}
-		const arm64_reg reg0 = static_cast<arm64_reg>(detail.arm64.operands[0].mem.base);
-		if (reg0 != reg) continue;
+		
+		if (!affectsReg) continue;
 		
 		const cs_insn insn = m_table.at(index);
-		if (insn.id == arm64_insn::ARM64_INS_LDR) {
+		/*
+		std::cout << "Checking: " << this->mnemStr(index).toStdString() << " Cnt: " << cnt << " { ";
+		for (size_t c = 0; c < cnt; c++) {
+			std::cout << " " <<  detail.arm64.operands[c].type;
+		}
+		std::cout << " }\n";
+		*/
+		if (insn.id == arm64_insn::ARM64_INS_LDR
+			&& cnt == 2
+			&& detail.arm64.operands[1].type == ARM64_OP_MEM
+			&& detail.arm64.operands[1].mem.base == reg
+			)
+		{
 			va += detail.arm64.operands[1].mem.disp;
+			_isOk = true;
 			//std::cout << "Added: " << std::hex << va << "\n";
 		}
 	}
