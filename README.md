@@ -49,9 +49,10 @@ The **Windows** build with *vs10* suffix is built with Qt4 (legacy) - in contras
 
 +   [git](https://git-scm.com/downloads)
 +   [cmake](http://www.cmake.org)
-+   [Qt5](https://www.qt.io/download) (optionally Qt4)
-+   bearparser (submodule of the current repository)
-+   capstone (submodule of the current repository)
++   [Qt6](https://www.qt.io/download) (optional: Qt5, Qt4)
++   bearparser (submodule)
++   capstone (submodule)
++   sig_finder (submodule)
 
 ### Clone
 
@@ -69,7 +70,8 @@ Use [CMake](http://www.cmake.org) to generate a Visual Studio project. Open in V
 ### Building on Linux and MacOS
 
 To build it on Linux or MacOS you can use the given scripts:
-+   [build.sh](./build.sh) - default, builds with Qt5
++   [build.sh](./build.sh) - default, builds with the latest Qt
++   [build_qt6.sh](./build_qt6.sh) - builds with Qt6
 +   [build_qt5.sh](./build_qt5.sh) - builds with Qt5
 +   [build_qt4.sh](./build_qt4.sh) - builds with Qt4
 
