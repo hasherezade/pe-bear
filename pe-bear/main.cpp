@@ -8,15 +8,12 @@
 #include "gui/windows/MainWindow.h"
 #include "base/MainSettings.h"
 
-QStringList collectSuppliedFiles(int argc, char *argv[])
+QStringList collectSuppliedFiles()
 {
+	QStringList args = QCoreApplication::arguments();
 	QStringList fNames;
-	if (argc <= 1) {
-		return fNames;
-	}
-	for (int i = 1; i < argc; i++) {
-		QString fileName = argv[i];
-		fNames << fileName;
+	for (int i = 1; i < args.length(); i++) {
+		fNames << args[i];
 	}
 	return fNames;
 }
@@ -61,8 +58,8 @@ int main(int argc, char *argv[])
 	mainWin.setIconSize(QSize(48, 48));
 	mainWin.resize(950, 650);
 
-	if (argc > 1) {
-		QStringList fileNames = collectSuppliedFiles(argc, argv);
+	QStringList fileNames = collectSuppliedFiles();
+	if (fileNames.length()) {
 		mainWin.openMultiplePEs(fileNames);
 	}
 	mainWin.show();
