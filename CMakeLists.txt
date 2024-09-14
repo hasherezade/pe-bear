@@ -63,6 +63,14 @@ option(CAPSTONE_X86_REDUCE "x86 with reduce instruction sets to minimize library
 option(CAPSTONE_X86_ATT_DISABLE "Disable x86 AT&T syntax" ON)
 option(CAPSTONE_SH_SUPPORT "SH support" OFF)
 
+if(CAPSTONE_ARM64_SUPPORT)
+	add_compile_definitions(USE_ARM64)
+endif()
+
+if(CAPSTONE_ARM_SUPPORT)
+	add_compile_definitions(USE_ARM32)
+endif()
+
 # Add sub-directories
 #
 # libs

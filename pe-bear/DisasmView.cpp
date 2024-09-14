@@ -372,15 +372,32 @@ void DisasmTreeView::initHeaderMenu()
 	actionsI[0]->setData(0);
 
 	for (int i = 1; i < MODES_NUM; i++) {
+		bool isEnabled = true;
 		if (i < 4) {
 			int bitmode = 16<<(i-1);
 			actionsI[i] = group->addAction(QString(tr("Intel")) + ": " + QString::number(bitmode) + tr("-bit"));
 		} else {
 			int val = i - 2;
 			int bitmode = 16<<(val-1);
-			actionsI[i] = group->addAction(QString(tr("ARM")) + ": " + QString::number(bitmode) + tr("-bit"));
+			QString armInfo = QString(tr("ARM")) + ": " + QString::number(bitmode) + tr("-bit");
+			
+#ifndef USE_ARM32
+			if (bitmode == 32) {
+				armInfo += " [" + QString(tr("disabled")) + "]";
+				isEnabled = false;
+			}
+#endif //USE_ARM32
+
+#ifndef USE_ARM64
+			if (bitmode == 64) {
+				armInfo += " [" + QString(tr("disabled")) + "]";
+				isEnabled = false;
+			}
+#endif //USE_ARM64
+			actionsI[i] = group->addAction(armInfo);
 		}
 		actionsI[i]->setData(i);
+		actionsI[i]->setEnabled(isEnabled);
 	}
 
 	for (int i = 0; i < MODES_NUM; i++) {
