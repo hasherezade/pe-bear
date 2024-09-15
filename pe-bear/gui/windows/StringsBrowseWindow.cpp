@@ -97,7 +97,7 @@ void StringsBrowseWindow::filterPatamsChanged(QString &str, bool isRegex, bool i
 	if (!this->stringsProxyModel) return;
 
 	if (isRegex) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
 		QRegularExpression::PatternOptions options = isCaseSens ?
 			QRegularExpression::NoPatternOption :
 			QRegularExpression::CaseInsensitiveOption;
