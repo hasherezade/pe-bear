@@ -81,7 +81,5 @@ To generate the `.app` bundle on MacOS you can use:
 
 ---
 
-If you like PE-bear, you can support it:
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=FQX9B9VHCRBF4)
+If you like PE-bear, you can support it by buying [the merch 🐻](https://teespring.com/pe-bear-ate-my-malwarez-v2?pid=377)
 
