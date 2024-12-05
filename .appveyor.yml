@@ -121,10 +121,10 @@ for:
      - mkdir %artifactName%\platforms
      - mkdir %artifactName%\styles
      - mkdir %artifactName%\imageformats
-     - cp "%QT%\plugins\platforms\qwindows.dll" %artifactName%\platforms
-     - cp "%QT%\plugins\imageformats\qico.dll" %artifactName%\imageformats
-     - if [%QT_VER%]==[5] (cp "%QT%\plugins\styles\qwindowsvistastyle.dll" %artifactName%\styles)
-     - if [%QT_VER%]==[6] (cp "%QT%\plugins\styles\qmodernwindowsstyle.dll" %artifactName%\styles)
+     - cp "%QT%\plugins\platforms\qwindows%DLL_SUFFIX%" %artifactName%\platforms
+     - cp "%QT%\plugins\imageformats\qico%DLL_SUFFIX%" %artifactName%\imageformats
+     - if [%QT_VER%]==[5] (cp "%QT%\plugins\styles\qwindowsvistastyle%DLL_SUFFIX%" %artifactName%\styles)
+     - if [%QT_VER%]==[6] (cp "%QT%\plugins\styles\qmodernwindowsstyle%DLL_SUFFIX%" %artifactName%\styles)
 
     artifacts:
      - path: build\%artifactName%
