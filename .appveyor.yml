@@ -12,7 +12,11 @@ matrix:
       image: macOS
     - platform: x86
       image: Ubuntu2204
-
+    - configuration: Debug
+      image: macOS
+    - configuration: Debug
+      image: Ubuntu2204
+      
 platform:
   - x64
   - x86
