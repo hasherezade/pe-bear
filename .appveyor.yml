@@ -33,7 +33,7 @@ build:
   verbosity: detailed
 
 environment:
-  artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(PLATFORM)
+  artifactName: $(APPVEYOR_PROJECT_NAME)-$(APPVEYOR_REPO_COMMIT)-$(CONFIGURATION)-$(PLATFORM)
   buildConfig: $(CONFIGURATION)
   buildPlatform: $(PLATFORM)
   
