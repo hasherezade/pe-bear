@@ -2,4 +2,5 @@ build_qt4/*
 build_qt5/*
 build_qt6/*
 build_udis/*
+*.bak
 
