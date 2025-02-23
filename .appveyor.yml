@@ -2,12 +2,17 @@ version: '{branch}.{build}'
 skip_tags: true
 
 image:
+- Visual Studio 2022
+- Visual Studio 2019
 - Ubuntu2204
 - macos
-- Visual Studio 2019
 
 matrix:
   exclude:
+    - platform: x86
+      image: Visual Studio 2022
+    - platform: x64
+      image: Visual Studio 2019
     - platform: x86
       image: macOS
     - platform: x86
@@ -95,7 +100,7 @@ for:
     install:
      - git submodule update --init --recursive
      - if [%buildPlatform%]==[x64] (set QT_VER=6)
-     - if [%buildPlatform%]==[x64] (set QT=C:\Qt\6.7\msvc2019_64)
+     - if [%buildPlatform%]==[x64] (set QT=C:\Qt\6.8\msvc2022_64)
      - if [%buildPlatform%]==[x86] (set QT_VER=5) 
      - if [%buildPlatform%]==[x86] (set QT=C:\Qt\5.15.2\msvc2019)
      - set QT_DIR=%QT%
