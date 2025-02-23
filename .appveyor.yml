@@ -95,7 +95,7 @@ for:
   -
     matrix:
       only:
-        - image: Visual Studio 2019
+        - image: Visual Studio 2022
     
     install:
      - git submodule update --init --recursive
