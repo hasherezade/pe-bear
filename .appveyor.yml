@@ -96,7 +96,8 @@ for:
     matrix:
       only:
         - image: Visual Studio 2022
-    
+        - image: Visual Studio 2019
+        
     install:
      - git submodule update --init --recursive
      - if [%buildPlatform%]==[x64] (set QT_VER=6)
