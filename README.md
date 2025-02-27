@@ -23,9 +23,10 @@ Signatures for PE-bear:
 
 
 ### Windows Packaging
-![](https://community.chocolatey.org/favicon.ico) Available also via [Chocolatey](https://community.chocolatey.org/packages/pebear)
 
-![](https://avatars.githubusercontent.com/u/16618068?s=15) Available also via [Scoop](https://scoop.sh/#/apps?q=pe-bear)
+Available also via:
++  ![](https://community.chocolatey.org/favicon.ico)[Chocolatey](https://community.chocolatey.org/packages/pebear)
++  ![](https://avatars.githubusercontent.com/u/16618068?s=15)[Scoop](https://scoop.sh/#/apps?q=pe-bear)
 
 ### Test Builds
 
