@@ -59,17 +59,24 @@ DiffWindow::DiffWindow(PeHandlersManager &peMngr, QWidget *parent)
 
 	this->setStatusBar(&this->statusBar);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 	connect( &this->fileCombo[LEFT], SIGNAL(currentTextChanged(const QString &)),
 		this, SLOT(file1Selected(const QString &)) );
 	connect( &this->fileCombo[RIGHT], SIGNAL(currentTextChanged(const QString &)),
 		this, SLOT(file2Selected(const QString &)) );
+#else
+	connect( &this->fileCombo[LEFT], SIGNAL(activated(const QString &)),
+		this, SLOT(file1Selected(const QString &)) );
+	connect( &this->fileCombo[RIGHT], SIGNAL(activated(const QString &)),
+		this, SLOT(file2Selected(const QString &)) );
+#endif
 
 	connect( this, SIGNAL(contentChanged(BYTE*, int, offset_t, ContentIndx)),
 		&hexDumpModelL, SLOT(setContent(BYTE*, int, offset_t, ContentIndx)) );
 		
 	connect( this, SIGNAL(contentChanged(BYTE*, int, offset_t, ContentIndx)),
 		&hexDumpModelR, SLOT(setContent(BYTE*, int, offset_t, ContentIndx)) );
-
+		
 	connect( this, SIGNAL(contentCleared(ContentIndx)), 
 		&hexDumpModelL, SLOT(clearContent(ContentIndx)) );
 		
