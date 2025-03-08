@@ -27,7 +27,8 @@ Signatures for PE-bear:
 Available also via:
 +  ![](https://community.chocolatey.org/favicon.ico) [Chocolatey](https://community.chocolatey.org/packages/pebear)
 +  ![](https://avatars.githubusercontent.com/u/16618068?s=15) [Scoop](https://scoop.sh/#/apps?q=pe-bear)
-
++  ![WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (`winget install pe-bear`)
+      
 ### Test Builds
 
 🧪 Fresh **test builds** (ahead of the official release) can be downloaded from the [AppVeyor build server](https://ci.appveyor.com/project/hasherezade/pe-bear). They are created on each commit to the `main` branch. You can download them by clicking on the build version, then choosing the tab `Artifacts`. WARNING: those builds may be unstable.
