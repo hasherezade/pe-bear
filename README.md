@@ -27,7 +27,7 @@ Signatures for PE-bear:
 Available also via:
 +  ![](https://community.chocolatey.org/favicon.ico) [Chocolatey](https://community.chocolatey.org/packages/pebear)
 +  ![](https://avatars.githubusercontent.com/u/16618068?s=15) [Scoop](https://scoop.sh/#/apps?q=pe-bear)
-+  ![WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (`winget install pe-bear`)
++  [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (`winget install pe-bear`)
       
 ### Test Builds
 
