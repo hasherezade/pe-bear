@@ -862,21 +862,30 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	for (auto itr = addedWrappers.begin(); itr != addedWrappers.end(); ++itr) {
 		ImportEntryWrapper* libWr = itr.value();
 		const QString library = itr.key();
-		for (auto fItr = settings.dllFunctions[library].begin(); fItr != settings.dllFunctions[library].end(); ++fItr) {
+		auto funcForLibItr = settings.dllFunctions.find(library);
+		if (funcForLibItr == settings.dllFunctions.end()) {
+			continue;
+		}
+		const QStringList &funcForLib = (*funcForLibItr);
+		for (auto fItr = funcForLib.begin(); fItr != funcForLib.end(); ++fItr) {
 			ImportedFuncWrapper* func = _addImportFunc(libWr, continueLastOperation);
 			if (!func) {
 				break;
 			}
 			continueLastOperation = true;
+            std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
 			const QString funcName = *fItr;
-
+            std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
 			if (funcName.startsWith("#")) {
+                std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
 				QString ordStr = funcName.mid(1); 
 				const int ordinal = ordStr.toInt();
 				_autoFillFunction(libWr, func, "", ordinal, storageOffset);
 			} else {
+                std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
 				_autoFillFunction(libWr, func, funcName, 0, storageOffset);
 			}
+            std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
 			delete func; func = NULL; // delete the temporary wrapper
 			libWr->wrap();
 		}
