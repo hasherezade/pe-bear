@@ -256,11 +256,11 @@ public:
 	
 //--------
 	/* wrappers for PE structures */
-	DosHdrWrapper dosHdrWrapper;
-	RichHdrWrapper richHdrWrapper;
-	FileHdrWrapper fileHdrWrapper;
-	OptHdrWrapper optHdrWrapper;
-	DataDirWrapper dataDirWrapper;
+	DosHdrWrapper &dosHdrWrapper;
+	RichHdrWrapper &richHdrWrapper;
+	FileHdrWrapper &fileHdrWrapper;
+	OptHdrWrapper &optHdrWrapper;
+	DataDirWrapper &dataDirWrapper;
 
 	ResourcesAlbum &resourcesAlbum;
 
@@ -352,7 +352,7 @@ protected:
 
 	bool isBaseHdrModif(offset_t modifOffset, bufsize_t size);
 	
-	bool rewrapDataDirs();
+	bool _rewrapDataDirs();
 
 	bool updatePeOnModified(offset_t modOffset = INVALID_ADDR, bufsize_t modSize = 0);// throws exception
 	void updatePeOnResized();

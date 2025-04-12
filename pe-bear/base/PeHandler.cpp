@@ -18,8 +18,8 @@ using namespace sig_finder;
 PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	: QObject(), 
 	m_PE(pe), m_fileBuffer(fileBuffer),
-	dosHdrWrapper(pe), 
-	fileHdrWrapper(pe), optHdrWrapper(pe), richHdrWrapper(pe), dataDirWrapper(pe),
+	dosHdrWrapper(*pe->getDosHdrWrapper()), 
+	fileHdrWrapper(*pe->getFileHdrWrapper()), optHdrWrapper(*pe->getOptHdrWrapper()), richHdrWrapper(*pe->getRichHdrWrapper()), dataDirWrapper(*pe->getDataDirWrapper()),
 	exportDirWrapper(*pe->getExportsDir()), importDirWrapper(*pe->getImportsDir()), tlsDirWrapper(*pe->getTlsDir()), relocDirWrapper(*pe->getRelocsDir()), 
 	securityDirWrapper(*pe->getSecurityDir()), ldConfDirWrapper(*pe->getLoadConfigDir()), boundImpDirWrapper(*pe->getBoundImportsDir()),
 	delayImpDirWrapper(*pe->getDelayedImportsDir()), debugDirWrapper(*pe->getDebugDir()), exceptDirWrapper(*pe->getExceptionsDir()), clrDirWrapper(*pe->getClsDir()),
@@ -89,8 +89,7 @@ bool PeHandler::hasDirectory(dir_entry dirNum) const
 
 	if (!this->m_PE || !this->m_PE->hasDirectory(dirNum)) return false;
 
-	if (!dataDirWrappers[dirNum]) return false;
-	if (!dataDirWrappers[dirNum]->getPtr()) return false;
+	if (!dataDirWrappers[dirNum] || !dataDirWrappers[dirNum]->getPtr()) return false;
 	return true;
 }
 
@@ -103,8 +102,10 @@ QString PeHandler::getCurrentHash(SupportedHashes::hash_type type)
 void PeHandler::onHashReady(QString hash, int hType)
 {
 	if (hType >= SupportedHashes::HASHES_NUM) return;
-	QMutexLocker ml(&m_hashMutex[hType]);
-	this->hash[hType] = hash;
+	{ //scope
+		QMutexLocker ml(&m_hashMutex[hType]);
+		this->hash[hType] = hash;
+	} //scope
 	emit hashChanged();
 }
 
@@ -461,7 +462,7 @@ bool PeHandler::copyVirtualSizesToRaw()
 		);
 		this->optHdrWrapper.setNumValue(OptHdrWrapper::FILE_ALIGN, val);
 	}
-	rewrapDataDirs();
+	_rewrapDataDirs();
 	emit modified();
 	emit secHeadersModified();
 	return true;
@@ -469,21 +470,20 @@ bool PeHandler::copyVirtualSizesToRaw()
 
 SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_t vSize) //throws exception
 {
-	offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
-	bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
-	this->modifHndl.backupModification(modOffset, modSize, false);
-
-	modOffset = this->fileHdrWrapper.getFieldOffset(FileHdrWrapper::SEC_NUM);
-	modSize = this->fileHdrWrapper.getFieldSize(FileHdrWrapper::SEC_NUM);
-	this->modifHndl.backupModification(modOffset, modSize, true);
-
-	//--
-	modOffset = m_PE->secHdrsEndOffset();
-	modSize = sizeof(IMAGE_SECTION_HEADER);
-	this->modifHndl.backupModification(modOffset, modSize, true);
-	//---
-	SectionHdrWrapper* newSec = NULL;
+	SectionHdrWrapper* newSec = nullptr;
 	try {
+		offset_t modOffset = this->optHdrWrapper.getFieldOffset(OptHdrWrapper::IMAGE_SIZE);
+		bufsize_t modSize = this->optHdrWrapper.getFieldSize(OptHdrWrapper::IMAGE_SIZE);
+		this->modifHndl.backupModification(modOffset, modSize, false);
+
+		modOffset = this->fileHdrWrapper.getFieldOffset(FileHdrWrapper::SEC_NUM);
+		modSize = this->fileHdrWrapper.getFieldSize(FileHdrWrapper::SEC_NUM);
+		this->modifHndl.backupModification(modOffset, modSize, true);
+
+		modOffset = m_PE->secHdrsEndOffset();
+		modSize = sizeof(IMAGE_SECTION_HEADER);
+		this->modifHndl.backupModification(modOffset, modSize, true);
+
 		const bufsize_t roundedRawEnd = buf_util::roundupToUnit(m_PE->getMappedSize(Executable::RAW), m_PE->getAlignment(Executable::RAW));
 		const bufsize_t newSize = roundedRawEnd + rSize;
 		this->modifHndl.backupResize(newSize, true);
@@ -576,7 +576,7 @@ bool PeHandler::moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw)
 size_t PeHandler::getDirSize(dir_entry dirNum)
 {
 	if (dirNum >= DIR_ENTRIES_COUNT) return 0;
-	if (dataDirWrappers[dirNum] == NULL) return 0;
+	if (!dataDirWrappers[dirNum]) return 0;
 	
 	bufsize_t dirSize = dataDirWrappers[dirNum]->getSize();
 	return dirSize;
@@ -1078,7 +1078,7 @@ bool PeHandler::isBaseHdrModif(offset_t modO, bufsize_t modSize)
 	return baseHdrsModified;
 }
 
-bool PeHandler::rewrapDataDirs()
+bool PeHandler::_rewrapDataDirs()
 {
 	if (!m_PE) return false;
 	return m_PE->wrapDataDirs();
@@ -1111,13 +1111,7 @@ bool PeHandler::updatePeOnModified(offset_t modO, bufsize_t modSize)// throws ex
 			baseHdrModified = true;
 			isSecHdrModified = true;
 		}
-
-		if (baseHdrModified) {
-			fileHdrWrapper.wrap();
-			optHdrWrapper.wrap();
-		}
-
-		rewrapDataDirs();
+		_rewrapDataDirs();
 	}//!scope0
 	
 	if (isSecHdrModified) {
@@ -1130,7 +1124,7 @@ void PeHandler::updatePeOnResized()
 {
 	{ //scope0
 		QMutexLocker lock(&m_UpdateMutex);
-		rewrapDataDirs();
+		_rewrapDataDirs();
 	}//!scope0
 	emit secHeadersModified();
 }
