@@ -545,11 +545,11 @@ bool PeHandler::_moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw, bool
 
 	if (!ptr || !dirSize || dirOffset == INVALID_ADDR) return false;
 
-	backupModification(dirOffset, dirSize, continueLastOperation); // backup current area
-	backupModification(targetRaw, dirSize, true); // backup the target area
-	backupModification(fieldOffset, fieldSize, true); //backup the offset
 	bool isOk = false;
 	try {
+		backupModification(dirOffset, dirSize, continueLastOperation); // backup current area
+		backupModification(targetRaw, dirSize, true); // backup the target area
+		backupModification(fieldOffset, fieldSize, true); //backup the offset
 		isOk = m_PE->moveDataDirEntry(dirNum, targetRaw, Executable::RAW);
 	}
 	catch (CustomException e) {
