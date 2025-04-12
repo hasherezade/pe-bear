@@ -170,7 +170,7 @@ bool MainWindow::checkFileChanges(const QString &path)
 		msgbox.setIcon(QMessageBox::Question);
 		msgbox.addButton(QMessageBox::Yes);
 		msgbox.addButton(QMessageBox::No);
-		msgbox.setDefaultButton(QMessageBox::Yes);		
+		msgbox.setDefaultButton(QMessageBox::Yes);
 #if QT_VERSION >= 0x050000
 		QCheckBox cb(tr("Remember the answer"), &msgbox);
 		cb.setToolTip(tr("Can be changed in: [Settings] -> [Configure...]"));
@@ -306,12 +306,12 @@ void MainWindow::createActions()
 
 	//Actions
 	newInstance = new QAction(QIcon(":/icons/add_entry.ico"), tr("&New Instance"), this);
-	newInstance->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+	newInstance->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
 	newInstance->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->newInstance, SIGNAL(triggered()), this, SLOT(runNewInstance()));
 
 	openAction = new QAction(QIcon(":/icons/Add.ico"), tr("&Load PEs"), this);
-	openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+	openAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
 	openAction->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->openAction, SIGNAL(triggered()), this, SLOT(open()));
 	
@@ -366,7 +366,7 @@ void MainWindow::createActions()
 	connect(this->zoomOutAction, SIGNAL(triggered()), this, SLOT(zoomOutFonts()));
 	
 	zoomDefault = new QAction(tr("Default size"), this);
-	zoomDefault->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
+	zoomDefault->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_0));
 	zoomDefault->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->zoomDefault, SIGNAL(triggered()), this, SLOT(setDefaultZoom()));
 }
