@@ -177,13 +177,13 @@ void HexTableView::initMenu()
 	//QMenu* editSubmenu = menu.addMenu("&Selection");
 
 	QAction *copySelAction = new QAction(tr("Copy"), menu);
-	copySelAction->setShortcut(Qt::CTRL + Qt::Key_C);
+	copySelAction->setShortcut(Qt::CTRL | Qt::Key_C);
 
 	menu->addAction(copySelAction);
 	connect(copySelAction, SIGNAL(triggered()), this, SLOT(copySelected()));
 
 	QAction *pasteSelAction = new QAction(tr("Paste to selected"), menu);
-	pasteSelAction->setShortcut(Qt::CTRL + Qt::Key_V);
+	pasteSelAction->setShortcut(Qt::CTRL | Qt::Key_V);
 	menu->addAction(pasteSelAction);
 	connect(pasteSelAction, SIGNAL(triggered()), this, SLOT(pasteToSelected()));
 
@@ -199,7 +199,7 @@ void HexTableView::initMenu()
 	connect(fillSelAction, SIGNAL(triggered()), this, SLOT(fillSelected()));
 
 	undo = new QAction(tr("Undo"), menu);
-	undo->setShortcut(Qt::CTRL + Qt::Key_Z);
+	undo->setShortcut(Qt::CTRL | Qt::Key_Z);
 	connect(undo, SIGNAL(triggered()), this, SLOT(undoLastModification()));
 }
 
