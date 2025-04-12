@@ -17,7 +17,7 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 			
 			bool isWide = false;
 			char *ptr = (char*) m_PE->getContentAt(step, 1);
-			if (!IS_PRINTABLE(*ptr) || isspace(*ptr) ) {
+			if (!ptr || !IS_PRINTABLE(*ptr) || isspace(*ptr) ) {
 				continue;
 			}
 			const size_t remainingSize = maxSize - step;
