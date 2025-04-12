@@ -845,13 +845,18 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 	QMap<QString, ImportEntryWrapper*> addedWrappers;
 
 	for (auto itr = dllsList.begin(); itr != dllsList.end(); ++itr) {
-		
-		QString library = *itr;
-		const size_t funcCount = settings.dllFunctions[library].size();
-		if (!funcCount) continue;
-		
+
+		const QString library = *itr;
+		auto funcForLibItr = settings.dllFunctions.find(library);
+		if (funcForLibItr == settings.dllFunctions.end()) {
+			continue;
+		}
+		const size_t funcCount = funcForLibItr->size();
+		if (!funcCount) {
+			continue;
+		}
 		ImportEntryWrapper* libWr = _autoAddLibrary(library, funcCount, dllsCount, storageOffset, settings.separateOFT, continueLastOperation);
-		if (libWr == NULL) {
+		if (!libWr) {
 			throw CustomException("Adding library failed!");
 			return false;
 		}
@@ -873,26 +878,21 @@ bool PeHandler::autoAddImports(const ImportsAutoadderSettings &settings)
 				break;
 			}
 			continueLastOperation = true;
-            std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
-			const QString funcName = *fItr;
-            std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
-			if (funcName.startsWith("#")) {
-                std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
+			QString funcName = (*fItr);
+            int ordinal = 0;
+			if (funcName.length() > 1 && funcName.startsWith("#")) {
 				QString ordStr = funcName.mid(1); 
-				const int ordinal = ordStr.toInt();
-				_autoFillFunction(libWr, func, "", ordinal, storageOffset);
-			} else {
-                std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
-				_autoFillFunction(libWr, func, funcName, 0, storageOffset);
+				ordinal = ordStr.toInt();
+				funcName = "";
 			}
-            std::cerr << __FUNCTION__ << " : " << __LINE__ << std::endl;
+            _autoFillFunction(libWr, func, funcName, ordinal, storageOffset);
 			delete func; func = NULL; // delete the temporary wrapper
 			libWr->wrap();
 		}
 	}
 	
 	ImportDirWrapper* imports = dynamic_cast<ImportDirWrapper*> (m_PE->getWrapper(PEFile::WR_DIR_ENTRY + pe::DIR_IMPORT));
-	if (imports == NULL) {
+	if (!imports) {
 		throw CustomException("Cannot fetch imports!");
 		return false;
 	}
