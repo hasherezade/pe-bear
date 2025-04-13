@@ -1,5 +1,7 @@
 #pragma once
+
 #include <QtCore>
+
 #include <bearparser/bearparser.h>
 #include "../ViewSettings.h"
 
@@ -8,6 +10,7 @@
 
 //--------------------
 
+class defaultStylesheet;
 class ColorSettings : public QWidget
 {
 	Q_OBJECT
@@ -262,30 +265,9 @@ public:
 		return disasmVSettings.myFont;
 	}
 
-	void setDefaultStyle()
-	{
-		qApp->setStyleSheet(defaultStylesheet);
-		qApp->setStyleSheet(ColorSettings::defaultStyle);
-		qApp->setStyleSheet("QLineEdit[readOnly=\"true\"]{ border: 2px ridge gray; }");
-		resetFonts();
-		this->currentStyle = "";
-	}
+	void setDefaultStyle();
 
-	void setStyleByName(const QString &name)
-	{
-		if (this->nameToStyle.contains(name)) {
-			const QString styleSheet = this->nameToStyle.value(name);
-			
-			if (styleSheet.length() != 0) {
-				qApp->setStyleSheet(styleSheet);
-				resetFonts();
-				this->currentStyle = name;
-				return;
-			}
-		}
-		// set default style:
-		setDefaultStyle();
-	}
+	void setStyleByName(const QString &name);
 	
 	QList<QString> getStyles()
 	{

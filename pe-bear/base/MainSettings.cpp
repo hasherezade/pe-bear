@@ -1,9 +1,24 @@
 #include "MainSettings.h"
+#include <QPalette>
+#include <QStyleHints>
 
 #include "../gui/DarkStyle.h"
-
+#define DARK_STYLE_NAME "Dark"
 
 //--------------------
+inline bool isDarkMode()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+	const auto scheme = QGuiApplication::styleHints()->colorScheme();
+	return scheme == Qt::ColorScheme::Dark;
+#else
+	const QPalette defaultPalette;
+	const auto text = defaultPalette.color(QPalette::WindowText);
+	const auto window = defaultPalette.color(QPalette::Window);
+	return text.lightness() > window.lightness();
+#endif // QT_VERSION
+}
+//---
 
 
 QString ColorSettings::defaultRawColor = "green";
@@ -52,6 +67,41 @@ t_reload_mode intToReloadMode(int val)
 
 ////
 
+void GuiSettings::setStyleByName(const QString &name)
+{
+	if (this->nameToStyle.contains(name)) {
+		const QString styleSheet = this->nameToStyle.value(name);
+		if (styleSheet.length() != 0) {
+			qApp->setStyleSheet(styleSheet);
+			resetFonts();
+			this->currentStyle = name;
+			return;
+		}
+	}
+	// set default style:
+	setDefaultStyle();
+}
+
+void GuiSettings::setDefaultStyle()
+{
+	// if system is is in the dark mode, try to autoselect dark theme
+	if (isDarkMode() && this->nameToStyle.contains(DARK_STYLE_NAME)) {
+		const QString styleSheet = this->nameToStyle.value(DARK_STYLE_NAME);
+		if (styleSheet.length() != 0) {
+			qApp->setStyleSheet(styleSheet);
+			resetFonts();
+			this->currentStyle = ""; // treat as system default
+			return;
+		}
+	}
+	qApp->setStyleSheet(defaultStylesheet);
+	qApp->setStyleSheet(ColorSettings::defaultStyle);
+	qApp->setStyleSheet("QLineEdit[readOnly=\"true\"]{ border: 2px ridge gray; }");
+	resetFonts();
+	this->currentStyle = "";
+}
+//--------------------
+
 const QString MainSettings::languageDir = "Language";
 
 bool MainSettings::readPersistent()
@@ -85,6 +135,7 @@ bool MainSettings::writePersistent()
 	}
 	return false;
 }
+
 //--------------------
 
 bool writeFontProperties(QSettings &settings, QFont &font, QString propertyName)
@@ -167,5 +218,5 @@ void GuiSettings::initStyles()
 	this->defaultStyleName = tr("*System Default*");
 
 	nameToStyle[this->defaultStyleName] = this->defaultStylesheet;
-	nameToStyle["Dark"] = g_DarkStyle;
+	nameToStyle[DARK_STYLE_NAME] = g_DarkStyle;
 }
