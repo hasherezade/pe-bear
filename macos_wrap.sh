@@ -15,12 +15,12 @@ if [[ -z $MCDEPLOY ]]; then
 	fi	
 fi
 
-APP_PATH="./build_qt6/pe-bear/"
+APP_PATH="./build_qt5/pe-bear/"
 # clean the previous build
 rm -rf $APP_PATH/PE-bear.app
 
 #build stuff
-./build_qt6.sh
+./build_qt5.sh
 
 #strip the created build
 strip $APP_PATH/PE-bear.app/Contents/MacOS/PE-bear
