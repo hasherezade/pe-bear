@@ -1,7 +1,8 @@
 #include "MainSettings.h"
 #include <QPalette>
-#include <QStyleHints>
-
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+	#include <QStyleHints>
+#endif
 #include "../gui/DarkStyle.h"
 #define DARK_STYLE_NAME "Dark"
 
