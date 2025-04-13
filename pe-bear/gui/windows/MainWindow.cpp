@@ -374,6 +374,7 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
 	//Create toolbar menus:
+	menuBar()->setNativeMenuBar(false);
 	this->fileMenu = menuBar()->addMenu(tr("&File"));
 	this->settingsMenu = menuBar()->addMenu(tr("&Settings"));
 	this->viewMenu = menuBar()->addMenu(tr("&View"));
