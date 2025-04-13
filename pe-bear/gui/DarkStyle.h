@@ -338,7 +338,6 @@ QString g_DarkStyle = QString() +
 ""
 "QMenuBar::item"
 "{"
-"    background-color: transparent;"
 "    border-radius: 2px;"
 "    padding: 5px;"
 "}"
