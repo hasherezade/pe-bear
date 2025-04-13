@@ -1,23 +1,15 @@
 #include "MainSettings.h"
 #include <QPalette>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-	#include <QStyleHints>
-#endif
 #include "../gui/DarkStyle.h"
 #define DARK_STYLE_NAME "Dark"
 
 //--------------------
 inline bool isDarkMode()
 {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-	const auto scheme = QGuiApplication::styleHints()->colorScheme();
-	return scheme == Qt::ColorScheme::Dark;
-#else
 	const QPalette defaultPalette;
 	const auto text = defaultPalette.color(QPalette::WindowText);
 	const auto window = defaultPalette.color(QPalette::Window);
 	return text.lightness() > window.lightness();
-#endif // QT_VERSION
 }
 //---
 
