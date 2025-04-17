@@ -7,17 +7,19 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 	int progress = 0;
 	emit loadingStrings(progress);
 	
-	offset_t step = 0;
-	size_t maxSize = m_PE->getContentSize();
-	for (step = 0; step < maxSize; step++) {
-
+	for (offset_t step = 0; true ; step++) {
+        
 		{ //scope0
 			QMutexLocker stopLock(&this->stopMutex);
 			if (this->stopRequested) break;
-			
+            
+			const size_t maxSize = m_PE->getContentSize();
+			if (step >= maxSize) break;
+
 			bool isWide = false;
-			char *ptr = (char*) m_PE->getContentAt(step, 1);
-			if (!ptr || !IS_PRINTABLE(*ptr) || isspace(*ptr) ) {
+			const char *ptr = (char*) m_PE->getContentAt(step, 1);
+			const char nextC = ptr ? (*ptr) : 0;
+			if (!nextC || !IS_PRINTABLE(nextC) || isspace(nextC) ) {
 				continue;
 			}
 			const size_t remainingSize = maxSize - step;
@@ -35,6 +37,7 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 			step--;
 		} //!scope0
 		
+		const size_t maxSize = m_PE->getContentSize();
 		int proc = int(((float)step / (float)maxSize) * 100);
 		if ((proc - progress) > 1) {
 			progress = proc;
