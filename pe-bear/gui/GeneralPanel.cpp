@@ -127,18 +127,20 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 	const int row = index.row();
 	if (row != INFO_UNITS && row != INFO_LOADED_SIZE) return false;
 
-	int64_t newSize = 0;
+	bufsize_t newSize = 0;
 	if (row == INFO_UNITS) {
-		int64_t newUnits = data.toInt();
+		bufsize_t newUnits = data.toULongLong();
 		const bufsize_t fileAlign = m_PE->getFileAlignment();
-		int64_t current = fileAlign ? (pe_util::roundup(m_PE->getRawSize(), fileAlign) / fileAlign) : 0;
+		bufsize_t current = fileAlign ? (pe_util::roundup(m_PE->getRawSize(), fileAlign) / fileAlign) : 0;
 
 		if (newUnits == current) return false;
-		int64_t dif = (newUnits - current) * m_PE->getFileAlignment();
+		bufsize_t dif = (newUnits - current) * m_PE->getFileAlignment();
 		newSize = m_PE->getRawSize() + dif;
-
 	} else if (row == INFO_LOADED_SIZE) {
-			newSize = data.toInt();
+		newSize = data.toULongLong();
+		if (QString::number(newSize, 10) != data.toString()) {
+			return false; // failed value
+		}
 	}
 
 	static QString alert = tr("Do your really want to resize file?");
@@ -147,26 +149,27 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 
 	QMessageBox msgBox;
 	msgBox.setText(alert);
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	bufsize_t currentSize = m_PE->getRawSize();
 
-	msgBox.addButton(tr("Yes, continue"), QMessageBox::AcceptRole);
-	msgBox.addButton(tr("No, abort"), QMessageBox::RejectRole);
-	QString info;
-
-	int64_t currentSize = m_PE->getRawSize();
-	int64_t dif;
-	if (!m_PE->canResize(newSize)) {
+	if ((newSize > BUFSIZE_MAX) || !m_PE->canResize(newSize)) {
 		QMessageBox msgBox;
 		msgBox.setText(tr("Incorrect new size supplied!"));
 
-		if (newSize < currentSize)
+		if (newSize < currentSize) {
 			msgBox.setInformativeText(tr("Choose the size that will not damage headers!"));
-		else
+		}
+		else {
 			msgBox.setInformativeText(tr("Too big!"));
+		}
 		msgBox.exec();
 		return false;
 	}
-	if (newSize == currentSize) return false;
-
+	if (newSize == currentSize) {
+		return false;
+	}
+	QString info;
+	bufsize_t dif = 0;
 	if (newSize < currentSize) {
 		dif = currentSize - newSize;
 		msgBox.setIconPixmap(shrink);
@@ -176,10 +179,15 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 		msgBox.setIconPixmap(enlarge);
 		info = tr("bytes are going to be added!");
 	}
-	msgBox.setInformativeText( QString::number((uint32_t) dif) + " (0x"+ QString::number((uint32_t)dif, 16) + ") "+ info);
+	msgBox.setInformativeText( tr("New size") + ": " + QString::number(newSize) + " (0x" + QString::number(newSize, 16) + ")" + "\n"
+		+ tr("Current size: ") + QString::number(currentSize) + " (0x" + QString::number(currentSize, 16) + ")" + "\n"
+		+ QString::number(dif) + " (0x" + QString::number(dif, 16) + ")" + info);
 
-	int res = msgBox.exec();
-	if (res != QMessageBox::AcceptRole) return false;
+	int ret = msgBox.exec();
+	if (ret != QMessageBox::Ok) {
+		QMessageBox::information(NULL, tr("Canceled!"), tr("Resizing canceled!"));
+		return false;
+	}
 	bool isOk = myPeHndl->resize(newSize);
 	if (!isOk) {
 		QMessageBox msgBox;
