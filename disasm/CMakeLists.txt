@@ -39,6 +39,10 @@ else()
 	message(STATUS "capstone_lib='${CAPSTONE_LIB}'")
 endif ()
 
+# multi-processor compilation
+if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
 
 set (disasm_srcs
 	Disasm.cpp

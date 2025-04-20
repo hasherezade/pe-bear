@@ -291,6 +291,11 @@ SOURCE_GROUP("Header Files\\gui\\pe_models" FILES ${pebear_gui_pe_mod_hdrs} )
 SOURCE_GROUP("Header Files\\gui\\windows" FILES ${pebear_windows_hdrs} )
 SOURCE_GROUP("Header Files\\gui_base" FILES ${pebear_gui_base_hdrs} )
 
+# multi-processor compilation
+if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
+
 IF (WIN32)
 	IF(NOT SHOW_CONSOLE)
 		#console hidden
