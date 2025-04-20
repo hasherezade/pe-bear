@@ -242,7 +242,7 @@ void DetailsTab::onCopyVirtualToRaw()
 		QString warningText = tr("The PE does not seem to be in the mapped (virtual) format.") + "\n"
 			+ tr("Changing the layout may corrupt the file.") + "\n"
 			+ tr("Do you really want copy virtual sections layout as raw?");
-		QMessageBox::StandardButton reply = QMessageBox::question(NULL, tr("Copy virtual to raw"), warningText,  QMessageBox::Yes|QMessageBox::No);                     
+		QMessageBox::StandardButton reply = QMessageBox::question(NULL, tr("Copy virtual to raw"), warningText,  QMessageBox::Yes|QMessageBox::No);
 		if (reply != QMessageBox::Yes) return;  
 	}
 	this->myPeHndl->copyVirtualSizesToRaw();
@@ -272,9 +272,10 @@ void DetailsTab::onFitSections()
 		whatToResize += tr("Image");
 	}
 	QString confirmation = tr("Do you want to resize ") + whatToResize  + tr(" to fit?") + "\n";
-	QMessageBox::StandardButton reply = QMessageBox::question(NULL, tr("Do you really want to resize?"), confirmation + '\n' + info,  QMessageBox::Yes|QMessageBox::No);                     
-	if (reply != QMessageBox::Yes) return;  
-
+	QMessageBox::StandardButton reply = QMessageBox::question(NULL, tr("Do you really want to resize?"), confirmation + '\n' + info,  QMessageBox::Yes | QMessageBox::No);
+	if (reply != QMessageBox::Yes) {
+		return;
+	}
 	bool fOk = !fileToResize;
 	bool iOk = !imageToResize;
 

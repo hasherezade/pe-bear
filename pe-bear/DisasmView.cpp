@@ -979,7 +979,7 @@ bool DisasmModel::setHexData(offset_t offset, const size_t bytesCount, const QSt
 	
 	// convert hex string to bytes:
 	size_t modifBytes = 0;
-	for (size_t i = 0; i < bytesCount * 2 && i < data.size(); i += 2) {
+	for (size_t i = 0; i < (bytesCount * 2) && i < data.size(); i += 2) {
 
 		QString text = data.mid(i, 2);
 		bool isConv = false;

@@ -207,7 +207,7 @@ public:
 	QVariant getRawContentAt(const QModelIndex &index) const;
 
 	void setMarkedAddress(offset_t cRva, offset_t tRva);
-	int disasmCount() const { int size = myDisasm.chunksCount(); return size > 0 ? size - 1 : 0; }
+	int disasmCount() const { int size = myDisasm.chunksCount(); return (size > 0) ? (size - 1) : 0; }
 
 	int rowCount(const QModelIndex &parent) const { return disasmCount(); }
 	int columnCount(const QModelIndex &parent) const;

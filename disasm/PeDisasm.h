@@ -64,7 +64,7 @@ public:
 		offset_t myRVA = INVALID_ADDR;
 		try {
 			myRVA = m_PE->convertAddr(raw, Executable::RAW, Executable::RVA);
-		} catch (CustomException &e) {
+		} catch (const CustomException&) {
 			myRVA = raw;
 		}
 		return myRVA;
@@ -75,7 +75,7 @@ public:
 		offset_t myVA = INVALID_ADDR;
 		try {
 			myVA = m_PE->convertAddr(raw, Executable::RAW, Executable::VA);
-		} catch (CustomException &e) {
+		} catch (const CustomException&) {
 			myVA = raw;
 		}
 		return myVA;

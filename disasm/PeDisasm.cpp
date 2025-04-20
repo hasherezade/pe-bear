@@ -32,10 +32,11 @@ bool PeDisasm::init(const offset_t offset, Executable::exe_arch arch, Executable
 	} else {
 		this->m_arch = arch;
 	}
-	if (m_PE->getContentSize() < offset) {
+	const offset_t maxOffset = m_PE->getContentSize();
+	if (maxOffset < offset) {
 		return false;
 	}
-	size_t maxSize = m_PE->getContentSize() - offset;
+	const size_t maxSize = size_t(maxOffset - offset);
 	size_t disasmSize = (maxSize > previewSize) ? previewSize : maxSize;
 	
 	uint8_t *buf = m_PE->getContentAt(offset, disasmSize);
