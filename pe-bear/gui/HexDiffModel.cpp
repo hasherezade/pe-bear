@@ -4,39 +4,39 @@
 
 #define PREVIEW_SIZE 0x200
 
-int32_t HexDiffModel::getDiffStart(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2)
+bufsize_t HexDiffModel::getDiffStart(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2)
 {
-	if (content1Ptr == NULL && content2Ptr == NULL) return (-1);
+	if (content1Ptr == NULL && content2Ptr == NULL) return DIFF_NOT_FOUND;
 	
 	if (content1Ptr == NULL || content2Ptr == NULL) return 0;
 
-	if (content1Ptr == content2Ptr && size1 == size2) return (-1);
+	if (content1Ptr == content2Ptr && size1 == size2) return DIFF_NOT_FOUND;
 	
 	size_t cmpSize = (size1 > size2 )? size2 : size1;
 	int cmpRes = memcmp(content1Ptr, content2Ptr, cmpSize);
-	if (cmpRes == 0) return -1;
+	if (cmpRes == 0) return DIFF_NOT_FOUND;
 
-	int32_t minSize = (size1 < size2) ? size1 : size2;
-	for (int32_t i = 0; i < minSize; i++) {
+	bufsize_t minSize = (size1 < size2) ? size1 : size2;
+	for (bufsize_t i = 0; i < minSize; i++) {
 		if (content1Ptr[i] != content2Ptr[i]) return i;
 	}
-	return (-1);
+	return DIFF_NOT_FOUND;
 }
 
-int32_t HexDiffModel::getDiffEnd(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2)
+bufsize_t HexDiffModel::getDiffEnd(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2)
 {
-	if (content1Ptr == NULL && content2Ptr == NULL) return (-1);
+	if (content1Ptr == NULL && content2Ptr == NULL) return DIFF_NOT_FOUND;
 	
 	if (content1Ptr == NULL || content2Ptr == NULL) return 0;
 
-	if (content1Ptr == content2Ptr && size1 == size2) return (-1);
+	if (content1Ptr == content2Ptr && size1 == size2) return DIFF_NOT_FOUND;
 		
-	int32_t minSize = (size1 < size2) ? size1 : size2;
+	bufsize_t minSize = (size1 < size2) ? size1 : size2;
 
-	for (int32_t i = 0; i < minSize; i++) {
+	for (bufsize_t i = 0; i < minSize; i++) {
 		if (content1Ptr[i] == content2Ptr[i]) return i;
 	}
-	return (-1);
+	return DIFF_NOT_FOUND;
 }
 
 
@@ -106,7 +106,7 @@ void HexDiffModel::onGoToNextDiff()
 		contentSize[RIGHT]
 	);
 	
-	if (diff == (-1)) return;
+	if (diff == DIFF_NOT_FOUND) return;
 	
 	offset += diff;
 	if (diff != 0) {
@@ -119,14 +119,14 @@ void HexDiffModel::onGoToNextDiff()
 
 	diff = HexDiffModel::getDiffEnd(&contentPtr[LEFT][offset], leftSize, &contentPtr[RIGHT][offset], rightSize);
 
-	if (diff == (-1)) return;
+	if (diff == DIFF_NOT_FOUND) return;
 
 	offset += diff;
 	leftSize = contentSize[LEFT] - offset;
 	rightSize = contentSize[RIGHT] - offset;
 	diff = HexDiffModel::getDiffStart(&contentPtr[LEFT][offset], leftSize, &contentPtr[RIGHT][offset], rightSize);
 
-	if (diff != (-1)) {
+	if (diff != DIFF_NOT_FOUND) {
 		offset += diff;
 		if (diff != 0)
 			setStartingOffset(offset);

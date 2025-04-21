@@ -34,8 +34,9 @@ public slots:
 	}
 	
 public:
-	static int32_t getDiffStart(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2);
-	static int32_t getDiffEnd(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2);
+	static const bufsize_t DIFF_NOT_FOUND = bufsize_t(-1);
+	static bufsize_t getDiffStart(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2);
+	static bufsize_t getDiffEnd(BYTE *content1Ptr, bufsize_t size1, BYTE *content2Ptr, bufsize_t size2);
 //------
 	HexDiffModel(ContentIndx indx, QObject *parent = 0);
 
