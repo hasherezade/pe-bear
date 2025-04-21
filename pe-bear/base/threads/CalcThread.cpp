@@ -3,7 +3,7 @@
 //--- 
 inline QString stripExtension(const QString & fileName)
 {
-    return fileName.left(fileName.lastIndexOf("."));
+	return fileName.left(fileName.lastIndexOf("."));
 }
 
 QString CalcThread::makeImpHash(PEFile* pe)
@@ -119,11 +119,10 @@ void CalcThread::run()
 			size_t bufSize = m_buf->getContentSize();
 
 			if (hashType == SupportedHashes::CHECKSUM) {
-				long checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
+				ulong checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
 				fileHash = QString::number(checksum, 16);
 			}
-			
-			if (hashType == SupportedHashes::RICH_HDR_MD5) {
+			else if (hashType == SupportedHashes::RICH_HDR_MD5) {
 				PEFile pe(m_buf);
 				fileHash = makeRichHdrHash(&pe);
 			}
