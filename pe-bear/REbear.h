@@ -6,8 +6,8 @@
 #define V_MAJOR 0
 #define V_MINOR 7
 #define V_PATCH 0
-#define V_PATCH_SUB 5
-#define V_DESC "-dev"
+#define V_PATCH_SUB 6
+#define V_DESC ""
 
 #define DISASMDMP_BG "black"
 #define DISASMDMP_TXT "lime"
