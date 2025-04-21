@@ -9,15 +9,19 @@ class CollectorThread : public QThread
 {
 	Q_OBJECT
 public:
-	CollectorThread(ByteBuffer* buf)
-		: m_buf(buf), stopRequested(false)
+	CollectorThread(AbstractByteBuffer* inpBuf)
+		: m_buf(nullptr), stopRequested(false)
 	{
-		m_buf->addRef();
+		if (inpBuf && inpBuf->getContent()) {
+			m_buf = new ByteBuffer(inpBuf->getContent(), inpBuf->getContentSize());
+		}
 	}
 
 	~CollectorThread()
 	{
-		ByteBuffer::release(m_buf);
+		if (m_buf) {
+			delete m_buf;
+		}
 	}
 
 	bool isByteArrInit() { return (m_buf && m_buf->getContent()); }

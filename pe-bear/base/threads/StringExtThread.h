@@ -8,8 +8,8 @@ class StringExtThread : public CollectorThread
 	Q_OBJECT
 
 public:
-	StringExtThread(ByteBuffer *buf, size_t _minStrLen)
-		: CollectorThread(buf), minStrLen(_minStrLen), mapToFill(nullptr)
+	StringExtThread(AbstractByteBuffer *inpBuf, size_t _minStrLen)
+		: CollectorThread(inpBuf), minStrLen(_minStrLen), mapToFill(nullptr)
 	{
 		mapToFill = new StringsCollection();
 	}
@@ -48,11 +48,9 @@ public:
 		PEFile* pe = m_peHndl->getPe();
 		if (!pe) return false;
 
-		ByteBuffer* tmpBuf = new ByteBuffer(pe->getContent(), pe->getContentSize());
-		StringExtThread *stringThread = new StringExtThread(tmpBuf, m_minStrLen);
-		ByteBuffer::release(tmpBuf);
-
+		StringExtThread *stringThread = new StringExtThread(pe->getFileBuffer(), m_minStrLen);
 		this->myThread = stringThread;
+
 		QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), m_peHndl, SLOT(onStringsReady(StringsCollection* )));
 		QObject::connect(stringThread, SIGNAL(loadingStrings(int)), m_peHndl, SLOT(onStringsLoadingProgress(int)));
 		return true;

@@ -9,7 +9,7 @@ class CalcThread : public CollectorThread
 	
 public:
 
-	CalcThread(ByteBuffer* buf, offset_t checksumOffset)
+	CalcThread(AbstractByteBuffer* buf, offset_t checksumOffset)
 		: CollectorThread(buf), checksumOff(checksumOffset)
 	{
 	}
@@ -25,7 +25,6 @@ private:
 	offset_t checksumOff;
 };
 
-
 ///----
 
 class HashCalcThreadManager : public CollectorThreadManager
@@ -40,13 +39,12 @@ public:
 	{
 		if (!m_peHndl) return false;
 		PEFile* pe = m_peHndl->getPe();
-		
-		ByteBuffer* tmpBuf = new ByteBuffer(pe->getContent(), pe->getContentSize());
-		offset_t checksumOffset = m_peHndl->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		CalcThread *calcThread = new CalcThread(tmpBuf, checksumOffset);
-		ByteBuffer::release(tmpBuf);
+		if (!pe) return false;
 
+		offset_t checksumOffset = m_peHndl->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
+		CalcThread *calcThread = new CalcThread(pe->getFileBuffer(), checksumOffset);
 		this->myThread = calcThread;
+
 		QObject::connect(calcThread, SIGNAL(gotHash(QString, int)), m_peHndl, SLOT(onHashReady(QString, int)));
 		return true;
 	}

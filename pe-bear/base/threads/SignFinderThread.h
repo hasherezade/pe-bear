@@ -29,13 +29,9 @@ class SignFinderThread : public CollectorThread
 {
 	Q_OBJECT
 public:
-	SignFinderThread(ByteBuffer* buf, sig_finder::Node &signFinder, MatchesCollection &matched, offset_t offset)
+	SignFinderThread(AbstractByteBuffer* buf, sig_finder::Node &signFinder, MatchesCollection &matched, offset_t offset)
 		: CollectorThread(buf),
 		m_signFinder(signFinder), m_matched(matched), startOffset(offset)
-	{
-	}
-	
-	~SignFinderThread()
 	{
 	}
 	
@@ -81,9 +77,7 @@ public:
 	
 	bool setupThread()
 	{
-		ByteBuffer* tmpBuf = new ByteBuffer(m_Buf->getContent(), m_Buf->getContentSize());
-		SignFinderThread *thread = new SignFinderThread(tmpBuf, m_patternFinder, m_matched, startOffset);
-		ByteBuffer::release(tmpBuf);
+		SignFinderThread *thread = new SignFinderThread(m_Buf, m_patternFinder, m_matched, startOffset);
 
 		this->myThread = thread;
 
