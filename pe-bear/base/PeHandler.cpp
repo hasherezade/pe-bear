@@ -10,7 +10,6 @@
 #include <iostream>
 
 #define MIN_STRING_LEN 5
-#define RUN_THREADS
 
 using namespace pe;
 using namespace sig_finder;
@@ -1127,7 +1126,6 @@ void PeHandler::updatePeOnResized()
 
 void PeHandler::runExtractingThreads()
 {
-#ifdef RUN_THREADS
 	// run threads for hash calculation
 	if (!this->hashCalcMgr) {
 		this->hashCalcMgr = new HashCalcThreadManager(this);
@@ -1139,7 +1137,6 @@ void PeHandler::runExtractingThreads()
 		stringThreadMgr = new StringThreadManager(this, MIN_STRING_LEN);
 	}
 	this->stringThreadMgr->recreateThread();
-#endif //RUN_THREADS
 }
 
 void PeHandler::unModify()
