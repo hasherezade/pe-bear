@@ -311,10 +311,9 @@ signals:
 protected slots:
 	// hashes:
 	void onHashReady(QString hash, int hType);
-	void runHashesCalculation();
-	
-	// strings extraction:
-	bool runStringsExtraction();
+
+	void runExtractingThreads();
+
 	void onStringsReady(StringsCollection *mapToFill);
 
 	void onStringsLoadingProgress(int progress)
@@ -364,11 +363,10 @@ protected:
 	QDateTime m_fileModDate; //modification time of the corresponding file on the disk
 	QDateTime m_loadedFileModDate; //modification time of the version that is currently loaded
 
-	CollectorThreadManager *hashCalcMgrs[SupportedHashes::HASHES_NUM];
-
 	QString hash[SupportedHashes::HASHES_NUM];
 	QMutex m_hashMutex[SupportedHashes::HASHES_NUM];
-	
+
+	CollectorThreadManager* hashCalcMgr;
 	CollectorThreadManager* stringThreadMgr;
 
 	sig_finder::Node *signFinder;

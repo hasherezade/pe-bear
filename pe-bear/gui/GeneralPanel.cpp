@@ -181,7 +181,7 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 	}
 	msgBox.setInformativeText( tr("New size") + ": " + QString::number(newSize) + " (0x" + QString::number(newSize, 16) + ")" + "\n"
 		+ tr("Current size: ") + QString::number(currentSize) + " (0x" + QString::number(currentSize, 16) + ")" + "\n"
-		+ QString::number(dif) + " (0x" + QString::number(dif, 16) + ")" + info);
+		+ QString::number(dif) + " (0x" + QString::number(dif, 16) + ")" + " " + info);
 
 	int ret = msgBox.exec();
 	if (ret != QMessageBox::Ok) {

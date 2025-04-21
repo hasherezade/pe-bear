@@ -53,17 +53,17 @@ void PatternSearchWindow::onSearchClicked()
 	}
 	
 	if (!this->m_peHndl) return;
-	PEFile* peFile = m_peHndl->getPe();
-	if (!peFile) return;
+	MappedExe* exe = m_peHndl->getPe();
+	if (!exe) return;
 
-	offset_t maxOffset = peFile->getContentSize();
+	const offset_t maxOffset = exe->getContentSize();
 	offset_t offset = startOffsetBox.value();
 
-	size_t fullSize = peFile->getContentSize();
+	const size_t fullSize = exe->getContentSize();
 	if (offset >= fullSize) return;
 	
 	if (!this->threadMngr) {
-		threadMngr = new SignFinderThreadManager(peFile);
+		threadMngr = new SignFinderThreadManager(exe);
 	}
 	threadMngr->setStartOffset(offset);
 	if (!threadMngr->loadSignature(tr("Searched"), text)) {

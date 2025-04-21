@@ -3,13 +3,13 @@
 //--- 
 inline QString stripExtension(const QString & fileName)
 {
-    return fileName.left(fileName.lastIndexOf("."));
+	return fileName.left(fileName.lastIndexOf("."));
 }
 
-QString CalcThread::makeImpHash()
+QString CalcThread::makeImpHash(PEFile* pe)
 {
 	static CommonOrdinalsLookup lookup;
-	ImportDirWrapper* imports = m_PE->getImportsDir();
+	ImportDirWrapper* imports = pe->getImportsDir();
 	if (!imports) return QString();
 
 	QStringList exts;
@@ -56,12 +56,13 @@ QString CalcThread::makeImpHash()
 	return QString(calcHash.result().toHex());
 }
 
-QString CalcThread::makeRichHdrHash()
+QString CalcThread::makeRichHdrHash(PEFile* pe)
 {
-	pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
-	pe::RICH_DANS_HEADER* dans = NULL;
+	if (!pe) return QString();
+	pe::RICH_SIGNATURE* sign = pe->getRichHeaderSign();
+	pe::RICH_DANS_HEADER* dans = nullptr;
 	if (sign) {
-		dans = m_PE->getRichHeaderBgn(sign);
+		dans = pe->getRichHeaderBgn(sign);
 	}
 	if (!dans) {
 		return QString();
@@ -80,46 +81,65 @@ QString CalcThread::makeRichHdrHash()
 
 void CalcThread::run()
 {
+	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+		SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
+		emit gotHash("Calculating...", hashType);
+	}
+
 	QMutexLocker lock(&myMutex);
 	if (this->isStopRequested()) {
 		return;
 	}
-	QString fileHash = "Cannot calculate!";
-	if (!m_PE || !m_PE->getContent()) {
-		emit gotHash(fileHash, hashType);
-		return;
+	const QString hashFailed = "Cannot calculate!";
+	if (!m_buf || !m_buf->getContent()) {
+		for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+			SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
+			emit gotHash(hashFailed, hashType);
+		}
 	}
-	QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
-	if (hashType == SupportedHashes::MD5) {
-		qHashType = QCryptographicHash::Md5;
-	} else if (hashType == SupportedHashes::SHA1) {
-		qHashType = QCryptographicHash::Sha1;
-	} 
+	// calculate all types:
+	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+		const SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
+		QString fileHash = hashFailed;
+
+		QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
+		if (hashType == SupportedHashes::MD5) {
+			qHashType = QCryptographicHash::Md5;
+		}
+		else if (hashType == SupportedHashes::SHA1) {
+			qHashType = QCryptographicHash::Sha1;
+		}
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) //the feature was introduced in Qt5.0
-	else if (hashType == SupportedHashes::SHA256) {
-		qHashType = QCryptographicHash::Sha256;
-	}
+		else if (hashType == SupportedHashes::SHA256) {
+			qHashType = QCryptographicHash::Sha256;
+		}
 #endif
-	emit gotHash("Calculating...", hashType);
-	try {
-		if (hashType == SupportedHashes::CHECKSUM) {
-			long checksum = PEFile::computeChecksum((BYTE*) m_PE->getContent(), m_PE->getContentSize(), checksumOff);
-			fileHash = QString::number(checksum, 16);
+		try {
+			BYTE* buf = m_buf->getContent();
+			size_t bufSize = m_buf->getContentSize();
+
+			if (hashType == SupportedHashes::CHECKSUM) {
+				ulong checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
+				fileHash = QString::number(checksum, 16);
+			}
+			else if (hashType == SupportedHashes::RICH_HDR_MD5) {
+				PEFile pe(m_buf);
+				fileHash = makeRichHdrHash(&pe);
+			}
+			else if (hashType == SupportedHashes::IMP_MD5) {
+				PEFile pe(m_buf);
+				fileHash = makeImpHash(&pe);
+			}
+			else {
+				QCryptographicHash calcHash(qHashType);
+				calcHash.addData((char*)buf, bufSize);
+				fileHash = QString(calcHash.result().toHex());
+			}
 		}
-		else if (hashType == SupportedHashes::RICH_HDR_MD5) {
-			fileHash = makeRichHdrHash();
+		catch (...) {
+			fileHash = hashFailed;
 		}
-		else if (hashType == SupportedHashes::IMP_MD5) {
-			fileHash = makeImpHash();
-		}
-		else {
-			QCryptographicHash calcHash(qHashType);
-			calcHash.addData((char*) m_PE->getContent(), m_PE->getContentSize());
-			fileHash = QString(calcHash.result().toHex());
-		}
-	} catch (...) {
-		fileHash = "Cannot calculate!";
+		emit gotHash(fileHash, hashType);
 	}
-	emit gotHash(fileHash, hashType);
 }
 

@@ -9,8 +9,8 @@ class CalcThread : public CollectorThread
 	
 public:
 
-	CalcThread(SupportedHashes::hash_type hType, PEFile* pe, offset_t checksumOffset)
-		: CollectorThread(pe), hashType(hType), checksumOff(checksumOffset)
+	CalcThread(ByteBuffer* buf, offset_t checksumOffset)
+		: CollectorThread(buf), checksumOff(checksumOffset)
 	{
 	}
 
@@ -19,10 +19,9 @@ signals:
 
 private:
 	void run();
-	QString makeImpHash();
-	QString makeRichHdrHash();
+	QString makeImpHash(PEFile* pe);
+	QString makeRichHdrHash(PEFile* pe);
 
-	SupportedHashes::hash_type hashType;
 	offset_t checksumOff;
 };
 
@@ -32,24 +31,27 @@ private:
 class HashCalcThreadManager : public CollectorThreadManager
 {
 public:
-	HashCalcThreadManager(PeHandler *peHndl, SupportedHashes::hash_type hType)
-		: m_peHndl(peHndl), m_hashType(hType)
+	HashCalcThreadManager(PeHandler *peHndl)
+		: m_peHndl(peHndl)
 	{
 	}
 	
 	bool setupThread()
 	{
 		if (!m_peHndl) return false;
+		PEFile* pe = m_peHndl->getPe();
 		
+		ByteBuffer* tmpBuf = new ByteBuffer(pe->getContent(), pe->getContentSize());
 		offset_t checksumOffset = m_peHndl->optHdrWrapper.getFieldOffset(OptHdrWrapper::CHECKSUM);
-		CalcThread *calcThread = new CalcThread(m_hashType, m_peHndl->getPe(), checksumOffset);
+		CalcThread *calcThread = new CalcThread(tmpBuf, checksumOffset);
+		ByteBuffer::release(tmpBuf);
+
 		this->myThread = calcThread;
 		QObject::connect(calcThread, SIGNAL(gotHash(QString, int)), m_peHndl, SLOT(onHashReady(QString, int)));
 		return true;
 	}
 	
 protected:
-	SupportedHashes::hash_type m_hashType;
 	PeHandler *m_peHndl;
 };
 
