@@ -87,11 +87,16 @@ public:
 			isQueued = true;
 			return false; //previous thread didn't finished
 		}
-		if (setupThread()) {
-			runThread();
-			return true;
+		bool isOk = false;
+		try {
+			if (setupThread()) {
+				runThread();
+				isOk = true;
+			}
+		} catch (const BufferException&) {
+			isOk = false;
 		}
-		return false;
+		return isOk;
 	}
 	
 	
@@ -102,13 +107,20 @@ protected slots:
 			delete myThread;
 			myThread = nullptr;
 		}
-		if (isQueued) {
-			if (setupThread()) {
-				runThread();
-				return true;
+		bool isOk = false;
+		try {
+			if (isQueued) {
+				if (setupThread()) {
+					runThread();
+					isOk = true;
+				}
 			}
 		}
-		return false;
+		catch (const BufferException&) {
+			isOk = false;
+			isQueued = false; // failed to run, remove from the queue
+		}
+		return isOk;
 	}
 	
 protected:
