@@ -65,8 +65,8 @@ class SignFinderThreadManager : public CollectorThreadManager
 {
 	Q_OBJECT
 public:
-	SignFinderThreadManager(PEFile* pe, offset_t offset=0)
-		: m_PE(pe), startOffset(offset)
+	SignFinderThreadManager(AbstractByteBuffer* buf, offset_t offset=0)
+		: m_Buf(buf), startOffset(offset)
 	{
 	}
 	
@@ -81,9 +81,10 @@ public:
 	
 	bool setupThread()
 	{
-		if (!m_PE) return false;
-#ifdef SIGN_THREAD
-		SignFinderThread *thread = new SignFinderThread(m_PE, m_patternFinder, m_matched, startOffset);
+		ByteBuffer* tmpBuf = new ByteBuffer(m_Buf->getContent(), m_Buf->getContentSize());
+		SignFinderThread *thread = new SignFinderThread(tmpBuf, m_patternFinder, m_matched, startOffset);
+		ByteBuffer::release(tmpBuf);
+
 		this->myThread = thread;
 
 		QObject::connect(thread, SIGNAL(gotMatches(MatchesCollection* )), 
@@ -94,7 +95,7 @@ public:
 		
 		QObject::connect(thread, SIGNAL(searchStarted(bool)), 
 			this, SLOT(onSearchStarted(bool)), Qt::UniqueConnection);
-#endif //SIGN_THREAD
+
 		return true;
 	}
 	
@@ -134,7 +135,7 @@ protected slots:
 	
 protected:
 
-	PEFile* m_PE;
+	AbstractByteBuffer* m_Buf;
 	offset_t startOffset;
 	sig_finder::Node m_patternFinder;
 	MatchesCollection m_matched;
