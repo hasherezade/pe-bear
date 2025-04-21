@@ -168,13 +168,13 @@ size_t PeHandler::findPackerSign(offset_t startAddr, Executable::addr_type aT)
 	return foundCount;
 }
 
-void PeHandler::setHilighted(offset_t hOffset, uint32_t hSize)
+void PeHandler::setHilighted(offset_t hOffset, bufsize_t hSize)
 {
 	this->hilightedOffset = hOffset;
 	this->hilightedSize = hSize;
 }
 
-void PeHandler::setHovered(bool isRVA, offset_t hOffset, uint32_t hSize)
+void PeHandler::setHovered(bool isRVA, offset_t hOffset, bufsize_t hSize)
 {
 	if (!m_PE) return;
 

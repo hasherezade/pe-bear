@@ -44,14 +44,13 @@ public:
 	bool setupThread()
 	{
 		if (!m_peHndl) return false;
-		
+
 		PEFile* pe = m_peHndl->getPe();
 		if (!pe) return false;
 
-		StringExtThread *stringThread = new StringExtThread(pe->getFileBuffer(), m_minStrLen);
+		StringExtThread* stringThread = new StringExtThread(pe->getFileBuffer(), m_minStrLen);
 		this->myThread = stringThread;
-
-		QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection* )), m_peHndl, SLOT(onStringsReady(StringsCollection* )));
+		QObject::connect(stringThread, SIGNAL(gotStrings(StringsCollection*)), m_peHndl, SLOT(onStringsReady(StringsCollection*)));
 		QObject::connect(stringThread, SIGNAL(loadingStrings(int)), m_peHndl, SLOT(onStringsLoadingProgress(int)));
 		return true;
 	}

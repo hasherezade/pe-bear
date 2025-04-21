@@ -52,7 +52,7 @@ QString CalcThread::makeImpHash(PEFile* pe)
 	const QString allImps = impsBlock.join(",");
 	//std::cout << allImps.toStdString() << "\n";
 	QCryptographicHash calcHash(QCryptographicHash::Md5);
-	calcHash.addData((char*) allImps.toStdString().c_str(), allImps.length());
+	calcHash.addData((const char*) allImps.toStdString().c_str(), allImps.length());
 	return QString(calcHash.result().toHex());
 }
 
