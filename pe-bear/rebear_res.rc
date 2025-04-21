@@ -1,0 +1,28 @@
+#include "rebear_ver_short.h"
+#include "resources.h"
+#include <windows.h>
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Application Version
+//
+#define VER_COMPANYNAME_STR         "Hasherezade"
+#define VER_FILETYPE                VFT_APP
+#define VER_FILESUBTYPE             VFT2_UNKNOWN
+#define VER_FILEOS                  VOS_NT_WINDOWS32
+#define VER_FILEDESCRIPTION_STR     "PE-bear: Portable Executable reversing tool with a friendly GUI ."
+#define VER_INTERNALNAME_STR        "PE-bear.exe"
+#define VER_ORIGINALFILENAME_STR    "PE-bear.exe"
+#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2013-2025 Hasherezade"
+#define VER_PRODUCTNAME_STR         "PE-bear"
+#define VER_FILEVERSION             REBEAR_MAJOR_VERSION,REBEAR_MINOR_VERSION,REBEAR_MICRO_VERSION,REBEAR_PATCH_VERSION
+#define VER_PRODUCTVERSION_STR      REBEAR_VERSION_STR
+
+#define VER_FILEFLAGSMASK (VS_FF_DEBUG | VS_FF_PRERELEASE)
+#ifdef DEBUG
+    #define VER_FILEFLAGS (VS_FF_DEBUG)
+#else
+    #define VER_FILEFLAGS (0)
+#endif
+
+#include "common.ver"

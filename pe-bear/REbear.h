@@ -1,12 +1,13 @@
 // RE-bear release version and settings
 #pragma once
 #include <bearparser/bearparser.h>
+#include "rebear_ver_short.h"
 
 #define TITLE "PE-bear"
-#define V_MAJOR 0
-#define V_MINOR 7
-#define V_PATCH 0
-#define V_PATCH_SUB 7
+#define V_MAJOR REBEAR_MAJOR_VERSION 
+#define V_MINOR REBEAR_MINOR_VERSION
+#define V_PATCH REBEAR_MICRO_VERSION
+#define V_PATCH_SUB REBEAR_PATCH_VERSION
 #define V_DESC ""
 
 #define DISASMDMP_BG "black"

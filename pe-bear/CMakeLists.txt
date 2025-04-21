@@ -254,6 +254,7 @@ set (pebear_srcs
 set (pebear_hdrs
 	QtCompat.h
 	REbear.h
+	rebear_ver_short.h
 	${pebear_threads_hdrs}
 	${pebear_base_hdrs}
 	${pebear_gui_base_hdrs}
@@ -261,6 +262,11 @@ set (pebear_hdrs
 	${pebear_gui_pe_mod_hdrs}
 	${pebear_windows_hdrs}
 	${pebear_followable_hdrs}
+)
+
+set (rsrc
+	rebear_res.rc
+	resources.rc
 )
 
 set (pebear_rcc application.qrc )
@@ -310,7 +316,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF()
 
 IF(MACOSX)
-	add_executable (${PROJECT_NAME} MACOSX_BUNDLE resources.rc ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
+	add_executable (${PROJECT_NAME} MACOSX_BUNDLE ${rsrc} ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
 
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 	    BUNDLE True
@@ -321,7 +327,7 @@ IF(MACOSX)
 	    #MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/customtemplate.plist.in
 	)
 ELSE()
-	add_executable (${PROJECT_NAME} resources.rc ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
+	add_executable (${PROJECT_NAME} ${rsrc} ${pebear_hdrs} ${pebear_srcs} ${pebear_hdrs_moc} ${pebear_rcc_src} )
 ENDIF()
 
 target_link_libraries( ${PROJECT_NAME} ${SIGFIND_LIB} ${PARSER_LIB} )
