@@ -263,7 +263,7 @@ bool PeHandler::setDisplayedEP()
 	offset_t epOff = 0;
 	try {
 		epOff = m_PE->rvaToRaw(epRVA);
-	} catch (CustomException &e) {
+	} catch (const CustomException &) {
 		isOk = false;
 	}
 	if (!isOk) return false;
@@ -337,7 +337,7 @@ bool PeHandler::resize(bufsize_t newSize, bool continueLastOperation)
 {
 	try {
 		this->backupResize(newSize, continueLastOperation);
-	} catch (CustomException &e) {
+	} catch (const CustomException &e) {
 		std::cerr << "Resize backup fail: " << e.what() << std::endl;
 	}
 	if (m_PE->resize(newSize)) {
@@ -475,7 +475,7 @@ SectionHdrWrapper* PeHandler::addSection(QString name, bufsize_t rSize, bufsize_
 		this->modifHndl.backupResize(newSize, true);
 		
 		newSec = m_PE->addNewSection(name, rSize, vSize);
-	} catch (CustomException &e) {
+	} catch (const CustomException &e) {
 		this->modifHndl.unStoreLast();
 		throw (e); // rethrow the exception to exit from the function
 	}
@@ -538,7 +538,7 @@ bool PeHandler::_moveDataDirEntry(pe::dir_entry dirNum, offset_t targetRaw, bool
 		backupModification(fieldOffset, fieldSize, true); //backup the offset
 		isOk = m_PE->moveDataDirEntry(dirNum, targetRaw, Executable::RAW);
 	}
-	catch (CustomException e) {
+	catch (const CustomException&) {
 		isOk = false;
 	}
 	if (!isOk) {
@@ -942,7 +942,7 @@ bool PeHandler::addImportFunc(size_t libNum)
 	ImportedFuncWrapper* func = NULL;
 	try {
 		func = _addImportFunc(lib);
-	} catch (CustomException &e) {
+	} catch (const CustomException &) {
 		func = NULL;
 	}
 	if (!func) {
@@ -1044,7 +1044,7 @@ bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)
 		updatePeOnModified(modO, modSize); // throws exception
 		isOk = true;
 
-	} catch (CustomException &e) {
+	} catch (const CustomException &e) {
 		this->undoLastModification();
 		std::cerr << "Unacceptable modification: " << e.what() << "\n";
 		isOk = false;
@@ -1150,7 +1150,7 @@ void PeHandler::unModify()
 	try {
 		updatePeOnModified();
 	}
-	catch (CustomException &e)
+	catch (const CustomException &e)
 	{
 		std::cerr << "Failed to update PE on modification: " << e.what() << std::endl;
 	}
@@ -1228,3 +1228,4 @@ bool PeHandler::exportDisasm(const QString &path, const offset_t startOff, const
 	fOut.close();
 	return true;
 }
+
