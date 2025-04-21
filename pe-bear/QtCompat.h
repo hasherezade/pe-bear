@@ -11,7 +11,7 @@
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-        #define QT_SkipEmptyParts Qt::SkipEmptyParts
+	#define QT_SkipEmptyParts Qt::SkipEmptyParts
 #else
-        #define QT_SkipEmptyParts QString::SkipEmptyParts
+	#define QT_SkipEmptyParts QString::SkipEmptyParts
 #endif

@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(application);
 
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	app.setApplicationName(TITLE);
 	app.setWindowIcon(QIcon(":/main_ico.ico"));
 	app.setQuitOnLastWindowClosed(true);
-    
+
 	MainWindow mainWin(mainSettings);
 	mainWin.setIconSize(QSize(48, 48));
 	mainWin.resize(950, 650);
