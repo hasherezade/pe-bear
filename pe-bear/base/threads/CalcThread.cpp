@@ -81,50 +81,66 @@ QString CalcThread::makeRichHdrHash(PEFile* pe)
 
 void CalcThread::run()
 {
+	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+		SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
+		emit gotHash("Calculating...", hashType);
+	}
+
 	QMutexLocker lock(&myMutex);
 	if (this->isStopRequested()) {
 		return;
 	}
-	QString fileHash = "Cannot calculate!";
+	const QString hashFailed = "Cannot calculate!";
 	if (!m_buf || !m_buf->getContent()) {
-		emit gotHash(fileHash, hashType);
-		return;
+		for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+			SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
+			emit gotHash(hashFailed, hashType);
+		}
 	}
-	QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
-	if (hashType == SupportedHashes::MD5) {
-		qHashType = QCryptographicHash::Md5;
-	} else if (hashType == SupportedHashes::SHA1) {
-		qHashType = QCryptographicHash::Sha1;
-	} 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) //the feature was introduced in Qt5.0
-	else if (hashType == SupportedHashes::SHA256) {
-		qHashType = QCryptographicHash::Sha256;
-	}
-#endif
-	emit gotHash("Calculating...", hashType);
-	try {
-		BYTE* buf = m_buf->getContent();
-		size_t bufSize = m_buf->getContentSize();
+	// calculate all types:
+	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+		const SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
+		QString fileHash = hashFailed;
 
-		if (hashType == SupportedHashes::CHECKSUM) {
-			long checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
-			fileHash = QString::number(checksum, 16);
+		QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
+		if (hashType == SupportedHashes::MD5) {
+			qHashType = QCryptographicHash::Md5;
 		}
-		/*
-		else if (hashType == SupportedHashes::RICH_HDR_MD5) {
-			fileHash = makeRichHdrHash(m_PE);
+		else if (hashType == SupportedHashes::SHA1) {
+			qHashType = QCryptographicHash::Sha1;
 		}
-		else if (hashType == SupportedHashes::IMP_MD5) {
-			fileHash = makeImpHash(m_PE);
-		}*/
-		else {
-			QCryptographicHash calcHash(qHashType);
-			calcHash.addData((char*)buf, bufSize);
-			fileHash = QString(calcHash.result().toHex());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) //the feature was introduced in Qt5.0
+		else if (hashType == SupportedHashes::SHA256) {
+			qHashType = QCryptographicHash::Sha256;
 		}
-	} catch (...) {
-		fileHash = "Cannot calculate!";
+#endif
+		try {
+			BYTE* buf = m_buf->getContent();
+			size_t bufSize = m_buf->getContentSize();
+
+			if (hashType == SupportedHashes::CHECKSUM) {
+				long checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
+				fileHash = QString::number(checksum, 16);
+			}
+			
+			if (hashType == SupportedHashes::RICH_HDR_MD5) {
+				PEFile pe(m_buf);
+				fileHash = makeRichHdrHash(&pe);
+			}
+			else if (hashType == SupportedHashes::IMP_MD5) {
+				PEFile pe(m_buf);
+				fileHash = makeImpHash(&pe);
+			}
+			else {
+				QCryptographicHash calcHash(qHashType);
+				calcHash.addData((char*)buf, bufSize);
+				fileHash = QString(calcHash.result().toHex());
+			}
+		}
+		catch (...) {
+			fileHash = hashFailed;
+		}
+		emit gotHash(fileHash, hashType);
 	}
-	emit gotHash(fileHash, hashType);
 }
 

@@ -30,7 +30,7 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 	m_fileModDate(QDateTime()), // init with empty
 	m_loadedFileModDate(QDateTime()), // init with empty
 	signFinder(nullptr), 
-	stringThreadMgr(nullptr)
+	stringThreadMgr(nullptr), hashCalcMgr(nullptr)
 {
 	markedTarget = INVALID_ADDR;
 	markedOrigin = INVALID_ADDR;
@@ -49,10 +49,6 @@ PeHandler::PeHandler(PEFile *pe, FileBuffer *fileBuffer)
 
 	updateFileModifTime();
 	m_loadedFileModDate = m_fileModDate; // init
-
-	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
-		hashCalcMgrs[i] = nullptr;
-	}
 	//---
 	this->runExtractingThreads();
 	connect( this, SIGNAL(modified()), this, SLOT(runExtractingThreads()) );
@@ -113,9 +109,9 @@ void PeHandler::deleteThreads()
 		delete stringThreadMgr;
 		stringThreadMgr = nullptr;
 	}
-	for (int hType = 0; hType < SupportedHashes::HASHES_NUM; hType++) {
-		delete this->hashCalcMgrs[hType];
-		this->hashCalcMgrs[hType] = nullptr;
+	if (hashCalcMgr) {
+		delete hashCalcMgr;
+		hashCalcMgr = nullptr;
 	}
 }
 
@@ -1133,13 +1129,11 @@ void PeHandler::runExtractingThreads()
 {
 #ifdef RUN_THREADS
 	// run threads for hash calculation
-	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
-		SupportedHashes::hash_type hType = static_cast<SupportedHashes::hash_type>(i);
-		if (!this->hashCalcMgrs[i]) {
-			this->hashCalcMgrs[i] = new HashCalcThreadManager(this, hType);
-		}
-		this->hashCalcMgrs[i]->recreateThread();
+	if (!this->hashCalcMgr) {
+		this->hashCalcMgr = new HashCalcThreadManager(this);
 	}
+	this->hashCalcMgr->recreateThread();
+
 	// run threads for strings extraction
 	if (!stringThreadMgr) {
 		stringThreadMgr = new StringThreadManager(this, MIN_STRING_LEN);
