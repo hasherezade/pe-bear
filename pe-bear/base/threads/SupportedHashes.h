@@ -3,12 +3,12 @@
 class SupportedHashes {
 public:
 	enum hash_type {
-		MD5 = 0,
-		SHA1 = 1,
-		SHA256,
-		CHECKSUM,
+		CHECKSUM = 0,
 		RICH_HDR_MD5,
 		IMP_MD5,
+		MD5,
+		SHA1,
+		SHA256,
 		HASHES_NUM
 	};
 };
