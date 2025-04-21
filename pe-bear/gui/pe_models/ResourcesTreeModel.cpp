@@ -124,7 +124,7 @@ QVariant ResourcesTreeModel::subdirsData(const QModelIndex &index, int role) con
 				return subW->translateType(val);
 			}
 			const ushort *str = (ushort*)ptr->NameString;
-			name = QString::fromUtf16(str, ptr->Length);
+			name = QString::fromUtf16(reinterpret_cast<const char16_t*>(str), ptr->Length);
 			return name;
 		}
 		case ENTRIES_NUM: 
