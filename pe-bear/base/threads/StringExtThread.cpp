@@ -7,13 +7,25 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 	int progress = 0;
 	emit loadingStrings(progress);
 	
-	for (offset_t step = 0; true ; step++) {
+	const size_t contentSize = m_buf->getContentSize();
+	size_t maxSize = contentSize;
+
+	// remove null padding at the end
+	for (; maxSize > 0; maxSize--) {
+		QMutexLocker stopLock(&this->stopMutex);
+		if (this->stopRequested) break;
+
+		const char* ptr = (char*)m_buf->getContentAt((maxSize - 1), 1);
+		const char nextC = ptr ? (*ptr) : 0;
+		if (nextC != 0) break;
+	}
+
+	for (offset_t step = 0; step < maxSize; step++) {
+
 		{ //scope0
 			QMutexLocker stopLock(&this->stopMutex);
 			if (this->stopRequested) break;
-			const size_t maxSize = m_buf->getContentSize();
-			if (step >= maxSize) break;
-
+			
 			bool isWide = false;
 			const char *ptr = (char*)m_buf->getContentAt(step, 1);
 			const char nextC = ptr ? (*ptr) : 0;
@@ -34,14 +46,12 @@ size_t StringExtThread::extractStrings(StringsCollection &mapToFill, const size_
 			step += util::getStringSize(str, isWide);
 			step--;
 		} //!scope0
-		
-		const size_t maxSize = m_buf->getContentSize();
+
 		int proc = int(((float)step / (float)maxSize) * 100);
 		if ((proc - progress) > 1) {
 			progress = proc;
 			emit loadingStrings(progress);
 		}
-
 	}
 	return mapToFill.size();
 }
