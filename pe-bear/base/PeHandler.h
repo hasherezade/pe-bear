@@ -311,10 +311,9 @@ signals:
 protected slots:
 	// hashes:
 	void onHashReady(QString hash, int hType);
-	void runHashesCalculation();
-	
-	// strings extraction:
-	bool runStringsExtraction();
+
+	void runExtractingThreads();
+
 	void onStringsReady(StringsCollection *mapToFill);
 
 	void onStringsLoadingProgress(int progress)

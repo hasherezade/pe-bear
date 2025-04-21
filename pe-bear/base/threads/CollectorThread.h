@@ -9,12 +9,18 @@ class CollectorThread : public QThread
 {
 	Q_OBJECT
 public:
-	CollectorThread(PEFile* pe)
-		: m_PE(pe), stopRequested(false)
+	CollectorThread(ByteBuffer* buf)
+		: m_buf(buf), stopRequested(false)
 	{
+		m_buf->addRef();
 	}
-	
-	bool isByteArrInit() { return (m_PE && m_PE->getContent()); }
+
+	~CollectorThread()
+	{
+		ByteBuffer::release(m_buf);
+	}
+
+	bool isByteArrInit() { return (m_buf && m_buf->getContent()); }
 	
 	void stop()
 	{
@@ -29,7 +35,7 @@ public:
 	}
 	
 protected:
-	PEFile* m_PE;
+	ByteBuffer* m_buf;
 	QMutex myMutex;
 	QMutex stopMutex;
 	bool stopRequested;

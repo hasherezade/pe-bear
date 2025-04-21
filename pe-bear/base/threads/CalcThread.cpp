@@ -6,10 +6,10 @@ inline QString stripExtension(const QString & fileName)
     return fileName.left(fileName.lastIndexOf("."));
 }
 
-QString CalcThread::makeImpHash()
+QString CalcThread::makeImpHash(PEFile* pe)
 {
 	static CommonOrdinalsLookup lookup;
-	ImportDirWrapper* imports = m_PE->getImportsDir();
+	ImportDirWrapper* imports = pe->getImportsDir();
 	if (!imports) return QString();
 
 	QStringList exts;
@@ -56,12 +56,13 @@ QString CalcThread::makeImpHash()
 	return QString(calcHash.result().toHex());
 }
 
-QString CalcThread::makeRichHdrHash()
+QString CalcThread::makeRichHdrHash(PEFile* pe)
 {
-	pe::RICH_SIGNATURE* sign = m_PE->getRichHeaderSign();
-	pe::RICH_DANS_HEADER* dans = NULL;
+	if (!pe) return QString();
+	pe::RICH_SIGNATURE* sign = pe->getRichHeaderSign();
+	pe::RICH_DANS_HEADER* dans = nullptr;
 	if (sign) {
-		dans = m_PE->getRichHeaderBgn(sign);
+		dans = pe->getRichHeaderBgn(sign);
 	}
 	if (!dans) {
 		return QString();
@@ -85,7 +86,7 @@ void CalcThread::run()
 		return;
 	}
 	QString fileHash = "Cannot calculate!";
-	if (!m_PE || !m_PE->getContent()) {
+	if (!m_buf || !m_buf->getContent()) {
 		emit gotHash(fileHash, hashType);
 		return;
 	}
@@ -102,19 +103,23 @@ void CalcThread::run()
 #endif
 	emit gotHash("Calculating...", hashType);
 	try {
+		BYTE* buf = m_buf->getContent();
+		size_t bufSize = m_buf->getContentSize();
+
 		if (hashType == SupportedHashes::CHECKSUM) {
-			long checksum = PEFile::computeChecksum((BYTE*) m_PE->getContent(), m_PE->getContentSize(), checksumOff);
+			long checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
 			fileHash = QString::number(checksum, 16);
 		}
+		/*
 		else if (hashType == SupportedHashes::RICH_HDR_MD5) {
-			fileHash = makeRichHdrHash();
+			fileHash = makeRichHdrHash(m_PE);
 		}
 		else if (hashType == SupportedHashes::IMP_MD5) {
-			fileHash = makeImpHash();
-		}
+			fileHash = makeImpHash(m_PE);
+		}*/
 		else {
 			QCryptographicHash calcHash(qHashType);
-			calcHash.addData((char*) m_PE->getContent(), m_PE->getContentSize());
+			calcHash.addData((char*)buf, bufSize);
 			fileHash = QString(calcHash.result().toHex());
 		}
 	} catch (...) {

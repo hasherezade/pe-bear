@@ -29,8 +29,8 @@ class SignFinderThread : public CollectorThread
 {
 	Q_OBJECT
 public:
-	SignFinderThread(PEFile* pe, sig_finder::Node &signFinder, MatchesCollection &matched, offset_t offset)
-		: CollectorThread(pe), 
+	SignFinderThread(ByteBuffer* buf, sig_finder::Node &signFinder, MatchesCollection &matched, offset_t offset)
+		: CollectorThread(buf),
 		m_signFinder(signFinder), m_matched(matched), startOffset(offset)
 	{
 	}
@@ -82,7 +82,7 @@ public:
 	bool setupThread()
 	{
 		if (!m_PE) return false;
-		
+#ifdef SIGN_THREAD
 		SignFinderThread *thread = new SignFinderThread(m_PE, m_patternFinder, m_matched, startOffset);
 		this->myThread = thread;
 
@@ -94,7 +94,7 @@ public:
 		
 		QObject::connect(thread, SIGNAL(searchStarted(bool)), 
 			this, SLOT(onSearchStarted(bool)), Qt::UniqueConnection);
-			
+#endif //SIGN_THREAD
 		return true;
 	}
 	

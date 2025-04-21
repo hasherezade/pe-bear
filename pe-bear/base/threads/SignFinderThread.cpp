@@ -15,10 +15,10 @@ void SignFinderThread::run()
 
 void SignFinderThread::findInBuffer()
 {
-	if (!m_PE || startOffset == INVALID_ADDR) return;
+	if (!m_buf || startOffset == INVALID_ADDR) return;
 	
 	offset_t offset = startOffset;
-	offset_t fullSize = m_PE->getContentSize();
+	offset_t fullSize = m_buf->getContentSize();
 	int proc = 0;
 	int maxProgress = 1000;
 	bool found = false;
@@ -46,14 +46,14 @@ void SignFinderThread::findInBuffer()
 
 size_t SignFinderThread::findPackerSign(offset_t startingRaw)
 {
-	if (!m_PE && startingRaw == INVALID_ADDR) {
+	if (!m_buf && startingRaw == INVALID_ADDR) {
 		return 0;
 	}
-	BYTE* content = m_PE->getContent();
+	BYTE* content = m_buf->getContent();
 	if (!content) {
 		return 0;
 	}
-	const size_t contentSize = m_PE->getRawSize();
+	const size_t contentSize = m_buf->getContentSize();
 	if (startingRaw >= contentSize) {
 		return 0;
 	}
