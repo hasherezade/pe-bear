@@ -138,10 +138,10 @@ void CalcThread::run()
 			else {
 				QCryptographicHash calcHash(qHashType);
 				for (size_t i = 0; i < bufSize; i++) {
-					calcHash.addData((char*)buf + i, 1);
 					if (this->isStopRequested()) {
 						return;
 					}
+					calcHash.addData((char*)buf + i, 1);
 				}
 				fileHash = QString(calcHash.result().toHex());
 			}
