@@ -178,7 +178,7 @@ QVariant HexDiffModel::headerData(int section, Qt::Orientation orientation, int 
 			return settings.getVerticalSize();
 		}
 		if (role == Qt::DisplayRole) {
-			int offset = startOff + (section * HEX_COL_NUM);
+			bufsize_t offset = startOff + (section * HEX_COL_NUM);
 			if (isRelativeOffset() == false) {
 				offset += this->contentOffset[myIndx];
 			}

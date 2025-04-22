@@ -53,7 +53,7 @@ QVariant ExportsTreeModel::data(const QModelIndex &index, int role) const
 	return dataValue(index);
 }
 
-QString ExportsTreeModel::makeDockerTitle(uint32_t upId)
+QString ExportsTreeModel::makeDockerTitle(size_t upId)
 {
 	ExeNodeWrapper* node = dynamic_cast<ExeNodeWrapper*>(wrapper());
 	if (node == NULL) {

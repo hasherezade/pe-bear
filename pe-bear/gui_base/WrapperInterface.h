@@ -13,8 +13,8 @@ public:
 
 	Executable::addr_type addrTypeAt(QModelIndex index) const;
 
-	DWORD getFieldOffset(QModelIndex index) const;
-	DWORD getFieldSize(QModelIndex index) const;
+	offset_t getFieldOffset(QModelIndex index) const;
+	bufsize_t getFieldSize(QModelIndex index) const;
 	
 	virtual bool containsValue(QModelIndex index) const = 0;
 	virtual bool containsOffset(QModelIndex index) const;
@@ -23,7 +23,7 @@ public:
 	virtual ExeElementWrapper* wrapper() const = 0;
 	virtual ExeElementWrapper* wrapperAt(QModelIndex index) const { return wrapper(); }
 
-	virtual QString makeDockerTitle(uint32_t upId) { return ""; }
+	virtual QString makeDockerTitle(size_t upId) { return ""; }
 	
 protected:
 	virtual int getFID(const QModelIndex &index) const { return index.row(); }

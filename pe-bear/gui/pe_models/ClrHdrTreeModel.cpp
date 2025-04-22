@@ -241,7 +241,7 @@ Qt::ItemFlags ClrTreeModel::flags(const QModelIndex &index) const
 	return item->flags(index.column());
 }
 
-QString ClrTreeModel::makeDockerTitle(uint32_t upId)
+QString ClrTreeModel::makeDockerTitle(size_t upId)
 {
 	ExeNodeWrapper* node = dynamic_cast<ExeNodeWrapper*>(wrapper());
 	if (node == NULL) {

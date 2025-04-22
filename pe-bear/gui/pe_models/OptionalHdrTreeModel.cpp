@@ -183,8 +183,8 @@ QVariant DataDirTreeItem::toolTip(int column) const
 	if (this->level == DESC) return QVariant();
 	
 	DataDirWrapper *dDir = wrapper();
-	int fId = this->getFID(column);
-	const int recordsCount = (dDir) ? dDir->getDirsCount() : 0;
+	const size_t fId = this->getFID(column);
+	const size_t recordsCount = (dDir) ? dDir->getDirsCount() : 0;
 	if (fId >= recordsCount) return QVariant();
 	
 	if (column == COL_OFFSET) return tr("Right click to follow");

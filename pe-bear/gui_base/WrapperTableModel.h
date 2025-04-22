@@ -36,7 +36,7 @@ public:
 
 	virtual int rowCount(const QModelIndex &parent) const { return wrapper() ? wrapper()->getFieldsCount() : 0; }
 	
-	virtual QString makeDockerTitle(uint32_t upId);
+	virtual QString makeDockerTitle(size_t upId);
 	
 protected:
 	static int64_t counter;

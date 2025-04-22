@@ -88,5 +88,5 @@ protected:
 		HINT,
 		ADDED_COLS_NUM
 	};
-	uint32_t libraryId;
+	size_t libraryId;
 };

@@ -22,7 +22,7 @@ public:
 	virtual QVariant data(const QModelIndex &index, int role) const;
 
 	virtual bool containsValue(QModelIndex index) const { return (index.column()  == VALUE); }
-	QString makeDockerTitle(uint32_t id);
+	QString makeDockerTitle(size_t id);
 	
 protected:
 	virtual int getFID(const QModelIndex &index) const { return index.row();  }

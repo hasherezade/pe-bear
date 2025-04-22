@@ -92,7 +92,7 @@ public:
 	Qt::ItemFlags flags(const QModelIndex &index) const;
 
 	virtual bool containsValue(QModelIndex index) const;
-	QString makeDockerTitle(uint32_t upId);
+	QString makeDockerTitle(size_t upId);
 
 protected:
 	virtual ExeElementWrapper* wrapper() const { return &myPeHndl->clrDirWrapper; }

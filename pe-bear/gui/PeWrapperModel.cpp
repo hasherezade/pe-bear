@@ -51,7 +51,7 @@ Qt::ItemFlags PeWrapperModel::flags(const QModelIndex &index) const
 	return f;
 }
 
-QString PeWrapperModel::makeDockerTitle(uint32_t upId)
+QString PeWrapperModel::makeDockerTitle(size_t upId)
 {
 	ExeNodeWrapper* node = dynamic_cast<ExeNodeWrapper*>(wrapper());
 	if (node == NULL) {
@@ -62,7 +62,7 @@ QString PeWrapperModel::makeDockerTitle(uint32_t upId)
 		return "-";
 	}
 	QString name = childEntry->getName();
-	uint32_t funcNum = childEntry->getEntriesCount();
+	size_t funcNum = childEntry->getEntriesCount();
 	QString numDesc = funcNum == 1 ? tr(" entry") : tr(" entries");
 	QString desc = name + "   [ " + QString::number(funcNum) + numDesc + " ]"; 
 	return desc;

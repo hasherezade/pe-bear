@@ -22,7 +22,7 @@ public:
 
 	virtual QVariant toolTip(QModelIndex index) const;
 	virtual bool containsValue(QModelIndex index) const { return (index.column()  == VALUE); }
-	virtual QString makeDockerTitle(uint32_t upId);
+	virtual QString makeDockerTitle(size_t upId);
 	
 protected:
 	virtual int getFID(const QModelIndex &index) const { return index.row();  }

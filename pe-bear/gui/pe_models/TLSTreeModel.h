@@ -24,11 +24,11 @@ public:
 	virtual bool containsValue(QModelIndex index) const { return index.column() == COL_VALUE; }
 	virtual ExeElementWrapper* wrapper() const { return &myPeHndl->tlsDirWrapper; }
 
-	virtual QString makeDockerTitle(uint32_t upId);
+	virtual QString makeDockerTitle(size_t upId);
 
 protected:
-	virtual int getFID(const QModelIndex &index) const { return index.row();  }
-	virtual int getSID(const QModelIndex &index) const { return index.column();  }
+	virtual int getFID(const QModelIndex &index) const { return index.row(); }
+	virtual int getSID(const QModelIndex &index) const { return index.column(); }
 
 	enum FieldID {
 		NONE = FIELD_NONE,

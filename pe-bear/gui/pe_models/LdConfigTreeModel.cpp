@@ -67,7 +67,7 @@ QVariant LdConfigTreeModel::data(const QModelIndex &index, int role) const
 	return dataValue(index);
 }
 
-QString LdConfigTreeModel::makeDockerTitle(uint32_t upId)
+QString LdConfigTreeModel::makeDockerTitle(size_t upId)
 {
 	if (!wrapper()) return "";
 	QString name = this->wrapper()->getFieldName(upId);
@@ -79,9 +79,9 @@ QString LdConfigTreeModel::makeDockerTitle(uint32_t upId)
 	if (!wrapper()->hasSubfieldWrapper(upId)) {
 		return "";
 	}
-	uint32_t funcNum = node->getSubfieldWrapperCount(upId);
+	size_t funcNum = node->getSubfieldWrapperCount(upId);
 	QString numDesc = funcNum == 1 ? tr(" entry") : tr(" entries");
-	QString desc = name + "   [ " + QString::number(funcNum) + numDesc + " ]";
+	const QString desc = name + "   [ " + QString::number(funcNum) + numDesc + " ]";
 	return desc;
 }
 

@@ -67,14 +67,14 @@ Executable::addr_type WrapperInterface::addrTypeAt(QModelIndex index) const
 	return aType;
 }
 
-DWORD WrapperInterface::getFieldOffset(QModelIndex index) const
+offset_t WrapperInterface::getFieldOffset(QModelIndex index) const
 { 
 	if (!index.isValid()) return 0;
 	int fieldId = getFID(index);
 	return wrapperAt(index) ? wrapperAt(index)->getFieldOffset(fieldId) : 0;
 }
 
-DWORD WrapperInterface::getFieldSize(QModelIndex index) const 
+bufsize_t WrapperInterface::getFieldSize(QModelIndex index) const 
 {
 	if (!index.isValid()) return 0;
 	int fieldId = getFID(index);

@@ -119,7 +119,7 @@ QVariant HexDumpModel::getElement(offset_t offset) const
 	if (!contentPtr) {
 		return QVariant();
 	}
-	const BYTE val = contentPtr[0];
+	const BYTE val = (*contentPtr);
 	if (showHex) {
 #if QT_VERSION >= 0x050000
 		return QString().asprintf("%02X", val);

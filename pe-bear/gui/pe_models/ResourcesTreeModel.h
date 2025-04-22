@@ -65,8 +65,8 @@ class ResourceLeafModel : public WrapperTableModel
 	Q_OBJECT
 
 public slots:
-	void setParentId(size_t parentId) { this->parentId = parentId; reset(); emit modelUpdated(); }
-	void setLeafId(uint32_t leafId) { this->leafId = leafId; reset(); emit modelUpdated(); }
+	void setParentId(long parentId) { this->parentId = parentId; reset(); emit modelUpdated(); }
+	void setLeafId(long leafId) { this->leafId = leafId; reset(); emit modelUpdated(); }
 
 public:
 	ResourceLeafModel(PeHandler *peHndl, QObject *parent = 0) 

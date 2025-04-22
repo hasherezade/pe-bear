@@ -95,6 +95,6 @@ protected:
 		MAX_COL
 	};
 	
-	uint32_t parentId;
+	size_t parentId;
 };
 ///---

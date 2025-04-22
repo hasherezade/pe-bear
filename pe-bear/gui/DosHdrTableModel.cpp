@@ -68,8 +68,8 @@ bool DosHdrTableModel::setData(const QModelIndex &index, const QVariant &value, 
 	if (!index.isValid()) return false;
 
 	int fId = getFID(index);
-	uint32_t offset = wrapper()->getFieldOffset(fId);
-	uint32_t fieldSize = wrapper()->getFieldSize(fId);
+	offset_t offset = wrapper()->getFieldOffset(fId);
+	bufsize_t fieldSize = wrapper()->getFieldSize(fId);
 
 	bool isModified = false;
 

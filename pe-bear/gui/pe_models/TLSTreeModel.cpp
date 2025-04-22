@@ -40,7 +40,7 @@ QVariant TLSTreeModel::headerData(int section, Qt::Orientation orientation, int 
 	return QVariant();
 }
 
-QString TLSTreeModel::makeDockerTitle(uint32_t upId)
+QString TLSTreeModel::makeDockerTitle(size_t upId)
 {
 	ExeNodeWrapper *w = dynamic_cast<ExeNodeWrapper*>(wrapper());
 	if (w == NULL) return "";
