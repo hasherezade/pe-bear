@@ -91,16 +91,21 @@ void CalcThread::run()
 		return;
 	}
 	const QString hashFailed = "Cannot calculate!";
+	QString fileHash = hashFailed;
+
 	if (!m_buf || !m_buf->getContent()) {
 		for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
 			SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
-			emit gotHash(hashFailed, hashType);
+			emit gotHash(fileHash, hashType);
 		}
 	}
 	// calculate all types:
 	for (int i = 0; i < SupportedHashes::HASHES_NUM; i++) {
+		if (this->isStopRequested()) {
+			return;
+		}
 		const SupportedHashes::hash_type hashType = static_cast<SupportedHashes::hash_type>(i);
-		QString fileHash = hashFailed;
+		fileHash = hashFailed;
 
 		QCryptographicHash::Algorithm qHashType = QCryptographicHash::Md5;
 		if (hashType == SupportedHashes::MD5) {
@@ -132,7 +137,12 @@ void CalcThread::run()
 			}
 			else {
 				QCryptographicHash calcHash(qHashType);
-				calcHash.addData((char*)buf, bufSize);
+				for (size_t i = 0; i < bufSize; i++) {
+					calcHash.addData((char*)buf + i, 1);
+					if (this->isStopRequested()) {
+						return;
+					}
+				}
 				fileHash = QString(calcHash.result().toHex());
 			}
 		}
