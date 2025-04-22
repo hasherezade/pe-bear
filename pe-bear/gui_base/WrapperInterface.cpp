@@ -38,12 +38,12 @@ QVariant WrapperInterface::complexValue(const QModelIndex &index) const
 	int fId = getFID(index);
 	int sId = getSID(index);
 
-	uint32_t fieldSize = wrapper->getFieldSize(fId, sId);
+	bufsize_t fieldSize = wrapper->getFieldSize(fId, sId);
 	WORD* ptr = (WORD*) wrapper->getFieldPtr(fId, sId);
 	if (ptr == NULL || fieldSize == 0) return "INVALID";
 
-	int cntr = fieldSize / sizeof(WORD);
-	const int CNTR_MAX = 50;
+	size_t cntr = fieldSize / sizeof(WORD);
+	const size_t CNTR_MAX = 50;
 	QStringList strL;
 	for (int i = 0; i < cntr && i < CNTR_MAX; i++) {
 		strL.append(QString::number(ptr[i], 16));

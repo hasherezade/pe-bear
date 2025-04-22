@@ -69,41 +69,19 @@ bool ExceptionTreeModel::setData(const QModelIndex &index, const QVariant &value
 	ExceptionEntryWrapper* entry =  dynamic_cast<ExceptionEntryWrapper*>(wrapperAt(index));
 	if (!entry) return false;
 
-	QString text = value.toString();
-
-	bool isModified = false;
-	uint32_t offset = 0;
-	uint32_t fieldSize = 0;
-
 	bool isOk = false;
-	ULONGLONG number = text.toLongLong(&isOk, 16);
+	ULONGLONG number = value.toString().toLongLong(&isOk, 16);
 	if (!isOk) return false;
 
-	offset = entry->getFieldOffset(fID);
-	fieldSize = entry->getFieldSize(fID);
+	const offset_t offset = entry->getFieldOffset(fID);
+	const bufsize_t fieldSize = entry->getFieldSize(fID);
 
 	this->myPeHndl->backupModification(offset, fieldSize);
-	isModified = entry->setNumValue(fID, index.column(), number);
-
+	const bool isModified = entry->setNumValue(fID, index.column(), number);
 	if (isModified) {
 		this->myPeHndl->setBlockModified(offset, fieldSize);
 		return true;
 	}
 	this->myPeHndl->unbackupLastModification();
 	return false;
-}
-
-//----------------------------------------------------------------------------
-
-void  ExceptionTreeView::selectionChanged(const QItemSelection &newSel, const QItemSelection &prevSel)
-{
-	FollowablePeTreeView::selectionChanged(newSel, prevSel);
-
-	ExceptionTreeModel *impModel = dynamic_cast<ExceptionTreeModel*> (this->model());
-	if (!impModel) return;
-	if (!impModel->wrapper()) return;
-	if (newSel.indexes().size() == 0) return;
-	QModelIndex index = newSel.indexes().at(0);
-	uint32_t libId = index.row();
-	emit librarySelected(libId);
 }

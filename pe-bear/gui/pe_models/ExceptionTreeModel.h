@@ -47,12 +47,7 @@ friend class ExceptionTreeView;
  class ExceptionTreeView : public FollowablePeTreeView
 {
 	Q_OBJECT
-signals:
-	void librarySelected(uint32_t libraryId);
 
 public:
 	ExceptionTreeView(QWidget *parent) : FollowablePeTreeView(parent) {}
-	void selectionChanged(const QItemSelection &newSel, const QItemSelection &prevSel);
-
-
 };
