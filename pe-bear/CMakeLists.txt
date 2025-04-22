@@ -285,6 +285,7 @@ else()
 endif()
 
 SOURCE_GROUP("Source Files\\base" FILES ${pebear_base_srcs} )
+SOURCE_GROUP("Source Files\\base\\threads" FILES ${pebear_threads_srcs} )
 SOURCE_GROUP("Source Files\\gui" FILES ${pebear_gui_srcs} )
 SOURCE_GROUP("Source Files\\gui\\pe_models" FILES ${pebear_gui_pe_mod_srcs} )
 SOURCE_GROUP("Source Files\\gui\\windows" FILES ${pebear_windows_srcs} )
@@ -292,10 +293,12 @@ SOURCE_GROUP("Source Files\\gui_base" FILES ${pebear_gui_base_srcs} )
 SOURCE_GROUP("Source Files\\Auto Generated" FILES ${pebear_hdrs_moc} ${pebear_rcc_src} )
 
 SOURCE_GROUP("Header Files\\base" FILES ${pebear_base_hdrs} )
+SOURCE_GROUP("Header Files\\base\\threads" FILES ${pebear_threads_hdrs} )
 SOURCE_GROUP("Header Files\\gui" FILES ${pebear_gui_hdrs} )
 SOURCE_GROUP("Header Files\\gui\\pe_models" FILES ${pebear_gui_pe_mod_hdrs} )
 SOURCE_GROUP("Header Files\\gui\\windows" FILES ${pebear_windows_hdrs} )
 SOURCE_GROUP("Header Files\\gui_base" FILES ${pebear_gui_base_hdrs} )
+
 
 # multi-processor compilation
 if(MSVC)
