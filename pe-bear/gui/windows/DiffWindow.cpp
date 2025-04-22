@@ -425,7 +425,6 @@ void DiffWindow::setTreeModel(QTreeView &treeView, const QString &name)
 	if (model == NULL) {
 		model = new PEFileTreeModel(&treeView);
 		model->addHandler(hndl);
-//		model->addPE(hndl);
 		peModels[name] = model;
 	}
 
@@ -473,8 +472,8 @@ void DiffWindow::itemMarked(const QModelIndex & current, const QModelIndex & pre
 	scopeCombo[contentIndx].clear();
 	scopeCombo[contentIndx].addItems(stringsList);
 	*/
-	uint32_t diff = HexDiffModel::getDiffStart(contentPtr[LEFT], contentSize[LEFT], contentPtr[RIGHT], contentSize[RIGHT]);
-	if (diff == (-1)) {
+	bufsize_t diff = HexDiffModel::getDiffStart(contentPtr[LEFT], contentSize[LEFT], contentPtr[RIGHT], contentSize[RIGHT]);
+	if (diff == HexDiffModel::DIFF_NOT_FOUND) {
 		if (contentSize[LEFT] != contentSize[RIGHT]) {
 			if (contentSize[LEFT] > contentSize[RIGHT])
 				this->statusBar.showMessage(tr("LEFT == RIGHT, till: 0x") + QString::number(contentSize[RIGHT], 16).toUpper() + tr("; LEFT longer."));
