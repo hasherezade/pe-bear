@@ -124,7 +124,7 @@ void CalcThread::run()
 			size_t bufSize = m_buf->getContentSize();
 
 			if (hashType == SupportedHashes::CHECKSUM) {
-				ulong checksum = PEFile::computeChecksum((BYTE*)buf, bufSize, checksumOff);
+				ulong checksum = PEFile::computeChecksum(buf, bufSize, checksumOff);
 				fileHash = QString::number(checksum, 16);
 			}
 			else if (hashType == SupportedHashes::RICH_HDR_MD5) {
