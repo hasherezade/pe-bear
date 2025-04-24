@@ -47,7 +47,9 @@ int main(int argc, char *argv[])
 		app.installTranslator(&translator);
 		mainSettings.language = currLanguage;
 	} else {
-		mainSettings.language = ""; //reset to default
+		if (!mainSettings.language.startsWith("en_US")) { // en_US is built-in, so it does not require translation file
+			mainSettings.language = ""; //if not US, and the language file could not be found, reset to default
+		}
 	}
 
 	app.setApplicationName(TITLE);
