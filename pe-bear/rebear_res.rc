@@ -10,7 +10,7 @@
 #define VER_FILETYPE                VFT_APP
 #define VER_FILESUBTYPE             VFT2_UNKNOWN
 #define VER_FILEOS                  VOS_NT_WINDOWS32
-#define VER_FILEDESCRIPTION_STR     "PE-bear: Portable Executable reversing tool with a friendly GUI ."
+#define VER_FILEDESCRIPTION_STR     "PE-bear: Portable Executable reversing tool"
 #define VER_INTERNALNAME_STR        "PE-bear.exe"
 #define VER_ORIGINALFILENAME_STR    "PE-bear.exe"
 #define VER_LEGALCOPYRIGHT_STR      "Copyright © 2013-2025 Hasherezade"
