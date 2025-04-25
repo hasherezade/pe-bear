@@ -65,8 +65,8 @@ class ResourceLeafModel : public WrapperTableModel
 	Q_OBJECT
 
 public slots:
-	void setParentId(long parentId) { this->parentId = parentId; reset(); emit modelUpdated(); }
-	void setLeafId(long leafId) { this->leafId = leafId; reset(); emit modelUpdated(); }
+	void setParentId(size_t parentId) { this->parentId = parentId; reset(); emit modelUpdated(); }
+	void setLeafId(size_t leafId) { this->leafId = leafId; reset(); emit modelUpdated(); }
 
 public:
 	ResourceLeafModel(PeHandler *peHndl, QObject *parent = 0) 
@@ -80,8 +80,8 @@ public:
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	virtual QVariant data(const QModelIndex &index, int role) const;
 	
-	long getParentId() { return parentId; }
-	long getLeafId() { return leafId; }
+	size_t getParentId() { return parentId; }
+	size_t getLeafId() { return leafId; }
 
 	Executable::addr_type addrTypeAt(QModelIndex index) const;
 	offset_t getFieldOffset(QModelIndex index) const;
@@ -92,7 +92,7 @@ protected:
 	virtual int getFID(const QModelIndex &index) const { return leafId; }
 	virtual int getSID(const QModelIndex &index) const { return index.row(); }
 
-	virtual ExeElementWrapper* wrapper() const;// { return &myPeHndl->resourcesDirWrapper; }
+	virtual ExeElementWrapper* wrapper() const;
 	ExeElementWrapper* wrapperAt(QModelIndex index) const;
 	virtual bool containsValue(QModelIndex index) const { return (index.column()  == VALUE); }
 	
@@ -103,6 +103,6 @@ protected:
 		COLS_NUM
 	};
 
-	long parentId;
-	long leafId;
+	size_t parentId;
+	size_t leafId;
 };
