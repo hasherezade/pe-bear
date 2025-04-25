@@ -129,15 +129,30 @@ bool InfoTableModel::setData(const QModelIndex &index, const QVariant &data, int
 
 	bufsize_t newSize = 0;
 	if (row == INFO_UNITS) {
-		bufsize_t newUnits = data.toULongLong();
 		const bufsize_t fileAlign = m_PE->getFileAlignment();
-		bufsize_t current = fileAlign ? (pe_util::roundup(m_PE->getRawSize(), fileAlign) / fileAlign) : 0;
-
-		if (newUnits == current) return false;
-		bufsize_t dif = (newUnits - current) * m_PE->getFileAlignment();
+		if (fileAlign == 0) {
+			return false; // header anomaly
+		}
+		const bufsize_t newUnits = data.toULongLong();
+		if (QString::number(newUnits, 10) != data.toString()) {
+			return false; // failed value
+		}
+		const bufsize_t current = fileAlign ? (pe_util::roundup(m_PE->getRawSize(), fileAlign) / fileAlign) : 0;
+		if (newUnits == current) {
+			return false; // no change
+		}
+		const bufsize_t dif = (newUnits - current) * fileAlign;
 		newSize = m_PE->getRawSize() + dif;
+
+		// validate:
+		bufsize_t unitsInNewSize = fileAlign ? (pe_util::roundup(newSize, fileAlign) / fileAlign) : 0;
+		if (unitsInNewSize != newUnits) {
+			return false; // value overflow
+		}
+
 	} else if (row == INFO_LOADED_SIZE) {
 		newSize = data.toULongLong();
+		// validate:
 		if (QString::number(newSize, 10) != data.toString()) {
 			return false; // failed value
 		}
