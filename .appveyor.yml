@@ -2,10 +2,10 @@ version: '{branch}.{build}'
 skip_tags: true
 
 image:
-- Ubuntu2204
 - Visual Studio 2022
 - Visual Studio 2019
 - macos
+- Ubuntu2204
 
 matrix:
   exclude:
