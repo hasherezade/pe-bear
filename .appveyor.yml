@@ -50,7 +50,7 @@ for:
 
     install:
      - git submodule update --init --recursive
-     - export PATH="$HOME/Qt/6.7.2/gcc_64/bin:$PATH"
+     - export PATH="$HOME/Qt/6.9/gcc_64/bin:$PATH"
 
     before_build:
       - cmake --version
