@@ -74,7 +74,7 @@ for:
 
     install:
      - git submodule update --init --recursive
-     - export PATH="$HOME/Qt/6.6.1/macos/bin:$PATH"
+     - export PATH="$HOME/Qt/6.6/macos/bin:$PATH"
      - export LDFLAGS="-L/usr/local/opt/qt/lib"
      - export CPPFLAGS="-I/usr/local/opt/qt/include"
      - export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
