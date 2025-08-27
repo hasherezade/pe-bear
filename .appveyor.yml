@@ -2,9 +2,9 @@ version: '{branch}.{build}'
 skip_tags: true
 
 image:
+- Ubuntu2204
 - Visual Studio 2022
 - Visual Studio 2019
-- Ubuntu2204
 - macos
 
 matrix:
@@ -50,10 +50,14 @@ for:
 
     install:
      - git submodule update --init --recursive
-     - export PATH="$HOME/Qt/6.9/gcc_64/bin:$PATH"
-
+     - export QTDIR="$HOME/Qt/6.9"
+     - export LD_LIBRARY_PATH="$QTDIR:$LD_LIBRARY_PATH"
+     - export PATH="$QTDIR/bin:$PATH"
+     - export PATH="$QTDIR/gcc_64/bin:$PATH"
+     
     before_build:
       - cmake --version
+      - qmake --version
 
     build_script:
       - ./build_qt6.sh
