@@ -2,7 +2,6 @@ version: '{branch}.{build}'
 skip_tags: true
 
 image:
-- Visual Studio 2017
 - Visual Studio 2022
 - macos
 - Ubuntu2204
