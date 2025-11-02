@@ -10,7 +10,7 @@
 	typedef QRegExpValidator QRegularExpressionValidator;
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
 	#define QT_SkipEmptyParts Qt::SkipEmptyParts
 #else
 	#define QT_SkipEmptyParts QString::SkipEmptyParts
