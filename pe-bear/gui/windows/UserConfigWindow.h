@@ -3,6 +3,7 @@
 
 #include "../../QtCompat.h"
 #include "../../base/MainSettings.h"
+#include "../../base/AISettings.h"
 
 //----------------------------------------------------
 
@@ -25,6 +26,7 @@ class UserConfigWindow : public QDialog
 public:
 	UserConfigWindow(QWidget *parent = 0);
 	void setMainSettings(MainSettings *settings);
+	void setAISettings(AISettings *settings);
 
 	t_reload_mode getReloadMode();
 	void setReloadMode(const t_reload_mode rMode);
@@ -42,7 +44,12 @@ protected:
 private:
 	int getLanguageIndex(const QString &lang);
 	int loadAvailableTranslations(const QString &rootDir);
+	void setupAITab();
 
+	QTabWidget *tabWidget;
+	QWidget *generalTab;
+	QWidget *aiTab;
+	
 	QVBoxLayout topLayout;
 	QPushButton dirButton, okButton, cancelButton;
 	QLabel uddDirLabel;
@@ -54,6 +61,16 @@ private:
 	QComboBox reloadFileStates;
 	QCheckBox autoSaveTagsCBox;
 
+	// AI Settings widgets
+	QLineEdit *openaiKeyEdit;
+	QLineEdit *geminiKeyEdit;
+	QLineEdit *virusTotalKeyEdit;
+	QComboBox *openaiModelCombo;
+	QComboBox *geminiModelCombo;
+	QCheckBox *useOpenAICBox;
+	QCheckBox *useGeminiCBox;
+
 	MainSettings *settings;
+	AISettings *aiSettings;
 };
 

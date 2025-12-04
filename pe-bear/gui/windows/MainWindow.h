@@ -16,6 +16,8 @@
 #include "PatternSearchWindow.h"
 #include "SignaturesBrowseWindow.h"
 #include "UserConfigWindow.h"
+#include "AIAssistantWindow.h"
+#include "AISettingsWindow.h"
 
 #include "../../SectionsDiagram.h"
 #include "../../PEFileTreeModel.h"
@@ -25,6 +27,7 @@
 
 #include "../../gui_base/PEViewsManager.h"
 #include "../../base/MainSettings.h"
+#include "../../base/AISettings.h"
 
 #include "../../ViewSettings.h"
 
@@ -75,6 +78,21 @@ public slots:
 	{
 		this->diffWindow.show();
 		this->diffWindow.raise(); 
+	}
+
+	void openAIAssistant()
+	{
+		if (!aiAssistantWindow.isVisible()) {
+			addDockWidget(Qt::RightDockWidgetArea, &aiAssistantWindow);
+		}
+		aiAssistantWindow.show();
+		aiAssistantWindow.raise();
+	}
+
+	void openAISettings()
+	{
+		this->aiSettingsWindow.show();
+		this->aiSettingsWindow.raise(); 
 	}
 
 	// zooming:
@@ -172,6 +190,7 @@ private:
 	std::vector<sig_finder::Signature*> signatures;
 	sig_finder::Node sigFinder;
 	MainSettings &mainSettings;
+	AISettings aiSettings;
 	GuiSettings guiSettings;
 
 	QString winDesc;
@@ -182,6 +201,8 @@ private:
 
 	DiffWindow diffWindow;
 	SectionAddWindow secAddWindow;
+	AIAssistantWindow aiAssistantWindow;
+	AISettingsWindow aiSettingsWindow;
 
 	QStatusBar statusBar;
 	QGridLayout cntntLayout;
@@ -199,6 +220,7 @@ private:
 		*settingsMenu,
 		*viewMenu,
 		*signaturesMenu,
+		*aiMenu,
 		*fromLoadedPEsMenu;
 
 	QActionGroup *stylesGroup;
@@ -220,7 +242,9 @@ private:
 		*dumpAllPEsSecAction,
 		*searchSignature,
 		*exportAllPEsDisasmAction,
-		*exportAllPEsStrings;
+		*exportAllPEsStrings,
+		*openAIAssistantAction,
+		*openAISettingsAction;
 
 	ExeDependentAction *dumpAllSecAction,
 		*addSecAction,

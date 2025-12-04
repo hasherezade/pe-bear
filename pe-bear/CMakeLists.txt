@@ -20,16 +20,16 @@ include(GNUInstallDirs)
 
 if(USE_QT4)
 	find_package (Qt4 REQUIRED)
-	include_directories ( ${QT_INCLUDE_DIR} ${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} )
+	include_directories ( ${QT_INCLUDE_DIR} ${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR} ${QT_QTNETWORK_INCLUDE_DIR} )
 	INCLUDE(${QT_USE_FILE})
 	ADD_DEFINITIONS(${QT_DEFINITIONS})
 else()
 	if(USE_QT5)
-		find_package(QT NAMES Qt5 COMPONENTS Core Widgets REQUIRED)
+		find_package(QT NAMES Qt5 COMPONENTS Core Widgets Network REQUIRED)
 	else()
-		find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets REQUIRED)
+		find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets Network REQUIRED)
 	endif()
-	find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
+	find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets Network REQUIRED)
 	get_target_property(QtCore_location Qt${QT_VERSION_MAJOR}::Core LOCATION)
 endif()
 
@@ -59,6 +59,8 @@ set (pebear_base_srcs
 	base/PeHandlerFactory.cpp
 	base/PeHandlersManager.cpp
 	base/RegKeyManager.cpp
+	base/AISettings.cpp
+	base/AIAnalyzer.cpp
 )
 
 set (pebear_base_hdrs
@@ -73,6 +75,8 @@ set (pebear_base_hdrs
 	base/StringsCollection.h
 	base/RegKeyManager.h
 	base/ImportsAutoadderSettings.h
+	base/AISettings.h
+	base/AIAnalyzer.h
 )
 
 set (pebear_gui_base_srcs
@@ -226,6 +230,8 @@ set (pebear_windows_srcs
 	gui/windows/UserConfigWindow.cpp
 	gui/windows/DiffWindow.cpp
 	gui/windows/MainWindow.cpp
+	gui/windows/AIAssistantWindow.cpp
+	gui/windows/AISettingsWindow.cpp
 )
 
 set (pebear_windows_hdrs
@@ -238,6 +244,8 @@ set (pebear_windows_hdrs
 	gui/windows/UserConfigWindow.h
 	gui/windows/DiffWindow.h
 	gui/windows/MainWindow.h
+	gui/windows/AIAssistantWindow.h
+	gui/windows/AISettingsWindow.h
 )
 
 set (pebear_srcs
@@ -337,9 +345,9 @@ target_link_libraries( ${PROJECT_NAME} ${SIGFIND_LIB} ${PARSER_LIB} )
 target_link_libraries (${PROJECT_NAME}  ${DISASM_LIB} ${CAPSTONE_LIB} )
 
 if(USE_QT4)
-	target_link_libraries (${PROJECT_NAME} ${QT_QTGUI_LIBRARIES} ${QT_QTCORE_LIBRARIES})
+	target_link_libraries (${PROJECT_NAME} ${QT_QTGUI_LIBRARIES} ${QT_QTCORE_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})
 else()	
-	target_link_libraries (${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
+	target_link_libraries (${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 endif()
 
 install(TARGETS ${PROJECT_NAME}

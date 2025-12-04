@@ -44,6 +44,8 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	m_PeHndl(NULL), m_Timer(this),
 	diffWindow(this->m_PEHandlers, this),
 	secAddWindow(this), userConfigWindow(this),
+	aiAssistantWindow(&aiSettings, this),
+	aiSettingsWindow(&aiSettings, this),
 	sectionsTree(this), sectionMenu(mainSettings, this),
 	peFileModel(NULL),
 	rightPanel(this), 
@@ -54,6 +56,7 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	// load the saved settings:
 	MainSettingsHolder::setMainSettings(&this->mainSettings);
 	userConfigWindow.setMainSettings(&this->mainSettings);
+	aiSettings.readPersistent();
 
 	winDesc = QString(TITLE) + " v" + currentVer.toString();
 	setWindowTitle(winDesc);
@@ -96,6 +99,9 @@ void MainWindow::connectSignals()
 
 	connect(&sectionsTree, SIGNAL(handlerSelected(PeHandler *)),
 		&diffWindow, SLOT(refresh()), Qt::UniqueConnection);
+	
+	connect(&sectionsTree, SIGNAL(handlerSelected(PeHandler *)),
+		&aiAssistantWindow, SLOT(setCurrentPeHandler(PeHandler*)), Qt::UniqueConnection);
 
 	connect(this, SIGNAL(addSectionRequested(PeHandler*)),
 		&secAddWindow, SLOT(onAddSectionToPe(PeHandler*)) );
@@ -369,6 +375,15 @@ void MainWindow::createActions()
 	zoomDefault->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_0));
 	zoomDefault->setShortcutContext(Qt::ApplicationShortcut);
 	connect(this->zoomDefault, SIGNAL(triggered()), this, SLOT(setDefaultZoom()));
+	
+	// AI Assistant actions
+	openAIAssistantAction = new QAction(QIcon(":/icons/List.ico"), tr("Open AI Assistant"), this);
+	openAIAssistantAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_A));
+	openAIAssistantAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(this->openAIAssistantAction, SIGNAL(triggered()), this, SLOT(openAIAssistant()));
+	
+	openAISettingsAction = new QAction(tr("AI Settings..."), this);
+	connect(this->openAISettingsAction, SIGNAL(triggered()), this, SLOT(openAISettings()));
 }
 
 void MainWindow::createMenus()
@@ -410,6 +425,12 @@ void MainWindow::createMenus()
 
 	// Signatures menu
 	this->signaturesMenu = this->settingsMenu->addMenu(tr("Si&gnatures"));
+
+	// AI menu
+	this->aiMenu = menuBar()->addMenu(tr("&AI Assistant"));
+	this->aiMenu->addAction(this->openAIAssistantAction);
+	this->aiMenu->addSeparator();
+	this->aiMenu->addAction(this->openAISettingsAction);
 
 	menuBar()->addAction(this->openDiffWindowAction);
 	menuBar()->addAction(this->infoAction);
@@ -812,7 +833,8 @@ void MainWindow::info()
 	msg += tr("authors: Hasherezade") + " (<a href='" + QString(MY_SITE_LINK) + "'>" + tr("homepage") +"</a>) "
 	+ tr("and") 
 	+ " <a href='" + QString("https://github.com/hasherezade/pe-bear/graphs/contributors") + "'>" + tr("contributors") +"</a><br/>";
-	msg += tr("Source code & more info:") + " <a href='" + QString(SOURCE_LINK) + "'>" + tr("here") +"</a><br/>";
+	msg += tr("Modified by: 0nsec") + " (<a href='https://github.com/0nsec'>GitHub</a>)<br/>";
+	msg += tr("Source code & more info:") + " <a href='https://github.com/0nsec/pe-bear'>" + tr("here") +"</a><br/>";
 	msg += "<br/>";
 	msg += "<i>" + tr("using:") + "</i><br/>";
 #if QT_VERSION < 0x050000
