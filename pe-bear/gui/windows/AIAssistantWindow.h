@@ -48,12 +48,19 @@ private:
 	QPushButton* createQuickButton(const QString &text, const QString &tooltip);
 	
 	// Agent functions - auto gather and analyze PE context
+	// Gathers general information about the current PE file.
 	QString gatherPEInfo();
+	// Extracts information about the sections in the given PE file.
 	QString extractSectionInfo(PEFile *pe);
+	// Extracts import table details from the given PE file.
 	QString extractImportInfo(PEFile *pe);
+	// Extracts export table details from the given PE file.
 	QString extractExportInfo(PEFile *pe);
+	// Checks and summarizes security features present in the given PE file.
 	QString checkSecurityFeatures(PEFile *pe);
+	// Extracts a sample of strings found in the given PE file.
 	QString extractStringSample(PEFile *pe);
+	// Generates a summary report of the PE file's key characteristics.
 	QString generatePESummary();
 	
 	AISettings *aiSettings;
