@@ -18,20 +18,103 @@ void HexDumpModel::onNeedReset()
 	const int rows = this->rowCount(QModelIndex());
 	if (rows != m_lastRowCount) {
 		m_lastRowCount = rows;
+		m_pendingRegions.clear(); // a full reset supersedes any pending precise update
 		reset();
 		emit modelUpdated();
 		return;
 	}
 	const int cols = this->columnCount(QModelIndex());
-	if (rows > 0 && cols > 0) {
-		emit dataChanged(this->index(0, 0, QModelIndex()), this->index(rows - 1, cols - 1, QModelIndex()));
+	if (rows <= 0 || cols <= 0) {
+		m_pendingRegions.clear();
+		return;
+	}
+	if (!m_pendingRegions.isEmpty()) {
+		const QVector<QPair<offset_t, offset_t> > regions = m_pendingRegions;
+		m_pendingRegions.clear();
+		for (int i = 0; i < regions.size(); i++) {
+			emitRegionChanged(regions[i].first, regions[i].second, rows, cols);
+		}
+		return;
+	}
+	// Fallback for changes we could not localize (should rarely hit now):
+	emit dataChanged(this->index(0, 0, QModelIndex()), this->index(rows - 1, cols - 1, QModelIndex()));
+}
+
+void HexDumpModel::onContentReplaced(offset_t modOffset, bufsize_t modSize)
+{
+	if (modSize == 0 || modOffset == INVALID_ADDR) return;
+	offset_t from = modOffset;
+	offset_t to = modOffset + (offset_t)modSize; // exclusive
+
+	// Merge into an existing overlapping or adjacent range.
+	for (int i = 0; i < m_pendingRegions.size(); i++) {
+		QPair<offset_t, offset_t> &r = m_pendingRegions[i];
+		if (from <= r.second && to >= r.first) {
+			if (from < r.first)  r.first  = from;
+			if (to   > r.second) r.second = to;
+			return;
+		}
+	}
+	if (m_pendingRegions.size() >= MAX_PENDING_REGIONS) {
+		// Too fragmented: collapse everything into a single bounding range.
+		offset_t lo = from, hi = to;
+		for (int i = 0; i < m_pendingRegions.size(); i++) {
+			if (m_pendingRegions[i].first  < lo) lo = m_pendingRegions[i].first;
+			if (m_pendingRegions[i].second > hi) hi = m_pendingRegions[i].second;
+		}
+		m_pendingRegions.clear();
+		m_pendingRegions.append(qMakePair(lo, hi));
+		return;
+	}
+	m_pendingRegions.append(qMakePair(from, to));
+}
+
+void HexDumpModel::emitRegionChanged(offset_t from, offset_t to, int rows, int cols)
+{
+	if (from >= to) return;                         // degenerate / empty range
+	if (rows <= 0 || cols <= 0) return;             // nothing to address
+	if (startOff == INVALID_ADDR || !m_PE) return;  // model not in a paintable state
+
+	const offset_t pageFrom = startOff;
+	const offset_t pageTo   = startOff + (offset_t)rows * HEX_COL_NUM; // grid extent
+	const offset_t fileTo   = m_PE->getRawSize();   // real data extent (exclusive)
+
+	// Clamp to the tighter of the visible grid and actual EOF, so trailing
+	// past-EOF cells of the final partial row are never addressed.
+	const offset_t hi = (pageTo < fileTo) ? pageTo : fileTo;
+	if (from < pageFrom) from = pageFrom;
+	if (to   > hi)       to   = hi;
+	if (from >= to) return;                         // collapsed to zero valid cells -> skip
+
+	const offset_t relFrom = from - startOff;
+	const offset_t relLast = (to - 1) - startOff;   // inclusive last byte
+	const int firstRow = (int)(relFrom / HEX_COL_NUM);
+	const int lastRow  = (int)(relLast / HEX_COL_NUM);
+
+	QModelIndex topLeft, bottomRight;
+	if (firstRow == lastRow) {
+		topLeft     = this->index(firstRow, (int)(relFrom % HEX_COL_NUM), QModelIndex());
+		bottomRight = this->index(firstRow, (int)(relLast % HEX_COL_NUM), QModelIndex());
+	} else {
+		topLeft     = this->index(firstRow, 0, QModelIndex());
+		bottomRight = this->index(lastRow, cols - 1, QModelIndex());
+	}
+	if (topLeft.isValid() && bottomRight.isValid()) {
+		emit dataChanged(topLeft, bottomRight);
 	}
 }
 
 void HexDumpModel::connectSignals()
 {
-	connect(myPeHndl, SIGNAL(modified()), this, SLOT(onNeedReset()));
-	connect(myPeHndl, SIGNAL(marked()), this, SLOT(onNeedReset()));
+	// Queued: the repaint must run after the editor commit fully unwinds, otherwise
+	// the view tears down the open editor mid-commit and Qt's editor bookkeeping desyncs.
+	connect(myPeHndl, SIGNAL(modified()), this, SLOT(onNeedReset()), Qt::QueuedConnection);
+	connect(myPeHndl, SIGNAL(marked()), this, SLOT(onNeedReset()), Qt::QueuedConnection);
+	// Direct is intentional: the slot only records the changed region (no view work),
+	// so it is safe to run synchronously during the commit. The actual dataChanged is
+	// emitted later, from the queued onNeedReset() above.
+	connect(myPeHndl, SIGNAL(contentReplaced(offset_t, bufsize_t)),
+		this, SLOT(onContentReplaced(offset_t, bufsize_t)));
 }
 
 void HexDumpModel::setShownContent(offset_t start, bufsize_t size)

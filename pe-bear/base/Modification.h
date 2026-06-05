@@ -119,6 +119,29 @@ public:
 		return mod->getOffset();
 	}
 
+	// Bounding [fromOff, toOff) range covering every backup in the last operation.
+	// Returns false if there is no operation or it has no addressable content
+	// (e.g. a pure resize, whose offset is INVALID_ADDR).
+	bool getLastOperationRange(offset_t &fromOff, offset_t &toOff)
+	{
+		OperationBackup* op = this->getLastOperation();
+		if (!op) return false;
+		bool any = false;
+		for (size_t i = 0; i < op->modifs.size(); i++) {
+			ModifBackup* m = op->modifs[i];
+			if (!m) continue;
+			const offset_t f = m->getOffset();
+			if (f == INVALID_ADDR) continue;
+			const offset_t t = f + m->getSize();
+			if (!any) { fromOff = f; toOff = t; any = true; }
+			else {
+				if (f < fromOff) fromOff = f;
+				if (t > toOff)   toOff = t;
+			}
+		}
+		return any;
+	}
+
 protected:
 	bool _backupModification(ModifBackup *newModif, bool continueLastOperation);
 	

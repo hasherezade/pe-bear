@@ -1,5 +1,7 @@
 #pragma once
 #include <QtGlobal>
+#include <QVector>
+#include <QPair>
 
 #include "QtCompat.h"
 #include "gui_base/PeTableModel.h"
@@ -20,6 +22,9 @@ public slots:
 	// Override: refresh in place instead of a full reset when the grid layout is
 	// unchanged, so open cell editors are never released during (fast) editing.
 	virtual void onNeedReset();
+
+	// Records a changed file region for a precise, deferred dataChanged (see onNeedReset).
+	void onContentReplaced(offset_t modOffset, bufsize_t modSize);
 
 public:
 	HexDumpModel(PeHandler *peHndl, bool isHex, QObject *parent = 0);
@@ -56,6 +61,9 @@ public:
 protected:
 	virtual void connectSignals();
 
+	// Maps a [from, to) file-offset range to a clamped row/col rect and emits dataChanged.
+	void emitRegionChanged(offset_t from, offset_t to, int rows, int cols);
+
 	Executable::addr_type addrType;
 
 private:
@@ -64,6 +72,10 @@ private:
 	offset_t startOff, endOff;
 	bufsize_t pageSize;
 	int m_lastRowCount; // tracks layout changes for onNeedReset()
+
+	// Pending changed regions [from, to) awaiting a deferred, targeted dataChanged.
+	QVector<QPair<offset_t, offset_t> > m_pendingRegions;
+	static const int MAX_PENDING_REGIONS = 16;
 
 friend class HexTableView;
 friend class OffsetHeader;

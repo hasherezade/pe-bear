@@ -1032,6 +1032,10 @@ bool PeHandler::substBlock(offset_t offset, uint64_t size, BYTE* buf)
 void PeHandler::backupModification(offset_t modifOffset, bufsize_t modifSize, bool continueLastOperation)
 {
 	modifHndl.backupModification(modifOffset, modifSize, continueLastOperation);
+	// Every localized edit backs up its region here before mutating, so this is the
+	// universal hook for a precise (deferred) hex-view repaint. The repaint itself is
+	// driven later by emit modified(); recording the region now is safe (no view work).
+	emit contentReplaced(modifOffset, modifSize);
 }
 
 void PeHandler::backupResize(bufsize_t newSize, bool continueLastOperation)
@@ -1046,7 +1050,14 @@ void PeHandler::unbackupLastModification()
 
 bool PeHandler::undoLastModification()
 {
-	return modifHndl.undoLastOperation();
+	// Capture the operation's affected range BEFORE the undo pops/frees it.
+	offset_t from = INVALID_ADDR, to = 0;
+	const bool hasRange = modifHndl.getLastOperationRange(from, to);
+	const bool ok = modifHndl.undoLastOperation();
+	if (ok && hasRange && from != INVALID_ADDR && to > from) {
+		emit contentReplaced(from, (bufsize_t)(to - from));
+	}
+	return ok;
 }
 
 bool PeHandler::setBlockModified(offset_t modO, bufsize_t modSize)

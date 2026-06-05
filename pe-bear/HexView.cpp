@@ -363,7 +363,11 @@ void HexTableView::onDataSet(int col, int row)
 		return;
 	}
 	this->setCurrentIndex(nextIndx);
-	this->edit(nextIndx);
+	// Use the protected bool overload instead of the public edit(index) slot: under fast
+	// editing the auto-advance can land while a commit is still settling, in which case
+	// opening the editor fails harmlessly. The public slot would warn ("editing failed");
+	// here we just let the cursor advance without forcing the editor open.
+	this->edit(nextIndx, QAbstractItemView::AllEditTriggers, NULL);
 }
 
 void HexTableView::updateFollowAction()
