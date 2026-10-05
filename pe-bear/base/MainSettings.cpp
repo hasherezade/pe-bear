@@ -107,6 +107,9 @@ bool MainSettings::readPersistent()
 	this->lExePath = settings.value("LastOpened", false).toString();
 	this->dirDump = settings.value("LastDumpDir", false).toString();
 	this->language = settings.value("language", false).toString();
+#ifdef PEBEAR_WITH_UPDATER
+	this->updSettings.read(settings);
+#endif
 	if (settings.status() != QSettings::NoError ) {
 		return false;
 	}
@@ -123,6 +126,9 @@ bool MainSettings::writePersistent()
 	settings.setValue("LastOpened", this->lExePath);
 	settings.setValue("LastDumpDir", this->dirDump);
 	settings.setValue("language", this->language);
+#ifdef PEBEAR_WITH_UPDATER
+	this->updSettings.write(settings);
+#endif
 	if ( settings.status() == QSettings::NoError ) {
 		return true;
 	}
