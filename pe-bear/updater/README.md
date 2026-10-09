@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD043 -->
 # Update check
 
 Tells the user when a newer PE-bear release exists. That is the whole feature:
