@@ -56,6 +56,15 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	fLayout2->setSizeConstraint(QLayout::SetMaximumSize);
 	
 	autoSaveTagsCBox.setText(tr("Auto-save tags"));
+
+#ifdef PEBEAR_WITH_UPDATER
+	updatesGroup.setTitle(tr("Updates"));
+	autoCheckUpdatesCBox.setText(tr("Check for new versions automatically"));
+	autoCheckUpdatesCBox.setToolTip(tr("Asks GitHub at most once a day, after the window is shown. Nothing is downloaded."));
+	QVBoxLayout *updatesLayout = new QVBoxLayout();
+	updatesLayout->addWidget(&autoCheckUpdatesCBox);
+	updatesGroup.setLayout(updatesLayout);
+#endif
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	okButton.setText(tr("Save"));
 	connect(&okButton, SIGNAL(clicked()), this, SLOT(onOkClicked()));
@@ -71,6 +80,9 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	topLayout.addLayout(fLayout1);
 	topLayout.addLayout(fLayout3);
 	topLayout.addWidget(&autoSaveTagsCBox);
+#ifdef PEBEAR_WITH_UPDATER
+	topLayout.addWidget(&updatesGroup);
+#endif
 	topLayout.addLayout(fLayout2);
 
 	topLayout.addStretch();
@@ -146,6 +158,9 @@ void UserConfigWindow::refreshSettingsView()
 	uddDirEdit.setText(settings->userDataDir());
 	languageEdit.setCurrentIndex(getLanguageIndex(settings->language));
 	autoSaveTagsCBox.setChecked(settings->isAutoSaveTags());
+#ifdef PEBEAR_WITH_UPDATER
+	autoCheckUpdatesCBox.setChecked(settings->updateSettings().isAutoCheckEnabled());
+#endif
 	setReloadMode(settings->isReloadOnFileChange());
 }
 
@@ -161,6 +176,9 @@ void UserConfigWindow::onOkClicked()
 	this->settings->language = languageEdit.currentText();
 	this->settings->setUserDataDir(fName);
 	this->settings->setAutoSaveTags(autoSaveTagsCBox.isChecked());
+#ifdef PEBEAR_WITH_UPDATER
+	this->settings->updateSettings().setAutoCheckEnabled(autoCheckUpdatesCBox.isChecked());
+#endif
 
 	const t_reload_mode rMode = getReloadMode();
 	this->settings->setReloadOnFileChange(rMode);
