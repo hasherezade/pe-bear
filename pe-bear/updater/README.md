@@ -31,23 +31,28 @@ is the release's `html_url` as returned by the API, and only if it points at
 
 ## Layout
 
-| File | Role |
-|---|---|
-| `Version.*` | strict numeric release versions; the number itself lives only in `rebear_ver_short.h` |
-| `ReleaseClient.*` | the bounded GitHub Releases API client |
-| `UpdateSettings.*` | `AutoCheck`, `CheckIntervalHours`, `LastCheck`, `SkippedVersion` in the `Updates` group of the existing `QSettings` |
-| `UpdateChecker.*` | compare and decide; takes any `IReleaseSource`, so it is tested without a network |
-| `UpdateTypes.*` | states, errors and their messages, the release structs |
-| `gui/UpdateDialog.*`, `gui/UpdateCoordinator.*` | the one dialog and the once-a-day timer; the only QtWidgets code |
-| `tests/` | `tst_version`, `tst_releaseclient` (fixtures, no network), `tst_updatesettings`, `tst_updatechecker`, and a check that the core library links no QtWidgets |
+- `Version.*`: strict numeric release versions; the number itself lives
+  only in `rebear_ver_short.h`.
+- `ReleaseClient.*`: the bounded GitHub Releases API client.
+- `UpdateSettings.*`: `AutoCheck`, `CheckIntervalHours`, `LastCheck` and
+  `SkippedVersion` in the `Updates` group of the existing `QSettings`.
+- `UpdateChecker.*`: compare and decide; takes any `IReleaseSource`, so it
+  is tested without a network.
+- `UpdateTypes.*`: states, errors and their messages, the release structs.
+- `gui/UpdateDialog.*`, `gui/UpdateCoordinator.*`: the one dialog and the
+  once-a-day timer; the only QtWidgets code.
+- `tests/`: `tst_version`, `tst_releaseclient` (fixtures, no network),
+  `tst_updatesettings`, `tst_updatechecker`, and a check that the core
+  library links no QtWidgets.
 
 `pebear_update_core` links Qt Core and Qt Network only; the GUI part is
 compiled into the PE-bear target.
 
 ## Build options
 
-| Option | Default | Meaning |
-|---|---|---|
-| `PEBEAR_ENABLE_UPDATER` | `ON` | build the update check at all (forced off on Qt4) |
-| `PEBEAR_BUILD_UPDATER_TESTS` | `OFF` | build and register the unit tests (needs Qt Test) |
-| `PEBEAR_UPDATE_REPOSITORY` | *(empty)* | GitHub repository to check, `owner/name`; empty means `hasherezade/pe-bear` |
+- `PEBEAR_ENABLE_UPDATER` (default `ON`): build the update check at all;
+  forced off on Qt4.
+- `PEBEAR_BUILD_UPDATER_TESTS` (default `OFF`): build and register the unit
+  tests; needs Qt Test.
+- `PEBEAR_UPDATE_REPOSITORY` (default empty): GitHub repository to check,
+  as `owner/name`; empty means `hasherezade/pe-bear`.

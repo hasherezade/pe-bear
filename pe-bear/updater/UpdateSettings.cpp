@@ -52,7 +52,7 @@ bool UpdateSettings::isAutomaticCheckDue(const QDateTime &now) const
 	return elapsedSecs >= (static_cast<qint64>(m_checkIntervalHours) * 3600);
 }
 
-void UpdateSettings::read(QSettings &settings)
+void UpdateSettings::load(QSettings &settings)
 {
 	settings.beginGroup(QLatin1String(SETTINGS_GROUP));
 	m_autoCheck = settings.value(QLatin1String(KEY_AUTO_CHECK), true).toBool();
@@ -70,7 +70,7 @@ void UpdateSettings::read(QSettings &settings)
 	settings.endGroup();
 }
 
-void UpdateSettings::write(QSettings &settings) const
+void UpdateSettings::save(QSettings &settings) const
 {
 	settings.beginGroup(QLatin1String(SETTINGS_GROUP));
 	settings.setValue(QLatin1String(KEY_AUTO_CHECK), m_autoCheck);

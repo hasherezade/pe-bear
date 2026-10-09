@@ -45,8 +45,8 @@ public:
 	 */
 	bool isAutomaticCheckDue(const QDateTime &now) const;
 
-	void read(QSettings &settings);
-	void write(QSettings &settings) const;
+	void load(QSettings &settings);
+	void save(QSettings &settings) const;
 
 private:
 	bool m_autoCheck;

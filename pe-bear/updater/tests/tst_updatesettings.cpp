@@ -116,16 +116,16 @@ void TestUpdateSettings::survivesARoundTripThroughQSettings()
 	written.setSkippedVersion(Version::fromString(QLatin1String("0.9.1")));
 
 	QSettings settings;
-	written.write(settings);
+	written.save(settings);
 	settings.sync();
 
-	UpdateSettings read;
-	read.read(settings);
+	UpdateSettings loaded;
+	loaded.load(settings);
 
-	QCOMPARE(read.isAutoCheckEnabled(), false);
-	QCOMPARE(read.checkIntervalHours(), 12);
-	QCOMPARE(read.lastCheck(), when);
-	QCOMPARE(read.skippedVersion(), QString("0.9.1"));
+	QCOMPARE(loaded.isAutoCheckEnabled(), false);
+	QCOMPARE(loaded.checkIntervalHours(), 12);
+	QCOMPARE(loaded.lastCheck(), when);
+	QCOMPARE(loaded.skippedVersion(), QString("0.9.1"));
 }
 
 void TestUpdateSettings::ignoresACorruptStoredVersion()
@@ -137,7 +137,7 @@ void TestUpdateSettings::ignoresACorruptStoredVersion()
 	settings.sync();
 
 	UpdateSettings s;
-	s.read(settings);
+	s.load(settings);
 	QVERIFY2(s.skippedVersion().isEmpty(), "a corrupt stored version was trusted");
 }
 

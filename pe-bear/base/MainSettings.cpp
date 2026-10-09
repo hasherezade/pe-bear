@@ -108,7 +108,7 @@ bool MainSettings::readPersistent()
 	this->dirDump = settings.value("LastDumpDir", false).toString();
 	this->language = settings.value("language", false).toString();
 #ifdef PEBEAR_WITH_UPDATER
-	this->updSettings.read(settings);
+	this->updSettings.load(settings);
 #endif
 	if (settings.status() != QSettings::NoError ) {
 		return false;
@@ -127,7 +127,7 @@ bool MainSettings::writePersistent()
 	settings.setValue("LastDumpDir", this->dirDump);
 	settings.setValue("language", this->language);
 #ifdef PEBEAR_WITH_UPDATER
-	this->updSettings.write(settings);
+	this->updSettings.save(settings);
 #endif
 	if ( settings.status() == QSettings::NoError ) {
 		return true;
