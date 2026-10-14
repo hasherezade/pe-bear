@@ -33,6 +33,27 @@ else()
 	get_target_property(QtCore_location Qt${QT_VERSION_MAJOR}::Core LOCATION)
 endif()
 
+# The update check needs Qt Network and the Qt5/Qt6 API; a Qt4 build simply
+# does not get it.
+set(PEBEAR_UPDATER_ACTIVE OFF)
+if(PEBEAR_ENABLE_UPDATER)
+	if(USE_QT4)
+		message(STATUS "updater: disabled (Qt4 build)")
+	else()
+		find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
+		if(PEBEAR_BUILD_UPDATER_TESTS)
+			find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Test REQUIRED)
+		endif()
+		set(PEBEAR_UPDATER_ACTIVE ON)
+		# A directory-level definition, not only a property of the library
+		# target: moc runs through qt_wrap_cpp below and only sees definitions
+		# added here. Without it, moc skips the #ifdef'd slots and the menu
+		# action silently fails to connect at runtime.
+		add_definitions(-DPEBEAR_WITH_UPDATER=1)
+		message(STATUS "updater: enabled")
+	endif()
+endif()
+
 include_directories( ${PARSER_INC} )
 include_directories( ${SIGFIND_INC} )
 include_directories( ${DISASM_DIR} ${CAPSTONE_INC})
@@ -240,7 +261,21 @@ set (pebear_windows_hdrs
 	gui/windows/MainWindow.h
 )
 
+set (pebear_updater_gui_srcs)
+set (pebear_updater_gui_hdrs)
+if(PEBEAR_UPDATER_ACTIVE)
+	set (pebear_updater_gui_srcs
+		updater/gui/UpdateDialog.cpp
+		updater/gui/UpdateCoordinator.cpp
+	)
+	set (pebear_updater_gui_hdrs
+		updater/gui/UpdateDialog.h
+		updater/gui/UpdateCoordinator.h
+	)
+endif()
+
 set (pebear_srcs
+	${pebear_updater_gui_srcs}
 	${pebear_threads_srcs}
 	${pebear_base_srcs}
 	${pebear_gui_base_srcs}
@@ -262,7 +297,12 @@ set (pebear_hdrs
 	${pebear_gui_pe_mod_hdrs}
 	${pebear_windows_hdrs}
 	${pebear_followable_hdrs}
+	${pebear_updater_gui_hdrs}
 )
+
+if(PEBEAR_UPDATER_ACTIVE)
+	add_subdirectory(updater)
+endif()
 
 set (rsrc
 	rebear_res.rc
@@ -340,6 +380,10 @@ if(USE_QT4)
 	target_link_libraries (${PROJECT_NAME} ${QT_QTGUI_LIBRARIES} ${QT_QTCORE_LIBRARIES})
 else()	
 	target_link_libraries (${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
+endif()
+
+if(PEBEAR_UPDATER_ACTIVE)
+	target_link_libraries (${PROJECT_NAME} pebear_update_core)
 endif()
 
 install(TARGETS ${PROJECT_NAME}

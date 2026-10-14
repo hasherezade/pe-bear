@@ -5,6 +5,10 @@
 #include <bearparser/bearparser.h>
 #include "../ViewSettings.h"
 
+#ifdef PEBEAR_WITH_UPDATER
+	#include "../updater/UpdateSettings.h"
+#endif
+
 #define APP_NAME "PE-bear"
 #define COMPANY_NAME APP_NAME
 
@@ -411,10 +415,19 @@ public:
 	bool readPersistent();
 	bool writePersistent();
 
+#ifdef PEBEAR_WITH_UPDATER
+	/* Update-check preferences travel with the rest of the configuration. */
+	pe_bear::updater::UpdateSettings& updateSettings() { return updSettings; }
+	const pe_bear::updater::UpdateSettings& updateSettings() const { return updSettings; }
+#endif
+
 	QString dirDump;
 	QString language;
 
 protected:
+#ifdef PEBEAR_WITH_UPDATER
+	pe_bear::updater::UpdateSettings updSettings;
+#endif
 	bool followOnClick;
 	QString uDataDir;
 	QString lExePath;

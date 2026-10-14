@@ -28,6 +28,10 @@
 
 #include "../../ViewSettings.h"
 
+#ifdef PEBEAR_WITH_UPDATER
+	#include "../../updater/gui/UpdateCoordinator.h"
+#endif
+
 //----------------------------------------------
 
 class MainWindow : public QMainWindow
@@ -62,6 +66,10 @@ public slots:
 	void searchPattern(PeHandler*);
 
 	void openSignatures();
+
+#ifdef PEBEAR_WITH_UPDATER
+	void checkForUpdates();
+#endif
 
 	void viewSignatures()
 	{
@@ -194,6 +202,12 @@ private:
 
 	//-------------------------
 	QLabel urlLabel;
+
+#ifdef PEBEAR_WITH_UPDATER
+	QMenu *helpMenu;
+	QAction *checkUpdatesAction;
+	UpdateCoordinator *updateCoordinator;
+#endif
 
 	QMenu *fileMenu, 
 		*settingsMenu,

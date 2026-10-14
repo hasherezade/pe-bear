@@ -10,6 +10,12 @@ set ( M_CAPSTONE "capstone" )
 option(USE_QT4 "Use Qt4" OFF )
 option(USE_QT5 "Use Qt5" OFF )
 option(SHOW_CONSOLE "Show debug console" OFF )
+option(PEBEAR_ENABLE_UPDATER "Build the update check (Help -> Check for Updates)" ON )
+option(PEBEAR_BUILD_UPDATER_TESTS "Build the update check's unit tests" OFF )
+if(PEBEAR_BUILD_UPDATER_TESTS)
+	# must be called from the top level so that ctest finds the cases
+	enable_testing()
+endif()
 
 # libraries should be searched in a local directory of the binary
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

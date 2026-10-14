@@ -54,6 +54,11 @@ private:
 	QComboBox reloadFileStates;
 	QCheckBox autoSaveTagsCBox;
 
+#ifdef PEBEAR_WITH_UPDATER
+	QGroupBox updatesGroup;
+	QCheckBox autoCheckUpdatesCBox;
+#endif
+
 	MainSettings *settings;
 };
 

@@ -49,6 +49,9 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	rightPanel(this), 
 	signWindow(signatures, this),
 	currentVer(V_MAJOR, V_MINOR, V_PATCH, V_PATCH_SUB, V_DESC),
+#ifdef PEBEAR_WITH_UPDATER
+	helpMenu(NULL), checkUpdatesAction(NULL), updateCoordinator(NULL),
+#endif
 	guiSettings()
 {
 	// load the saved settings:
@@ -74,6 +77,11 @@ MainWindow::MainWindow(MainSettings &_mainSettings, QWidget *parent)
 	guiSettings.readPersistent();
 	selectCurrentStyle();
 	startTimer();
+
+#ifdef PEBEAR_WITH_UPDATER
+	/* Created here, but it does nothing until the window is actually shown. */
+	updateCoordinator = new UpdateCoordinator(&this->mainSettings.updateSettings(), this);
+#endif
 
 	// try to load from alternative files:
 	const QString sigFile1 = this->mainSettings.userDataDir() + QDir::separator() + SIG_FILE;
@@ -340,6 +348,11 @@ void MainWindow::createActions()
 	infoAction = new QAction(tr("&Info"), this);
 	connect(this->infoAction, SIGNAL(triggered()), this, SLOT(info()));
 
+#ifdef PEBEAR_WITH_UPDATER
+	checkUpdatesAction = new QAction(tr("Check for &Updates..."), this);
+	connect(this->checkUpdatesAction, SIGNAL(triggered()), this, SLOT(checkForUpdates()));
+#endif
+
 	openDiffWindowAction = new QAction(tr("Compare"), this);
 	connect(this->openDiffWindowAction, SIGNAL(triggered()), this, SLOT(openDiffWindow()) );
 	
@@ -410,6 +423,11 @@ void MainWindow::createMenus()
 
 	// Signatures menu
 	this->signaturesMenu = this->settingsMenu->addMenu(tr("Si&gnatures"));
+
+#ifdef PEBEAR_WITH_UPDATER
+	this->helpMenu = menuBar()->addMenu(tr("&Help"));
+	this->helpMenu->addAction(this->checkUpdatesAction);
+#endif
 
 	menuBar()->addAction(this->openDiffWindowAction);
 	menuBar()->addAction(this->infoAction);
@@ -777,6 +795,13 @@ void MainWindow::showEvent(QShowEvent * event)
 {
 	this->readPersistent();
 	QMainWindow::showEvent(event);
+#ifdef PEBEAR_WITH_UPDATER
+	/* After the window is on screen, never before: a slow or unreachable
+	   network must not delay PE-bear becoming usable. */
+	if (this->updateCoordinator) {
+		this->updateCoordinator->onApplicationReady();
+	}
+#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -793,6 +818,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 	unloadAllPEs();
 }
+
+#ifdef PEBEAR_WITH_UPDATER
+void MainWindow::checkForUpdates()
+{
+	if (!this->updateCoordinator) return;
+	this->updateCoordinator->checkManually();
+}
+#endif
 
 void MainWindow::info()
 {
