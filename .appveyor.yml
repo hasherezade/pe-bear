@@ -125,6 +125,7 @@ for:
      - cp "%QT%\bin\Qt%QT_VER%Core%DLL_SUFFIX%" %artifactName%
      - cp "%QT%\bin\Qt%QT_VER%Gui%DLL_SUFFIX%" %artifactName%
      - cp "%QT%\bin\Qt%QT_VER%Widgets%DLL_SUFFIX%" %artifactName%
+     - cp "%QT%\bin\Qt%QT_VER%Network%DLL_SUFFIX%" %artifactName%
      - mkdir %artifactName%\platforms
      - mkdir %artifactName%\styles
      - mkdir %artifactName%\imageformats
