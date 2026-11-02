@@ -30,19 +30,20 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	dirButton.setToolTip(tr("Open"));
 	connect(&dirButton, SIGNAL(clicked()), this, SLOT(onDirChose()));
 	
-	QHBoxLayout *fLayout1 = new QHBoxLayout();
-	QHBoxLayout *fLayout1A = new QHBoxLayout();
-	QHBoxLayout *fLayout2 = new QHBoxLayout();
-	QHBoxLayout *fLayout3 = new QHBoxLayout();
+	QHBoxLayout * fUserDirChooseLayout = new QHBoxLayout();
+	QHBoxLayout *fUserDirChooseLayout2 = new QHBoxLayout();
+	QHBoxLayout *fReloadFileLayout = new QHBoxLayout();
+	QHBoxLayout *fLanguageLayout = new QHBoxLayout();
+
 	uddDirLabel.setText(tr("User Data Directory: "));
 	languageLabel.setText(tr("Language"));
 
-	fLayout1->addWidget(&uddDirLabel);
-	fLayout1->addLayout(fLayout1A);
-	fLayout1A->addWidget(&uddDirEdit);
-	fLayout1A->addWidget(&dirButton);
-	fLayout3->addWidget(&languageLabel);
-	fLayout3->addWidget(&languageEdit);
+	fUserDirChooseLayout->addWidget(&uddDirLabel);
+	fUserDirChooseLayout->addLayout(fUserDirChooseLayout2);
+	fUserDirChooseLayout2->addWidget(&uddDirEdit);
+	fUserDirChooseLayout2->addWidget(&dirButton);
+	fLanguageLayout->addWidget(&languageLabel);
+	fLanguageLayout->addWidget(&languageEdit);
 	languageEdit.insertItem(0, tr("en_US (default)"));
 	languageEdit.setToolTip(tr("Changing the language version requires application restart"));
 
@@ -51,20 +52,18 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	reloadFileStates.addItem(tr("Ask     "), RELOAD_ASK);
 	reloadFileStates.addItem(tr("Reload  "), RELOAD_AUTO);
 	
-	fLayout2->addWidget(&reloadFileLabel);
-	fLayout2->addWidget(&reloadFileStates);
-	fLayout2->setSizeConstraint(QLayout::SetMaximumSize);
+	fReloadFileLayout->addWidget(&reloadFileLabel);
+	fReloadFileLayout->addWidget(&reloadFileStates);
+	fReloadFileLayout->setSizeConstraint(QLayout::SetMaximumSize);
 	
 	autoSaveTagsCBox.setText(tr("Auto-save tags"));
+	autoSaveTagsCBox.setToolTip(tr("If selected, all tags applied in the currently loaded PE will be saved automatically on exit."));
 
 #ifdef PEBEAR_WITH_UPDATER
-	updatesGroup.setTitle(tr("Updates"));
-	autoCheckUpdatesCBox.setText(tr("Check for new versions automatically"));
-	autoCheckUpdatesCBox.setToolTip(tr("Asks GitHub at most once a day, after the window is shown. Nothing is downloaded."));
-	QVBoxLayout *updatesLayout = new QVBoxLayout();
-	updatesLayout->addWidget(&autoCheckUpdatesCBox);
-	updatesGroup.setLayout(updatesLayout);
-#endif
+	autoCheckUpdatesCBox.setText(tr("Auto-check for PE-bear updates"));
+	autoCheckUpdatesCBox.setToolTip(tr("If selected, you will get a pop-up notification if a new PE-bear version is available.\nMax one notification a day.\nNo automatic download."));
+#endif //PEBEAR_WITH_UPDATER
+
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	okButton.setText(tr("Save"));
 	connect(&okButton, SIGNAL(clicked()), this, SLOT(onOkClicked()));
@@ -76,15 +75,14 @@ UserConfigWindow::UserConfigWindow(QWidget *parent)
 	buttonLayout->addWidget(&okButton);
 	//buttonLayout->addStretch();
 	buttonLayout->addWidget(&cancelButton);
-    
-	topLayout.addLayout(fLayout1);
-	topLayout.addLayout(fLayout3);
+
+	topLayout.addLayout(fUserDirChooseLayout);
+	topLayout.addLayout(fLanguageLayout);
+	topLayout.addLayout(fReloadFileLayout);
 	topLayout.addWidget(&autoSaveTagsCBox);
 #ifdef PEBEAR_WITH_UPDATER
-	topLayout.addWidget(&updatesGroup);
+	topLayout.addWidget(&autoCheckUpdatesCBox);
 #endif
-	topLayout.addLayout(fLayout2);
-
 	topLayout.addStretch();
 	topLayout.addLayout(buttonLayout);
 
