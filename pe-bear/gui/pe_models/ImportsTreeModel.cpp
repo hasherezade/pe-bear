@@ -1,4 +1,5 @@
 #include "ImportsTreeModel.h"
+#include "../../base/InPlaceText.h"
 
 //-----------------------------------------------------------------------------
 
@@ -89,10 +90,11 @@ bool ImportsTreeModel::setData(const QModelIndex &index, const QVariant &value, 
 		if (!textPtr) return false;
 
 		offset = entry->getOffset(textPtr);
-		fieldSize = text.size() + 2;
+		fieldSize = in_place_text::capacity(m_PE, textPtr);
+		if (!in_place_text::fits(text, fieldSize)) return false; // would overwrite what follows
 
 		this->myPeHndl->backupModification(offset, fieldSize);
-		isModified = m_PE->setTextValue(textPtr, text.toStdString(), fieldSize);
+		isModified = in_place_text::write(textPtr, fieldSize, text);
 
 	} else {
 		
@@ -251,9 +253,11 @@ bool ImportedFuncModel::setData(const QModelIndex &index, const QVariant &value,
 			offset = entry->getOffset(textPtr, true);
 			if (offset == INVALID_ADDR) return false;
 
-			fieldSize = text.length() + 2;
+			fieldSize = in_place_text::capacity(m_PE, textPtr);
+			/* A longer name would overwrite what follows it in the image. */
+			if (!in_place_text::fits(text, fieldSize)) return false;
 			this->myPeHndl->backupModification(offset, fieldSize);
-			isModified = m_PE->setTextValue(textPtr, text.toStdString(), fieldSize);
+			isModified = in_place_text::write(textPtr, fieldSize, text);
 			break;
 		}
 		case ORDINAL:

@@ -1,4 +1,5 @@
 #include "BoundImpTreeModel.h"
+#include "../../base/InPlaceText.h"
 #include "../../DateDisplay.h"
 
 //-----------------------------------------------------------------------------
@@ -86,10 +87,11 @@ bool BoundImpTreeModel::setData(const QModelIndex &index, const QVariant &value,
 		if (!textPtr) return false;
 
 		offset = entry->getOffset(textPtr);
-		fieldSize = text.size() + 1;
-
+		fieldSize = in_place_text::capacity(m_PE, textPtr);
+		/* A longer name would overwrite what follows it in the image. */
+		if (!in_place_text::fits(text, fieldSize)) return false;
 		this->myPeHndl->backupModification(offset, fieldSize);
-		isModified = m_PE->setTextValue(textPtr, text.toStdString(), text.size());
+		isModified = in_place_text::write(textPtr, fieldSize, text);
 
 	} else {
 
