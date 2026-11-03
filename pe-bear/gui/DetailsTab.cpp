@@ -184,7 +184,7 @@ DetailsTab::DetailsTab(PeHandler *peHndl, QWidget *parent)
 	dirSplitters[pe::DIR_DEBUG]->title = tr("Debug");
 
 	// EXCEPTION
-	dirSplitters[pe::DIR_EXCEPTION] = new DataDirWrapperSplitter(this->myPeHndl, pe::DIR_EXCEPTION, exceptionModel, NULL, NULL);
+	dirSplitters[pe::DIR_EXCEPTION] = new ExceptionDirSplitter(this->myPeHndl, exceptionModel, NULL);
 	dirSplitters[pe::DIR_EXCEPTION]->title = tr("Exception");
 
 	// RESOURCES

@@ -61,3 +61,25 @@ public slots:
 private:
 	QAction* saveCertAction;
 };
+
+//-----------------------------
+
+/** The Exceptions table, with the controls of its paging in the tool bar. */
+class ExceptionDirSplitter : public DataDirWrapperSplitter
+{
+	Q_OBJECT
+public:
+	ExceptionDirSplitter(PeHandler *peHndl, ExceptionTreeModel *model, QWidget *parent);
+
+public slots:
+	/** Brings the controls in line with the model. */
+	void refreshPagingControls();
+
+private:
+	void initPagingControls();
+
+	ExceptionTreeModel *exceptionModel;
+	QLabel *countLabel;
+	QSpinBox *pageBox;
+	QSpinBox *perPageBox;
+};

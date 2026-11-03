@@ -127,3 +127,56 @@ void SecurityDirSplitter::onSaveCert()
 		QMessageBox::warning(this, tr("Failed"), tr("Dumping failed!"));
 	}
 }
+
+//----------------------------------
+
+ExceptionDirSplitter::ExceptionDirSplitter(PeHandler *peHndl, ExceptionTreeModel *model, QWidget *parent)
+	: DataDirWrapperSplitter(peHndl, pe::DIR_EXCEPTION, model, NULL, parent),
+	exceptionModel(model), countLabel(NULL), pageBox(NULL), perPageBox(NULL)
+{
+	initPagingControls();
+}
+
+void ExceptionDirSplitter::initPagingControls()
+{
+	countLabel = new QLabel(this);
+	pageBox = new QSpinBox(this);
+	perPageBox = new QSpinBox(this);
+
+	perPageBox->setRange(ExceptionTreeModel::MIN_PER_PAGE, ExceptionTreeModel::MAX_PER_PAGE);
+	perPageBox->setSingleStep(ExceptionTreeModel::MIN_PER_PAGE);
+	perPageBox->setValue(exceptionModel->maxPerPage());
+
+	toolBar.addSeparator();
+	toolBar.addWidget(countLabel);
+	toolBar.addWidget(new QLabel(tr("Page"), this));
+	toolBar.addWidget(pageBox);
+	toolBar.addWidget(new QLabel(tr("Max per page"), this));
+	toolBar.addWidget(perPageBox);
+
+	connect(pageBox, SIGNAL(valueChanged(int)), exceptionModel, SLOT(setPage(int)));
+	connect(perPageBox, SIGNAL(valueChanged(int)), exceptionModel, SLOT(setMaxPerPage(int)));
+	/* modelReset: the directory itself was rewrapped, e.g. after an edit */
+	connect(exceptionModel, SIGNAL(pagingChanged()), this, SLOT(refreshPagingControls()));
+	connect(exceptionModel, SIGNAL(modelReset()), this, SLOT(refreshPagingControls()));
+	refreshPagingControls();
+}
+
+void ExceptionDirSplitter::refreshPagingControls()
+{
+	if (!pageBox) return;
+	const int total = exceptionModel->totalCount();
+	const int pages = exceptionModel->pagesCount();
+
+	/* the controls follow the model here, so they must not feed it back */
+	const bool pageWas = pageBox->blockSignals(true);
+	const bool perPageWas = perPageBox->blockSignals(true);
+	pageBox->setRange(0, qMax(0, pages - 1));
+	pageBox->setValue(exceptionModel->page());
+	pageBox->setToolTip(tr("Total pages") + ": " + QString::number(pages));
+	perPageBox->setValue(exceptionModel->maxPerPage());
+	pageBox->blockSignals(pageWas);
+	perPageBox->blockSignals(perPageWas);
+
+	countLabel->setText(tr("Records: %1").arg(total));
+}
